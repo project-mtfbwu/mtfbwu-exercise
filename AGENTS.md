@@ -56,7 +56,8 @@ When Increment 0 is authorized, follow `docs/architecture/BUILD_INCREMENTS.md`.
 | `docs/architecture/REFERENCE_PROJECTS_RESEARCH.md` | External research |
 | `docs/architecture/BUILD_INCREMENTS.md` | Delivery sequence |
 | `docs/architecture/ADR/` | Architecture decisions |
-| `docs/design-references/README.md` | Approved visual direction |
+| `docs/design-references/README.md` | Approved visual references |
+| `docs/design-system/` | Extracted design system + compliance |
 | `.cursor/rules/` | Always-on agent constraints |
 
 ## Stack decisions (locked by ADR)
@@ -70,7 +71,7 @@ When Increment 0 is authorized, follow `docs/architecture/BUILD_INCREMENTS.md`.
 
 GeoCities-inspired: dark grid background, glitter typography, torn-paper cards, pixel stickers, retro desktop-window chrome, flat-lay board. Animation modes: **full**, **reduced**, **disabled**.
 
-See `docs/design-references/README.md` and `.cursor/rules/visual-direction.mdc`.
+See `docs/design-references/README.md`, `docs/design-system/`, and `.cursor/rules/visual-direction.mdc`.
 
 ## Open-source reuse policy
 

@@ -1,15 +1,26 @@
 ---
-description: MTFBWU GeoCities flat-lay visual direction
+description: MTFBWU GeoCities flat-lay visual direction and reference compliance
 alwaysApply: true
 ---
 
 # Visual direction
 
-- Follow `docs/design-references/README.md`, `UI_ARCHITECTURE.md`, ADR 0003.
+- Follow `docs/design-references/`, `docs/design-system/`, `UI_ARCHITECTURE.md`, ADR 0003.
 - Aesthetic: GeoCities-inspired, dark grid, glitter typography, torn-paper cards, pixel stickers, retro desktop windows, flat-lay board.
 - Normal mode: all **enabled** modules visible together.
 - Focus mode: selected module lifts; **board stays visible behind**.
 - Animation modes: `full` | `reduced` | `disabled`; honor `prefers-reduced-motion`.
-- Do not ship purple-indigo SaaS gradients or cream/terracotta AI-default looks.
-- Do not turn the board into a KPI dashboard or social feed.
-- If reference images are missing, ask for them before polishing UI — do not invent a new brand direction.
+- Do not ship purple-indigo SaaS gradients, cream/terracotta AI-default looks, or KPI dashboards.
+- Do not turn the board into a social feed or poster/infographic as the live UI.
+
+## Before any UI work
+
+1. Inspect relevant images under `docs/design-references/` (open them).
+2. Cite those filenames in the implementation report.
+3. For screens without a direct reference, use `docs/design-system/` (especially `FOCUS_MODE.md` + `REFERENCE_CATALOG.md`, usually via `01` + `10`).
+4. Meet WCAG 2.2 AA (`docs/design-system/ACCESSIBILITY.md`).
+5. Preserve flat-lay + focus behavior (`FOCUS_MODE.md`, `RESPONSIVE_BEHAVIOR.md`).
+6. Never replace this design with standard dashboard/admin components.
+7. Never use a generated reference image as the actual clickable application surface — rebuild with live HTML/CSS/SVG components.
+8. Do not copy generated-image mistakes (typos, fake values, garbled text, non-functional chrome).
+9. Run `docs/design-system/REFERENCE_COMPLIANCE_CHECKLIST.md` before calling UI work done.

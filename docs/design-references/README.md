@@ -1,54 +1,53 @@
 # Design references — MTFBWU
 
-Approved visual direction for the MTFBWU flat-lay board UI.
+Approved visual references for the MTFBWU flat-lay board UI.
 
-## Status of image assets
+## How to use
 
-**Inspection date:** 2026-07-26
+1. Open the relevant image(s) before any UI work.
+2. Follow the extracted system in `docs/design-system/` — especially `REFERENCE_CATALOG.md` and `DESIGN_SYSTEM.md`.
+3. Cite filenames in implementation reports.
+4. Treat images as **visual DNA**, not production pixel specs.
+5. Never use a reference PNG/JPEG as the live clickable app surface.
 
-At planning time, `docs/design-references/` contained **no image files**. The git workspace for `project-mtfbwu/mtfbwu-exercise` was empty aside from `.git`. No chat-attached or `@Files` images were available to this agent session.
+## Inventory (inspected 2026-07-26)
 
-**Action required before Increment 1 UI work:** place approved reference images in this folder and list them in the inventory table below.
+| File | Role |
+| --- | --- |
+| `01-master-today-board.png.png` | Canonical TODAY flat-lay board |
+| `02-diet-chicken-day.png.png` | Nutrition day board (chicken) |
+| `03-diet-plant-day.png.png` | Nutrition day board (plant) |
+| `04-diet-fish-day.png.png` | Nutrition day board (fish) |
+| `05-breakfast-focus.png.png` | Meal focus over nutrition board |
+| `06-workout-routine-board.png.jpeg` | Workout routine flat-lay |
+| `07-workout-focus.png.png` | Workout session focus |
+| `08-water-focus.png.png` | Hydration focus |
+| `10-optional-tracker-focus.png.png` | Mosaic: many focus UIs + calendar/AI/barcode |
+| `11-profile-board.png.png` | Profile + customize board |
+| `12-customize-board.png.png` | Food/workout log step flows |
+| `14-overview.png` | Duplicate of 01 — prefer citing 01 |
 
-### Expected inventory (placeholders)
-
-| File (expected) | Role | Status |
-| --- | --- | --- |
-| *(to be added)* | Full flat-lay board / normal mode | **Missing** |
-| *(to be added)* | Focus mode (module lifted; board still visible) | **Missing** |
-| *(to be added)* | Torn-paper card / pixel sticker / window chrome detail | **Missing** |
-| *(to be added)* | Glitter typography / dark grid atmosphere | **Missing** |
-
-Until images land, treat the **textual direction below** and `docs/architecture/UI_ARCHITECTURE.md` / `ADR/0003` as authoritative.
+Gaps `09` / `13`: unused. Full catalog notes and mistakes: `docs/design-system/REFERENCE_CATALOG.md`.
 
 ## Approved visual direction
 
-- **Inspiration:** GeoCities / early personal-web aesthetic, not corporate SaaS
-- **Background:** dark grid (desk/board atmosphere)
-- **Typography:** glitter / expressive display treatment for brand and module titles
-- **Surfaces:** torn-paper cards for module content
-- **Ornaments:** pixel stickers as decorative accents (not primary navigation chrome)
-- **Chrome:** retro desktop-window styling for focused modules
-- **Layout:** flat-lay — all **enabled** modules visible together in normal mode
-- **Focus mode:** selected module lifts into focus; surrounding flat-lay board remains visible behind it
-- **Motion:** three modes — `full` | `reduced` | `disabled`
+- GeoCities-inspired maximalist desk board
+- Dark grid background, glitter brand type, torn-paper cards, pixel stickers, retro windows
+- Normal: all enabled modules visible together
+- Focus: module lifts; board remains visible behind
+- Motion: `full` | `reduced` | `disabled`
 
 ## What this is not
 
-- Not a dashboard of KPI cards
+- Not a SaaS KPI dashboard
 - Not a feed or social wall
-- Not Odiina’s visual language (separate product)
-- Not purple-gradient / cream-serif AI default themes
+- Not Odiina
+- Not purple-indigo / cream-terracotta AI-default themes
+- Not poster layouts as the production interaction model
 
-## How agents should use this folder
+## Related
 
-1. Prefer files here over inventing a new aesthetic.
-2. When images are added, open and describe them before implementing UI.
-3. Encode reusable tokens (grid, paper texture, window chrome) as CSS variables — see `UI_ARCHITECTURE.md`.
-4. Respect `prefers-reduced-motion` and the user-selected animation mode.
-
-## Related docs
-
+- `docs/design-system/*`
 - `docs/architecture/UI_ARCHITECTURE.md`
 - `docs/architecture/ADR/0003-flat-lay-focus-ui.md`
 - `.cursor/rules/visual-direction.mdc`
