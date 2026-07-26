@@ -32,16 +32,16 @@ pnpm test:coverage
 
 ## Dependency audit
 
-**Official audit:** `pnpm audit --prod` (also the CI step).
+**Official CI/local gate:** `pnpm run audit`
 
-A manual npm registry security API probe is **not** equivalent to `pnpm audit` (different dependency graph resolution and advisory coverage). Do not treat a probe as a substitute.
+Uses the pnpm 11 bulk advisories endpoint against `pnpm-lock.yaml` (see
+`docs/development/PACKAGE_MANAGER.md`). Exit code reflects real advisories.
 
-### Local Windows limitation
+Bare `pnpm audit --prod` may still fail with `ERR_PNPM_AUDIT_BAD_RESPONSE` when
+the registry returns naked gzip — that is not a vulnerability report.
 
-On some Windows environments, `pnpm audit --prod` fails while parsing the registry response as JSON when the body is gzip-compressed, e.g.:
+### Audit ignore configuration
 
-```text
-ERROR  Unexpected token '', "... is not valid JSON
-```
-
-That is an **environment / client limitation**, not a clean audit result. After the first push, **GitHub Actions on ubuntu-latest** is the source of truth for the production audit.
+This repository has **no** `auditConfig.ignoreCves` and **no**
+`auditConfig.ignoreGhsas`. If ignores are ever needed, pnpm 11 requires GHSA IDs
+under `auditConfig.ignoreGhsas` only.

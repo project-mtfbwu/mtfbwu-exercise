@@ -1,10 +1,17 @@
-# Single-package workspace (required by pnpm for onlyBuiltDependencies persistence).
 packages:
   - "."
 
-onlyBuiltDependencies:
-  - esbuild
+# Build scripts: allow only trusted packages (pnpm 11 `allowBuilds`).
+# Preserves Increment 1 policy: esbuild yes; sharp / unrs-resolver no.
+allowBuilds:
+  esbuild: true
+  sharp: false
+  unrs-resolver: false
 
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# Fail installs when engines.node / engines.pnpm are not satisfied.
+engineStrict: true
+
+# Preserve pre-v11 install resolution behavior for Increment 1.
+# pnpm 11 defaults minimumReleaseAge to 1440 (1 day); that is an intentional
+# supply-chain default we are NOT adopting yet — document before enabling.
+minimumReleaseAge: 0

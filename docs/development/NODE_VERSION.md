@@ -27,7 +27,7 @@ Selected on **2026-07-26** from the official distribution index:
 | `.node-version`               | `24.18.0`                   |
 | `package.json` `engines.node` | `>=24.18.0 <25`             |
 | GitHub Actions                | `node-version-file: .nvmrc` |
-| `packageManager`              | `pnpm@10.14.0`              |
+| `packageManager`              | `pnpm@11.17.0`              |
 | `.npmrc`                      | `engine-strict=true`        |
 
 `engines.node` allows later **24.x** patches on developer machines without silently jumping to Node 25/26. CI and local version managers use the exact `.nvmrc` patch.

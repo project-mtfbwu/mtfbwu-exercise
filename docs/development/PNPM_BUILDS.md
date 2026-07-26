@@ -1,43 +1,40 @@
 # pnpm dependency build scripts
 
-pnpm 10+ ignores dependency `postinstall` / build scripts by default (supply-chain protection).
+pnpm ignores dependency `postinstall` / build scripts by default (supply-chain protection).
 
 ## Decision (Increment 1)
 
 **Allowlist only `esbuild`.**
 
-| Package         | Decision                              | Reason                                                                                 |
-| --------------- | ------------------------------------- | -------------------------------------------------------------------------------------- |
-| `esbuild`       | **Allowed** (`onlyBuiltDependencies`) | Required by Vitest / Vite tooling to materialize its native binary on install          |
-| `sharp`         | Ignored                               | Optional Next image optimizer native build — not required for Increment 1 verification |
-| `unrs-resolver` | Ignored                               | Optional native resolver — Next/Vitest already succeed without its build script        |
+| Package         | Decision                                  | Reason                                                                                 |
+| --------------- | ----------------------------------------- | -------------------------------------------------------------------------------------- |
+| `esbuild`       | **Allowed** (`allowBuilds.esbuild: true`) | Required by Vitest / Vite tooling to materialize its native binary on install          |
+| `sharp`         | Denied (`false`)                          | Optional Next image optimizer native build — not required for Increment 1 verification |
+| `unrs-resolver` | Denied (`false`)                          | Optional native resolver — Next/Vitest already succeed without its build script        |
 
-Configured in both `package.json` → `pnpm` and `pnpm-workspace.yaml` (pnpm 10 reads the allowlist from these):
+Configured in `pnpm-workspace.yaml` (pnpm 11; the old `onlyBuiltDependencies` / `ignoredBuiltDependencies` keys are gone):
 
 ```yaml
-onlyBuiltDependencies:
-  - esbuild
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+allowBuilds:
+  esbuild: true
+  sharp: false
+  unrs-resolver: false
 ```
 
-After adding the allowlist on an existing checkout, run once:
+After changing the allowlist on an existing checkout, run once:
 
 ```bash
 pnpm rebuild esbuild
 ```
 
-Subsequent `pnpm install` should not warn about ignored esbuild scripts.
-
 Do **not** run `pnpm approve-builds --all`. Approve additional packages only when a failing install proves a specific trusted package needs its script.
 
 ## CI consistency
 
-CI uses the same `package.json` allowlist via `pnpm install --frozen-lockfile`. No separate interactive approval step is required on GitHub Actions once this file is committed.
+CI uses the same `pnpm-workspace.yaml` allowlist via `pnpm install --frozen-lockfile`. No separate interactive approval step is required on GitHub Actions once this file is committed.
 
-## If you still see “Ignored build scripts: esbuild”
+## If you still see ignored build-script warnings
 
-1. Confirm `pnpm.onlyBuiltDependencies` includes `esbuild`.
+1. Confirm `allowBuilds.esbuild` is `true`.
 2. Re-run `pnpm install` (or `pnpm rebuild esbuild`).
 3. Do not broaden the allowlist without documenting why.

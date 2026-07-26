@@ -16,17 +16,19 @@ Why not Node 26? It is **Current**, not Active LTS yet. Production work targets 
 
 ## pnpm
 
+Pin **pnpm 11.17.0** (see `docs/development/PACKAGE_MANAGER.md`).
+
 ```bash
 corepack enable
-corepack prepare pnpm@10.14.0 --activate
-pnpm -v
+corepack prepare pnpm@11.17.0 --activate
+pnpm -v   # 11.17.0
 ```
 
-If Corepack is blocked on Windows, use `npx pnpm@10.14.0` for commands, or install pnpm via an approved team method.
+If Corepack is blocked on Windows, use `npx pnpm@11.17.0` for commands, or install pnpm via an approved team method.
 
 ### Dependency build scripts
 
-pnpm 10 blocks dependency lifecycle scripts until allowlisted. This repo allowlists **only** `esbuild` (Vitest toolchain) via `pnpm.onlyBuiltDependencies` in `package.json`. See `docs/development/PNPM_BUILDS.md`.
+pnpm blocks dependency lifecycle scripts until allowlisted. This repo allowlists **only** `esbuild` via `allowBuilds` in `pnpm-workspace.yaml`. See `docs/development/PNPM_BUILDS.md`.
 
 ## Install & run
 

@@ -20,7 +20,7 @@ Planning checkpoint: see `docs/architecture/BUILD_INCREMENTS.md`.
 ## Stack
 
 - Node **24.18.0** (Active LTS; see `docs/development/NODE_VERSION.md`)
-- pnpm **10**
+- pnpm **11.17.0** (see `docs/development/PACKAGE_MANAGER.md`)
 - Next.js App Router
 - Supabase (Auth/Postgres/Storage/RLS) — wired, not fully featured
 - Dexie offline outbox shell
@@ -29,7 +29,7 @@ Planning checkpoint: see `docs/architecture/BUILD_INCREMENTS.md`.
 
 ```bash
 corepack enable
-corepack prepare pnpm@10.14.0 --activate
+corepack prepare pnpm@11.17.0 --activate
 pnpm install
 cp .env.example .env.local
 # fill placeholder values for local boot
@@ -40,15 +40,15 @@ Open [http://localhost:3000](http://localhost:3000) → redirects to `/today`.
 
 ## Scripts
 
-| Command             | Purpose                     |
-| ------------------- | --------------------------- |
-| `pnpm dev`          | Dev server                  |
-| `pnpm build`        | Production build            |
-| `pnpm typecheck`    | `tsc --noEmit`              |
-| `pnpm lint`         | ESLint                      |
-| `pnpm format:check` | Prettier                    |
-| `pnpm test`         | Vitest                      |
-| `pnpm audit`        | Production dependency audit |
+| Command             | Purpose                                       |
+| ------------------- | --------------------------------------------- |
+| `pnpm dev`          | Dev server                                    |
+| `pnpm build`        | Production build                              |
+| `pnpm typecheck`    | `tsc --noEmit`                                |
+| `pnpm lint`         | ESLint                                        |
+| `pnpm format:check` | Prettier                                      |
+| `pnpm test`         | Vitest                                        |
+| `pnpm run audit`    | Production dependency audit (bulk advisories) |
 
 ## Architecture & design
 

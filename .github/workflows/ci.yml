@@ -9,6 +9,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -24,15 +27,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.14.0
+        uses: pnpm/action-setup@v6
+        # version comes from package.json#packageManager (pnpm@11.17.0)
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           # Pins exact Active LTS patch from .nvmrc (24.18.0)
           node-version-file: .nvmrc
@@ -57,4 +59,6 @@ jobs:
         run: pnpm build
 
       - name: Dependency audit (production)
-        run: pnpm audit --prod
+        # pnpm 11 bulk-advisories endpoint via `pnpm run audit` (see PACKAGE_MANAGER.md).
+        # Bare `pnpm audit --prod` still breaks on naked-gzip registry responses.
+        run: pnpm run audit

@@ -11,11 +11,11 @@
 
 ## Setup
 
-See `docs/development/LOCAL_SETUP.md`.
+See `docs/development/LOCAL_SETUP.md` and `docs/development/PACKAGE_MANAGER.md` (pnpm **11.17.0**).
 
 ## PR expectations
 
-- Typecheck, lint, format, tests, and build must pass (CI).
+- Typecheck, lint, format, tests, build, and `pnpm audit --prod` must pass (CI).
 - Prefer small, increment-scoped diffs.
 - No drive-by refactors unrelated to the task.
 
