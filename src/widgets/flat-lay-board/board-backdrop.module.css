@@ -1,0 +1,62 @@
+.backdrop {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: var(--mt-border-strong) solid
+    color-mix(in srgb, var(--mt-neon-purple) 55%, transparent);
+  border-radius: var(--mt-radius-lg);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(58 10 92 / 45%), transparent 55%),
+    linear-gradient(var(--mt-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mt-grid-line-alt) 1px, transparent 1px),
+    var(--mt-bg-board);
+  background-size:
+    auto,
+    28px 28px,
+    28px 28px,
+    auto;
+  box-shadow: inset 0 0 60px rgb(0 0 0 / 35%);
+}
+
+.twinkle {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 12% 18%, var(--mt-neon-yellow) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 78% 22%, var(--mt-neon-pink) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 42% 70%, var(--mt-neon-cyan) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 88% 64%, var(--mt-neon-lime) 0 1.5px, transparent 2px);
+  opacity: 0.55;
+}
+
+.twinkleFull {
+  animation: mt-twinkle 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes mt-twinkle {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkleFull {
+    animation: none;
+  }
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: var(--mt-space-4);
+}
+
+@media (min-width: 640px) {
+  .content {
+    padding: var(--mt-space-6);
+  }
+}

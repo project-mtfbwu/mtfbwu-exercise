@@ -1,0 +1,29 @@
+.paper {
+  position: relative;
+  background: var(--mt-paper);
+  color: var(--mt-ink);
+  border: var(--mt-border-strong) solid var(--mt-ink);
+  box-shadow: var(--mt-shadow-card);
+  clip-path: polygon(0% 2%, 2% 0%, 98% 0%, 100% 3%, 100% 97%, 98% 100%, 3% 100%, 0% 98%);
+}
+
+.paperWarm {
+  background: var(--mt-paper-warm);
+}
+
+.paperPink {
+  background: var(--mt-paper-pink);
+}
+
+.paperMint {
+  background: var(--mt-paper-mint);
+}
+
+.inner {
+  padding: var(--mt-space-4);
+}
+
+.dashed {
+  outline: 2px dashed color-mix(in srgb, var(--mt-neon-pink) 55%, transparent);
+  outline-offset: -10px;
+}

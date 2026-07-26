@@ -30,16 +30,16 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 1 — Application foundation** is in progress / complete when verification passes.
+**Increment 2 — Live GeoCities flat-lay board shell** is complete when verification passes and CI is green.
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do not start Increment 2 (auth UI, FlatLayBoard, domain CRUD) without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do not start Increment 3 (auth + profile + RLS) without authorization.
 
 ### Still deferred
 
-- FlatLayBoard / FocusLayer / RetroWindow components (Increment 2+)
+- Supabase Auth / profiles / RLS (Increment 3)
 - Domain Dexie tables and Supabase domain migrations
 - Barcode / USDA / OFF client libraries
-- Auth screens
+- Real module CRUD and persistence
 
 ## Source of truth (read these first)
 

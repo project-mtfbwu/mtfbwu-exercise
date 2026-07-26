@@ -22,7 +22,7 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 
 ---
 
-## Increment 1 — App skeleton + design tokens (authorized)
+## Increment 1 — App skeleton + design tokens
 
 - [x] Initialize Next.js App Router (TypeScript) + pnpm + Node 24
 - [x] PWA manifest stub
@@ -32,19 +32,48 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 - [x] Dexie outbox shell + tests
 - [x] Route placeholders, CI, docs
 
-## Increment 2 — Auth + profile + RLS skeleton
+---
+
+## Increment 2 — Live GeoCities flat-lay board shell
+
+**Goal:** Prove the core visual interaction system only (no backend / domain logic).
+
+### Deliverables
+
+- [x] Live GeoCities flat-lay Today board (`/today`)
+- [x] Reusable visual primitives (`PaperCard`, `RetroWindow`, `StickerBadge`, `PixelButton`, `NumericStepper`, `ProgressMeter`, `FlatLayCard`, …)
+- [x] Board shell (`FlatLayBoard`, `BoardBackdrop`, `DailyStatusStrip`, `TargetFooter`)
+- [x] Focus-mode interaction (`FocusLayer`, `FocusPanel`, focus trap; board stays visible/dimmed behind)
+- [x] Responsive board layouts (mobile / tablet / desktop rules)
+- [x] Motion preferences (`full` | `reduced` | `off`) with local override + `prefers-reduced-motion`
+- [x] Accessibility foundation (dialog semantics, Escape, focus restore, inert board, keyboard cards)
+- [x] Demo-only local component state for six module shells (Breakfast, Workout, Water, Meditation, Measurements, Profile)
+- [x] Visual review checklist: `docs/design-system/INCREMENT_2_VISUAL_REVIEW.md`
+
+### Explicitly out of scope for Increment 2
+
+- No Supabase domain tables or migrations
+- No authentication UI
+- No food / USDA / Open Food Facts APIs
+- No barcode scanner
+- No workout data model or real session persistence
+- No AI import
+- No real health data
+
+### Exit criteria
+
+1. Board + focus demos pass typecheck, lint, format, tests, build
+2. Production audit remains clean
+3. User accepts visual/a11y review against approved references
+
+---
+
+## Increment 3 — Auth + profile + RLS skeleton
 
 - Supabase Auth
 - `profiles` table + RLS
-- Enabled modules + animation_mode preferences
+- Enabled modules + animation_mode preferences (server-backed)
 - Logout clears Dexie
-
-## Increment 3 — Flat-lay + focus chrome
-
-- All enabled module cards visible
-- Focus lift with board behind
-- Empty states per module
-- Wire visual references once images exist
 
 ## Increment 4 — Offline kernel
 
@@ -93,11 +122,11 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 
 ## Open questions blocking crisp later increments
 
-1. Where are the approved design images, and who will add them?
-2. Preferred package manager / Node version pin?
-3. Supabase hosted vs local CLI for Increment 1?
-4. First-ship protocol set: supersets only, or drop sets too?
-5. App license for MTFBWU itself (proprietary vs permissive OSS)?
-6. Any must-have rehab fields from a clinician workflow?
+1. Preferred Supabase hosted vs local CLI for auth/RLS (Increment 3)?
+2. First-ship protocol set: supersets only, or drop sets too?
+3. App license for MTFBWU itself (proprietary vs permissive OSS)?
+4. Any must-have rehab fields from a clinician workflow?
+
+Resolved earlier: design references are in `docs/design-references/`; package manager is pnpm 11; Node is 24 Active LTS.
 
 Update this list as decisions land.

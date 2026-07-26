@@ -1,0 +1,96 @@
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.slot {
+  min-width: 0;
+}
+
+/* Mobile: slight stagger only */
+.rotBreakfast {
+  transform: rotate(-1deg);
+}
+.rotWorkout {
+  transform: rotate(1deg);
+}
+.rotWater {
+  transform: rotate(-1deg);
+}
+.rotMeditation {
+  transform: rotate(1deg);
+}
+.rotMeasurements {
+  transform: rotate(-1deg);
+}
+.rotProfile {
+  transform: rotate(1deg);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.1rem;
+  }
+
+  .rotBreakfast {
+    transform: rotate(-2deg);
+  }
+  .rotWorkout {
+    transform: rotate(2deg);
+    margin-top: 0.75rem;
+  }
+  .rotWater {
+    transform: rotate(-2deg);
+  }
+  .rotMeditation {
+    transform: rotate(2deg);
+    margin-top: -0.35rem;
+  }
+  .rotMeasurements {
+    transform: rotate(-2deg);
+  }
+  .rotProfile {
+    transform: rotate(2deg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem 1rem;
+  }
+
+  /* Controlled overlap — documented placement, not random */
+  .rotBreakfast {
+    transform: rotate(-3deg);
+    z-index: 2;
+  }
+  .rotWorkout {
+    transform: rotate(3deg);
+    margin-top: 1.25rem;
+    margin-left: -0.35rem;
+    z-index: 3;
+  }
+  .rotWater {
+    transform: rotate(-2deg);
+    margin-top: 0.5rem;
+  }
+  .rotMeditation {
+    transform: rotate(2deg);
+    margin-top: -0.75rem;
+    margin-right: -0.25rem;
+    z-index: 2;
+  }
+  .rotMeasurements {
+    transform: rotate(-4deg);
+    margin-top: 0.25rem;
+  }
+  .rotProfile {
+    transform: rotate(3deg);
+    margin-top: -0.5rem;
+    z-index: 2;
+  }
+}
