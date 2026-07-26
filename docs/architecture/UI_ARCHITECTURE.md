@@ -24,7 +24,7 @@ The home surface is a **flat-lay desk/board**: dark grid background, torn-paper 
 | --- | --- |
 | `full` | Lift transitions, glitter accents, sticker motion |
 | `reduced` | Opacity/position simplifications; no decorative loops |
-| `disabled` | Instant state changes; honor OS `prefers-reduced-motion` as floor |
+| `off` | Instant state changes; honor OS `prefers-reduced-motion` as floor (`disabled` in older docs = `off`) |
 
 User preference in profile overrides decorative motion; accessibility preference always wins when stricter.
 

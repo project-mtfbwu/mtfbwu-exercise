@@ -14,7 +14,6 @@ node_modules/
 out/
 build/
 .vercel/
-next-env.d.ts
 
 # Turbo / bundlers
 .turbo/
@@ -37,8 +36,6 @@ coverage/
 # Supabase local
 supabase/.temp/
 supabase/.branches/
-# Keep migrations tracked when added:
-# supabase/migrations/
 
 # Test / Playwright
 playwright-report/
@@ -79,3 +76,4 @@ $RECYCLE.BIN/
 *.local
 .eslintcache
 .stylelintcache
+mtfbwu-scaffold/

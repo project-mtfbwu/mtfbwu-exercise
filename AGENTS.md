@@ -30,35 +30,36 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-This repository is in **planning / foundation** until Increment 0 begins.
+**Increment 1 — Application foundation** is in progress / complete when verification passes.
 
-**Do not yet:**
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do not start Increment 2 (auth UI, FlatLayBoard, domain CRUD) without authorization.
 
-- Initialize Next.js
-- Install dependencies
-- Create database migrations
-- Write production application code
+### Still deferred
 
-When Increment 0 is authorized, follow `docs/architecture/BUILD_INCREMENTS.md`.
+- FlatLayBoard / FocusLayer / RetroWindow components (Increment 2+)
+- Domain Dexie tables and Supabase domain migrations
+- Barcode / USDA / OFF client libraries
+- Auth screens
 
 ## Source of truth (read these first)
 
-| Document | Purpose |
-| --- | --- |
-| `docs/architecture/PRODUCT.md` | Product boundaries and principles |
-| `docs/architecture/SYSTEM_ARCHITECTURE.md` | System shape |
-| `docs/architecture/DOMAIN_MODEL.md` | Domain language |
-| `docs/architecture/DATA_MODEL.md` | Persistence sketch |
-| `docs/architecture/UI_ARCHITECTURE.md` | Flat-lay + focus UI |
-| `docs/architecture/OFFLINE_SYNC.md` | Dexie / sync |
-| `docs/architecture/AI_IMPORT_PIPELINE.md` | AI import + provenance |
-| `docs/architecture/SECURITY_AND_PRIVACY.md` | Auth, RLS, private media |
-| `docs/architecture/REFERENCE_PROJECTS_RESEARCH.md` | External research |
-| `docs/architecture/BUILD_INCREMENTS.md` | Delivery sequence |
-| `docs/architecture/ADR/` | Architecture decisions |
-| `docs/design-references/README.md` | Approved visual references |
-| `docs/design-system/` | Extracted design system + compliance |
-| `.cursor/rules/` | Always-on agent constraints |
+| Document                                           | Purpose                              |
+| -------------------------------------------------- | ------------------------------------ |
+| `docs/architecture/PRODUCT.md`                     | Product boundaries and principles    |
+| `docs/architecture/SYSTEM_ARCHITECTURE.md`         | System shape                         |
+| `docs/architecture/DOMAIN_MODEL.md`                | Domain language                      |
+| `docs/architecture/DATA_MODEL.md`                  | Persistence sketch                   |
+| `docs/architecture/UI_ARCHITECTURE.md`             | Flat-lay + focus UI                  |
+| `docs/architecture/OFFLINE_SYNC.md`                | Dexie / sync                         |
+| `docs/architecture/AI_IMPORT_PIPELINE.md`          | AI import + provenance               |
+| `docs/architecture/SECURITY_AND_PRIVACY.md`        | Auth, RLS, private media             |
+| `docs/architecture/REFERENCE_PROJECTS_RESEARCH.md` | External research                    |
+| `docs/architecture/BUILD_INCREMENTS.md`            | Delivery sequence                    |
+| `docs/architecture/ADR/`                           | Architecture decisions               |
+| `docs/design-references/README.md`                 | Approved visual references           |
+| `docs/design-system/`                              | Extracted design system + compliance |
+| `docs/development/`                                | Local setup, env, testing            |
+| `.cursor/rules/`                                   | Always-on agent constraints          |
 
 ## Stack decisions (locked by ADR)
 
@@ -69,7 +70,7 @@ When Increment 0 is authorized, follow `docs/architecture/BUILD_INCREMENTS.md`.
 
 ## Visual direction (non-negotiable)
 
-GeoCities-inspired: dark grid background, glitter typography, torn-paper cards, pixel stickers, retro desktop-window chrome, flat-lay board. Animation modes: **full**, **reduced**, **disabled**.
+GeoCities-inspired: dark grid background, glitter typography, torn-paper cards, pixel stickers, retro desktop-window chrome, flat-lay board. Animation modes: **full**, **reduced**, **off** (docs historically said `disabled` — production code uses `off`).
 
 See `docs/design-references/README.md`, `docs/design-system/`, and `.cursor/rules/visual-direction.mdc`.
 

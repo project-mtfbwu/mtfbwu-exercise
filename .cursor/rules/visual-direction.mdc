@@ -9,7 +9,7 @@ alwaysApply: true
 - Aesthetic: GeoCities-inspired, dark grid, glitter typography, torn-paper cards, pixel stickers, retro desktop windows, flat-lay board.
 - Normal mode: all **enabled** modules visible together.
 - Focus mode: selected module lifts; **board stays visible behind**.
-- Animation modes: `full` | `reduced` | `disabled`; honor `prefers-reduced-motion`.
+- Animation modes: `full` | `reduced` | `off`; honor `prefers-reduced-motion`.
 - Do not ship purple-indigo SaaS gradients, cream/terracotta AI-default looks, or KPI dashboards.
 - Do not turn the board into a social feed or poster/infographic as the live UI.
 

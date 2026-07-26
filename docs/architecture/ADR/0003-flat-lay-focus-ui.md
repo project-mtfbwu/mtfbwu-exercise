@@ -15,7 +15,7 @@ Approved reference **images were missing** from `docs/design-references/` at dec
 - Normal mode: all enabled modules visible on one board
 - Focus mode: selected module lifts into retro desktop window; **board remains visible behind**
 - Visual language: dark grid, glitter type, torn-paper cards, pixel stickers, window chrome
-- Motion: `full` | `reduced` | `disabled`, with `prefers-reduced-motion` as a floor
+- Motion: `full` | `reduced` | `off`, with `prefers-reduced-motion` as a floor (`disabled` in older notes maps to `off`)
 
 ## Consequences
 

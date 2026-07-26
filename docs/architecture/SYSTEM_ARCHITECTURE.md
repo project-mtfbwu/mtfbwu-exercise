@@ -57,7 +57,7 @@ Single product, single team, shared user and calendar. Modules stay separable in
 | Online | Reads prefer local cache; writes go local + outbox → Supabase |
 | Offline | Writes stay in Dexie; UI shows sync pending |
 | Focus | One module elevated; board remains visible behind |
-| Animation | `full` / `reduced` / `disabled` |
+| Animation | `full` / `reduced` / `off` |
 
 ## PWA
 

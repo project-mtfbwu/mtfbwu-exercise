@@ -1,0 +1,10 @@
+# Single-package workspace (required by pnpm for onlyBuiltDependencies persistence).
+packages:
+  - "."
+
+onlyBuiltDependencies:
+  - esbuild
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver

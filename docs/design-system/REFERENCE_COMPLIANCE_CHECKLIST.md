@@ -28,7 +28,7 @@ Use this checklist for **every UI increment**. Fail the increment if any require
 - [ ] Text is live HTML/SVG, not essential baked image text
 - [ ] Keyboard access works; focus ring visible
 - [ ] Touch targets adequate; mobile keyboard doesn’t hide Save
-- [ ] Reduced / disabled motion works; `prefers-reduced-motion` honored
+- [ ] Reduced / off motion works; `prefers-reduced-motion` honored
 - [ ] Contrast checked for body/controls
 - [ ] Loading, empty, error, and offline states exist for the flow
 - [ ] Decorative motion does not block barcode, timers, or logging

@@ -17,7 +17,7 @@ People track nutrition, training, rehab, hydration, meditation, measurements, an
 5. **Not a journal** — short notes on logs are fine; freeform diary / social posting is out.
 6. **Odiina is separate** — no shared product surface or social features from Odiina.
 7. **Honest nutrition** — every food item carries source + provenance; AI suggestions are reviewable.
-8. **Accessible motion** — full / reduced / disabled animation modes.
+8. **Accessible motion** — full / reduced / off animation modes.
 
 ## Personas (initial)
 

@@ -1,0 +1,11 @@
+node_modules
+.next
+coverage
+pnpm-lock.yaml
+dist
+out
+public/icons/*.png
+*.tsbuildinfo
+docs/architecture
+docs/design-references
+docs/design-system

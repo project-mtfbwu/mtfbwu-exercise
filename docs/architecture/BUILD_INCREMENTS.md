@@ -2,7 +2,7 @@
 
 Phased delivery. **Stop before coding** until Increment 0 exit criteria are met and the user authorizes scaffolding.
 
-## Increment 0 — Foundation (current)
+## Increment 0 — Planning foundation
 
 **Goal:** Planning and reference foundation only.
 
@@ -11,35 +11,26 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 - [x] `AGENTS.md`
 - [x] Architecture docs + ADRs (this folder)
 - [x] Cursor rules
-- [x] Design-references README (image inventory)
-- [ ] Approved visual **images** placed under `docs/design-references/` (still missing as of 2026-07-26)
-- [ ] User confirmation of open questions (see end of this file / research report)
-
-### Explicitly out of increment
-
-- No Next.js init
-- No dependency installs
-- No migrations
-- No production code
+- [x] Design-references README + approved images
+- [x] Design system docs
 
 ### Exit criteria
 
-1. Docs and ADRs merged/available in repo
+1. Docs and ADRs available in repo
 2. License boundaries understood (AGPL study-only)
-3. Open questions acknowledged
-4. User says proceed to Increment 1
-
-**Ready for Increment 0 completion?** Docs/rules yes; **image assets + user ack** still open — see final report.
+3. User authorized Increment 1
 
 ---
 
-## Increment 1 — App skeleton + design tokens
+## Increment 1 — App skeleton + design tokens (authorized)
 
-- Initialize Next.js App Router (TypeScript) **when authorized**
-- PWA manifest stub
-- CSS variables + dark grid board shell (no real data)
-- Animation mode switch plumbing
-- Supabase project wiring (env only); no feature CRUD yet
+- [x] Initialize Next.js App Router (TypeScript) + pnpm + Node 24
+- [x] PWA manifest stub
+- [x] CSS variables + dark grid shell (no domain UI)
+- [x] Motion preference plumbing (`full` | `reduced` | `off`)
+- [x] Supabase client/proxy shells; no domain tables
+- [x] Dexie outbox shell + tests
+- [x] Route placeholders, CI, docs
 
 ## Increment 2 — Auth + profile + RLS skeleton
 

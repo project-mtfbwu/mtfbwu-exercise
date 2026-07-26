@@ -35,7 +35,7 @@ Gaps `09` / `13`: unused. Full catalog notes and mistakes: `docs/design-system/R
 - Dark grid background, glitter brand type, torn-paper cards, pixel stickers, retro windows
 - Normal: all enabled modules visible together
 - Focus: module lifts; board remains visible behind
-- Motion: `full` | `reduced` | `disabled`
+- Motion: `full` | `reduced` | `off`
 
 ## What this is not
 

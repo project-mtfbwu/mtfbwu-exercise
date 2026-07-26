@@ -6,11 +6,11 @@ Three user-selectable modes, with OS preference as a floor.
 | --- | --- |
 | `full` | Card lift/expand, sticker sparkle loops, soft parallax optional, glitter shimmer |
 | `reduced` | Opacity/transform only; no loops; shorter durations (~150–200ms) |
-| `disabled` | Instant state changes; no transitions |
+| `off` | Instant state changes; no transitions (`disabled` in older docs = `off`) |
 
 ## Rules
 
-1. Honor `prefers-reduced-motion: reduce` → never higher than `reduced` (force `disabled` if user chose off).
+1. Honor `prefers-reduced-motion: reduce` → never higher than `reduced` (force `off` if user chose off).
 2. Profile toggle “Animate UI” (ref `11`) maps to these modes.
 3. **Never** animate in ways that hurt:
    - barcode scanning
@@ -30,7 +30,7 @@ Three user-selectable modes, with OS preference as a floor.
 --mt-ease-lift: cubic-bezier(0.2, 0.8, 0.2, 1);
 ```
 
-When `disabled`: all durations `0ms`.
+When `off`: all durations `0ms`.
 
 ## Focus lift choreography (full)
 
@@ -40,4 +40,4 @@ When `disabled`: all durations `0ms`.
 4. On close: reverse; restore focus to the card.
 
 `reduced`: fade + scale without FLIP path complexity.  
-`disabled`: show/hide.
+`off`: show/hide.

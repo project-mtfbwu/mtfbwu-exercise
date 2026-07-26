@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+/*
+  MTFBWU design tokens — derived from docs/design-references/
+  (01-master-today-board, 05-breakfast-focus, 07-workout-focus, 08-water-focus, 11-profile-board)
+  Live HTML/CSS only; no baked reference images as UI.
+*/
+
+:root {
+  /* Backgrounds */
+  --mt-bg-deep: #0a0618;
+  --mt-bg-board: #12082a;
+  --mt-bg-glow: #3a0a5c;
+  --mt-grid-line: #7b5cff;
+  --mt-grid-line-alt: #5ce1ff;
+  --mt-checker-a: #ff2bd6;
+  --mt-checker-b: #0a0618;
+
+  /* Paper / surfaces */
+  --mt-paper: #f7f0e1;
+  --mt-paper-warm: #fff6c8;
+  --mt-paper-mint: #e8f8e8;
+  --mt-paper-pink: #ffe6f2;
+  --mt-window-face: #e8e4dc;
+  --mt-window-chrome: #c0c0c0;
+
+  /* Ink */
+  --mt-ink: #14121a;
+  --mt-ink-muted: #4a4558;
+  --mt-ink-inverse: #fff8ff;
+
+  /* Neon accents */
+  --mt-neon-pink: #ff2bd6;
+  --mt-neon-cyan: #2de2ff;
+  --mt-neon-lime: #b8ff2e;
+  --mt-neon-yellow: #ffe566;
+  --mt-neon-orange: #ff9a3c;
+  --mt-neon-purple: #9b5cff;
+  --mt-neon-blue: #3d7eff;
+  --mt-neon-green: #1fae5b;
+
+  /* Semantic */
+  --mt-success: #1fae5b;
+  --mt-warning: #e6a100;
+  --mt-danger: #d7263d;
+  --mt-focus-ring: #ffe566;
+  --mt-overlay: rgb(10 6 24 / 55%);
+
+  /* Elevation */
+  --mt-shadow-card: 0 8px 0 rgb(0 0 0 / 35%);
+  --mt-shadow-focus: 0 16px 40px rgb(0 0 0 / 45%);
+
+  /* Geometry */
+  --mt-border-strong: 2px;
+  --mt-radius-sm: 4px;
+  --mt-radius-md: 8px;
+  --mt-radius-lg: 16px;
+  --mt-rotate-card: -2deg;
+  --mt-rotate-sticker: 4deg;
+
+  /* Spacing */
+  --mt-space-1: 0.25rem;
+  --mt-space-2: 0.5rem;
+  --mt-space-3: 0.75rem;
+  --mt-space-4: 1rem;
+  --mt-space-6: 1.5rem;
+  --mt-space-8: 2rem;
+
+  /* Motion */
+  --mt-motion-fast: 120ms;
+  --mt-motion-med: 220ms;
+
+  /* Z-index */
+  --mt-z-board: 0;
+  --mt-z-card: 10;
+  --mt-z-sticker: 20;
+  --mt-z-overlay: 40;
+  --mt-z-focus: 50;
+  --mt-z-toast: 60;
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mt-motion-fast: 0ms;
+    --mt-motion-med: 0ms;
+  }
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--mt-bg-deep);
+  background-image:
+    radial-gradient(ellipse at top, rgb(58 10 92 / 35%), transparent 55%),
+    linear-gradient(var(--mt-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mt-grid-line) 1px, transparent 1px);
+  background-size:
+    auto,
+    32px 32px,
+    32px 32px;
+  background-position:
+    center top,
+    0 0,
+    0 0;
+  color: var(--mt-ink-inverse);
+  font-family:
+    "IBM Plex Sans", "Source Sans 3", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+}
+
+.mt-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mt-main {
+  flex: 1;
+  width: min(72rem, 100%);
+  margin-inline: auto;
+  padding: var(--mt-space-6) var(--mt-space-4) var(--mt-space-8);
+}
+
+.mt-paper-panel {
+  background: var(--mt-paper);
+  color: var(--mt-ink);
+  border: var(--mt-border-strong) solid var(--mt-ink);
+  box-shadow: var(--mt-shadow-card);
+  border-radius: var(--mt-radius-md);
+  padding: var(--mt-space-6);
+}
+
+.mt-checker-footer {
+  height: 12px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--mt-checker-a) 0 12px,
+    var(--mt-checker-b) 12px 24px
+  );
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

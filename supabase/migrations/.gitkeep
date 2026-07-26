@@ -1,0 +1,6 @@
+# supabase/migrations
+
+Domain table migrations begin in Increment 2+.
+
+Increment 1 keeps this folder ready. Do not add fake tables solely for connectivity demos.
+RLS must be enabled on every user-data table from the first migration that creates it.

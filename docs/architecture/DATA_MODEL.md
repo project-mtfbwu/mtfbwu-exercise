@@ -17,7 +17,7 @@ profiles
   id (uuid = auth.users.id)
   display_name
   units_preference
-  animation_mode  -- full | reduced | disabled
+  animation_mode  -- full | reduced | off
   enabled_modules jsonb
   created_at, updated_at
 ```
