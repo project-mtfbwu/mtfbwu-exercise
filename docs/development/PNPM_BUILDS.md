@@ -6,11 +6,13 @@ pnpm ignores dependency `postinstall` / build scripts by default (supply-chain p
 
 **Allowlist only `esbuild`.**
 
-| Package         | Decision                                  | Reason                                                                                 |
-| --------------- | ----------------------------------------- | -------------------------------------------------------------------------------------- |
-| `esbuild`       | **Allowed** (`allowBuilds.esbuild: true`) | Required by Vitest / Vite tooling to materialize its native binary on install          |
-| `sharp`         | Denied (`false`)                          | Optional Next image optimizer native build — not required for Increment 1 verification |
-| `unrs-resolver` | Denied (`false`)                          | Optional native resolver — Next/Vitest already succeed without its build script        |
+| Package         | Decision                                  | Reason                                                                                                                                                                                       |
+| --------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `esbuild`       | **Allowed** (`allowBuilds.esbuild: true`) | Required by Vitest / Vite tooling to materialize its native binary on install                                                                                                                |
+| `sharp`         | Denied (`false`)                          | `sharp@0.35+` has **no** install script; prebuilt optional platform packages install without a lifecycle approval. Keep denied unless a future sharp release reintroduces a required script. |
+| `unrs-resolver` | Denied (`false`)                          | Optional native resolver — Next/Vitest already succeed without its build script                                                                                                              |
+
+Nested `sharp` / `postcss` security overrides for Next are documented in [`DEPENDENCY_SECURITY.md`](./DEPENDENCY_SECURITY.md).
 
 Configured in `pnpm-workspace.yaml` (pnpm 11; the old `onlyBuiltDependencies` / `ignoredBuiltDependencies` keys are gone):
 

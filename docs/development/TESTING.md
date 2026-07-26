@@ -23,6 +23,8 @@ pnpm test:coverage
 - Online status hook
 - Today route smoke render
 - Next.js `proxy` export + matcher smoke
+- Sharp/libvips smoke via Next’s nested optional dependency (see
+  `docs/development/DEPENDENCY_SECURITY.md`)
 
 ## Conventions
 
@@ -35,7 +37,8 @@ pnpm test:coverage
 **Official CI/local gate:** `pnpm run audit`
 
 Uses the pnpm 11 bulk advisories endpoint against `pnpm-lock.yaml` (see
-`docs/development/PACKAGE_MANAGER.md`). Exit code reflects real advisories.
+`docs/development/PACKAGE_MANAGER.md` and `docs/development/DEPENDENCY_SECURITY.md`).
+Exit code reflects real advisories.
 
 Bare `pnpm audit --prod` may still fail with `ERR_PNPM_AUDIT_BAD_RESPONSE` when
 the registry returns naked gzip — that is not a vulnerability report.

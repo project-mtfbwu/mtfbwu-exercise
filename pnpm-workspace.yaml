@@ -3,10 +3,20 @@ packages:
 
 # Build scripts: allow only trusted packages (pnpm 11 `allowBuilds`).
 # Preserves Increment 1 policy: esbuild yes; sharp / unrs-resolver no.
+# sharp@0.35+ has no install/postinstall script (prebuilt optional binaries),
+# so keep sharp denied — nothing to approve for the image-optimizer path.
 allowBuilds:
   esbuild: true
   sharp: false
   unrs-resolver: false
+
+# Temporary security overrides until stable Next.js ships patched nested deps.
+# Scope is Next-only (`next>...`); do not broaden to global pins casually.
+# Remove when next depends on postcss >= 8.5.18 and sharp >= 0.35.0.
+# See docs/development/DEPENDENCY_SECURITY.md.
+overrides:
+  "next>postcss": "8.5.23"
+  "next>sharp": "0.35.3"
 
 # Fail installs when engines.node / engines.pnpm are not satisfied.
 engineStrict: true

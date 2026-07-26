@@ -39,6 +39,11 @@ Official confirmation: [pnpm 11.0 — “pnpm audit uses the bulk advisories end
 | Frozen lockfile     | Still `pnpm install --frozen-lockfile` in CI                                                                                                                |
 | Cache               | CI continues to use `actions/setup-node` `cache: pnpm`                                                                                                      |
 
+## Production dependency security
+
+See [`DEPENDENCY_SECURITY.md`](./DEPENDENCY_SECURITY.md) for PostCSS/Sharp advisories,
+temporary `next>` overrides, and removal conditions.
+
 ## Production audit gate
 
 ```bash
