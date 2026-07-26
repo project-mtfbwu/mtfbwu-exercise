@@ -1,0 +1,15 @@
+---
+description: Delivery quality bar for MTFBWU increments
+alwaysApply: true
+---
+
+# Delivery quality
+
+- Follow `BUILD_INCREMENTS.md`; do not skip ahead without user approval.
+- Offline workout + meal logging is first-class; use Dexie transactions + outbox.
+- Every FoodItem needs source + provenance; meal logs snapshot nutrients.
+- Progress photos: private Storage + RLS path `{user_id}/...` only.
+- AI imports: propose → human review → promote; store provenance.
+- Prefer simple protocol modeling (group id + protocol enum) before auto-progression engines.
+- Add tests for sync idempotency when implementing offline kernel.
+- No drive-by refactors or unrelated files; match existing docs’ language.

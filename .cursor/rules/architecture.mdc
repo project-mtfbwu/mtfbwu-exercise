@@ -1,0 +1,15 @@
+---
+description: MTFBWU architecture constraints — modular monolith, domains, stack
+alwaysApply: true
+---
+
+# Architecture
+
+- Read `AGENTS.md` and `docs/architecture/` before implementing features.
+- Modular monolith only: domain modules + shared kernel; no microservices split.
+- Stack lock: Next.js App Router, Supabase (Auth/Postgres/Storage/RLS), Dexie offline — see ADRs 0001–0002.
+- Separate **templates/plans** from **performed sessions/logs** always.
+- Domains in scope: nutrition, workouts, rehab, hydration, meditation, measurements, progress photos, calendar, profile, custom trackers.
+- Out of scope: feeds, social, general journaling; Odiina is a separate app.
+- Until Increment 0 is closed and user authorizes: no Next.js init, no dependency installs, no migrations, no production code.
+- Prefer documenting decisions in ADRs over silent stack changes.

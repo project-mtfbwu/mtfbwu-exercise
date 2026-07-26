@@ -1,0 +1,15 @@
+---
+description: MTFBWU GeoCities flat-lay visual direction
+alwaysApply: true
+---
+
+# Visual direction
+
+- Follow `docs/design-references/README.md`, `UI_ARCHITECTURE.md`, ADR 0003.
+- Aesthetic: GeoCities-inspired, dark grid, glitter typography, torn-paper cards, pixel stickers, retro desktop windows, flat-lay board.
+- Normal mode: all **enabled** modules visible together.
+- Focus mode: selected module lifts; **board stays visible behind**.
+- Animation modes: `full` | `reduced` | `disabled`; honor `prefers-reduced-motion`.
+- Do not ship purple-indigo SaaS gradients or cream/terracotta AI-default looks.
+- Do not turn the board into a KPI dashboard or social feed.
+- If reference images are missing, ask for them before polishing UI — do not invent a new brand direction.

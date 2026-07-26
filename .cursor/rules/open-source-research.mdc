@@ -1,0 +1,14 @@
+---
+description: Open-source research and license-safe reuse for MTFBWU
+alwaysApply: true
+---
+
+# Open-source research
+
+- Stars ≠ quality. Evaluate architecture, tests, maintenance, license.
+- **Do not copy** AGPL/GPL application code (e.g. wger, openfoodfacts-server).
+- Safe reuse examples: MIT/Apache/Unlicense libraries and datasets (Dexie, zxing, free-exercise-db) with attribution.
+- Before adopting a dependency: record license, commit/branch, safe vs study-only in research notes.
+- Prefer official API docs (USDA, OFF, Supabase, Next.js) over blog summaries.
+- Label uncertain findings explicitly.
+- Study wger/OFF for domain ideas only; implement original code in this repo.
