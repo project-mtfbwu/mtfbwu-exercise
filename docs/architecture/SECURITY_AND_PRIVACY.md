@@ -9,6 +9,8 @@ MTFBWU holds **sensitive personal health and body data**, including private prog
 - Use Supabase Auth for identity; app `profiles.id` = `auth.users.id`.
 - Browser uses anon/publishable key only.
 - Service role key: server-only (USDA proxy, admin jobs) — never in client bundles or Dexie.
+- Increment 3: email/password only; SSR cookie session via `@supabase/ssr` (`docs/development/AUTHENTICATION.md`).
+- Route protection runs in `src/proxy.ts` before private UI renders.
 
 Official guidance: Supabase Auth + RLS docs (`https://supabase.com/docs/guides/auth`, `https://supabase.com/docs/guides/database/postgres/row-level-security`).
 
@@ -17,6 +19,7 @@ Official guidance: Supabase Auth + RLS docs (`https://supabase.com/docs/guides/a
 - Enable RLS on every exposed user table.
 - Default deny; policies: `auth.uid() = user_id` (or `id` for profiles).
 - No public read on meals, sessions, measurements, photos metadata.
+- Increment 3 also: `dashboard_cards` via owned layouts; `daily_module_statuses` via owned daily records + user modules; `module_definitions` authenticated **read** of active system rows only.
 
 ## Storage (progress photos)
 

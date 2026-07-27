@@ -36,22 +36,27 @@ outbox
 
 | Domain | Offline write | Notes |
 | --- | --- | --- |
-| Workout sessions / sets | Required | Highest priority |
-| Meal logs / entries | Required | Cache FoodItems used |
-| Hydration / meditation | Required | Small payloads |
-| Measurements | Required | |
-| Progress photos | Deferred / partial | Queue metadata; upload blobs when online |
-| Templates | Nice-to-have | |
-| Profile prefs | Required | animation mode, modules |
+| User modules enable/disable | Increment 3 | Outbox `set_module_enabled` |
+| Dashboard reorder / variant | Increment 3 | Version conflict on layout |
+| Daily module status | Increment 3 | Revision + completed protection |
+| Profile prefs (safe fields) | Increment 3 | Not passwords |
+| Workout sessions / sets | Later | Highest priority domain |
+| Meal logs / entries | Later | Cache FoodItems used |
+| Hydration / meditation domain rows | Later | Status summary already exists |
+| Measurements / photos | Later | |
 
-## Conflict rules (initial)
+## Conflict rules (Increment 3 board)
 
 | Case | Rule |
 | --- | --- |
-| Same row edited on two devices | Last-write-wins on `updated_at` **plus** keep outbox audit; surface conflict banner for sessions if both completed differently |
+| Dashboard layout reorder | Optimistic `version`; stale → `layout_version_conflict`; refresh + message; no silent overwrite |
+| Daily module status | `revision` must match; completed cannot revert to `not_started` from stale offline write |
+| Same row edited on two devices (future domain) | Last-write-wins on `updated_at` **plus** keep outbox audit; surface conflict banner for sessions if both completed differently |
 | FoodItem cache | Server/normalized row wins; preserve user’s meal `nutrients_snapshot` |
 | Deletes | Tombstones with timestamp |
 | Photos | Server object path is source of truth after upload |
+
+Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
 
 ## Catalogs offline
 

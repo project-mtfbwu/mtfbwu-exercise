@@ -2,11 +2,16 @@
 
 import { usePathname } from "next/navigation";
 import { AppLink } from "@/shared/ui/app-link";
-import { ROUTES } from "@/shared/config/constants";
+import { AUTH_ROUTES, ROUTES } from "@/shared/config/constants";
 import { cn } from "@/shared/utils/cn";
+
+function matchesPath(pathname: string, route: string) {
+  return pathname === route || pathname.startsWith(`${route}/`);
+}
 
 const links = [
   { href: ROUTES.today, label: "Today" },
+  { href: ROUTES.customize, label: "Customize" },
   { href: ROUTES.calendar, label: "Calendar" },
   { href: ROUTES.plans, label: "Plans" },
   { href: ROUTES.progress, label: "Progress" },
@@ -17,6 +22,33 @@ const links = [
 
 export function SiteNav() {
   const pathname = usePathname();
+  const onAuthScreen =
+    AUTH_ROUTES.some((route) => matchesPath(pathname, route)) ||
+    pathname === ROUTES.resetPassword ||
+    pathname === ROUTES.onboarding;
+
+  if (onAuthScreen) {
+    return (
+      <header className="border-b-2 border-[var(--mt-neon-pink)] bg-[rgb(18_8_42_/0.92)] backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+          <div>
+            <p className="text-xs font-bold tracking-[0.2em] text-[var(--mt-neon-yellow)] uppercase">
+              MTFBWU
+            </p>
+            <p className="text-sm text-[var(--mt-ink-inverse)]/80">
+              Sign in · GeoCities desk
+            </p>
+          </div>
+          <AppLink
+            href={ROUTES.login}
+            className="text-sm text-[var(--mt-neon-lime)] no-underline"
+          >
+            Login
+          </AppLink>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="border-b-2 border-[var(--mt-neon-pink)] bg-[rgb(18_8_42_/0.92)] backdrop-blur">
@@ -26,7 +58,7 @@ export function SiteNav() {
             MTFBWU
           </p>
           <p className="text-sm text-[var(--mt-ink-inverse)]/80">
-            Increment 1 foundation shell
+            Increment 3 · auth + board foundation
           </p>
         </div>
         <nav aria-label="Primary">

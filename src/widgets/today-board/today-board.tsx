@@ -1,307 +1,400 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useMotionPreference } from "@/shared/providers/motion-provider";
 import { FlatLayBoard, boardLayoutStyles } from "@/widgets/flat-lay-board";
 import { FlatLayCard } from "@/shared/ui/flat-lay/flat-lay-card";
-import { ProgressMeter } from "@/shared/ui/flat-lay/progress-meter";
-import { StickerBadge } from "@/shared/ui/flat-lay/sticker-badge";
 import { ScreenReaderStatus } from "@/shared/ui/screen-reader-status";
 import { FocusLayer } from "@/widgets/focus-layer/focus-layer";
-import { MotionDevToggle } from "./motion-dev-toggle";
+import { FocusPanel } from "@/widgets/focus-layer/focus-panel";
+import { PixelButton } from "@/shared/ui/flat-lay/pixel-button";
+import { StickerBadge } from "@/shared/ui/flat-lay/sticker-badge";
+import { MotionDevToggle } from "@/widgets/today-board/motion-dev-toggle";
+import type { BoardSnapshot } from "@/shared/board/board-model";
+import { variantToFlatLay } from "@/shared/board/board-model";
+import { updateDailyStatusAction } from "@/shared/board/actions";
 import {
-  DEMO_STATUS_ITEMS,
-  createInitialDemoState,
-  type DemoBoardState,
-  type DemoModuleId,
-} from "./demo-state";
-import { BreakfastFocus } from "./focus/breakfast-focus";
-import { WorkoutFocus } from "./focus/workout-focus";
-import { WaterFocus } from "./focus/water-focus";
-import { MeditationFocus } from "./focus/meditation-focus";
-import { MeasurementsFocus } from "./focus/measurements-focus";
-import { ProfileFocus } from "./focus/profile-focus";
+  shiftLocalDate,
+  todayLocalDate,
+  compareLocalDates,
+} from "@/shared/utils/local-date";
+import { AppLink } from "@/shared/ui/app-link";
+import { ROUTES } from "@/shared/config/constants";
 import { cn } from "@/shared/utils/cn";
+import { BreakfastFocus } from "@/widgets/today-board/focus/breakfast-focus";
+import { WorkoutFocus } from "@/widgets/today-board/focus/workout-focus";
+import { WaterFocus } from "@/widgets/today-board/focus/water-focus";
+import { MeditationFocus } from "@/widgets/today-board/focus/meditation-focus";
+import { MeasurementsFocus } from "@/widgets/today-board/focus/measurements-focus";
+import { ProfileFocus } from "@/widgets/today-board/focus/profile-focus";
+import { createInitialDemoState } from "@/widgets/today-board/demo-state";
+import { SyncStatusBanner } from "@/widgets/sync/sync-status-banner";
+import { BOARD_ENTITY, queueBoardMutation } from "@/shared/offline/board-outbox";
+import { useOnlineStore } from "@/shared/offline/online-store";
+import { useSyncStatusStore } from "@/shared/offline/sync-status-store";
 
-const TITLE_IDS: Record<DemoModuleId, string> = {
-  breakfast: "focus-title-breakfast",
-  workout: "focus-title-workout",
-  water: "focus-title-water",
-  meditation: "focus-title-meditation",
-  measurements: "focus-title-measurements",
-  profile: "focus-title-profile",
+type Props = {
+  snapshot: BoardSnapshot;
 };
 
-const SLOT_CLASS: Record<DemoModuleId, string> = {
-  breakfast: boardLayoutStyles.rotBreakfast ?? "",
-  workout: boardLayoutStyles.rotWorkout ?? "",
-  water: boardLayoutStyles.rotWater ?? "",
-  meditation: boardLayoutStyles.rotMeditation ?? "",
-  measurements: boardLayoutStyles.rotMeasurements ?? "",
-  profile: boardLayoutStyles.rotProfile ?? "",
-};
-
-export function TodayBoard() {
+export function TodayBoard({ snapshot }: Props) {
+  const router = useRouter();
   const { resolution } = useMotionPreference();
   const motionPreference = resolution.preference;
-  const [state, setState] = useState<DemoBoardState>(() => createInitialDemoState());
-  const [openId, setOpenId] = useState<DemoModuleId | null>(null);
+  const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
-  const [emptyBreakfast, setEmptyBreakfast] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  const [demo] = useState(() => createInitialDemoState());
+  const [cards, setCards] = useState(snapshot.cards);
+  const onlineStatus = useOnlineStore((s) => s.status);
+  const online = onlineStatus !== "offline";
+  const today = todayLocalDate(snapshot.profile.timezone);
+  const atToday = compareLocalDates(snapshot.localDate, today) >= 0;
 
-  const close = useCallback(() => {
-    setOpenId(null);
-    setStatusMessage("Focus panel closed");
-  }, []);
+  const openCard = cards.find((c) => c.card.id === openCardId) ?? null;
 
-  const targetMetrics = useMemo(() => {
-    const waterL = state.water.ml / 1000;
-    return [
+  const targetMetrics = useMemo(
+    () => [
       {
-        label: "Demo calories",
-        value: 290,
-        max: 1900,
-        unit: "kcal",
-        tone: "pink" as const,
-      },
-      {
-        label: "Demo protein",
-        value: 17,
-        max: 150,
-        unit: "g",
+        label: "Modules enabled",
+        value: cards.length,
+        max: Math.max(cards.length, 1),
+        unit: "",
         tone: "lime" as const,
       },
       {
-        label: "Demo water",
-        value: Number(waterL.toFixed(2)),
-        max: 3,
-        unit: "L",
+        label: "Completed today",
+        value: cards.filter((c) => c.status?.status === "completed").length,
+        max: Math.max(cards.length, 1),
+        unit: "",
+        tone: "pink" as const,
+      },
+      {
+        label: "In progress",
+        value: cards.filter((c) => c.status?.status === "in_progress").length,
+        max: Math.max(cards.length, 1),
+        unit: "",
         tone: "cyan" as const,
       },
-    ];
-  }, [state.water.ml]);
+    ],
+    [cards],
+  );
 
-  const focusTitle = openId
-    ? `${openId.charAt(0).toUpperCase()}${openId.slice(1)} (demo)`
-    : "";
+  function goDate(delta: number) {
+    const next = shiftLocalDate(snapshot.localDate, delta);
+    if (compareLocalDates(next, today) > 0) return;
+    router.push(`${ROUTES.today}?date=${next}`);
+  }
+
+  function saveStatus(summaryText: string) {
+    if (!openCard?.status) {
+      setError("Missing daily status row — refresh and retry.");
+      return;
+    }
+    const statusId = openCard.status.id;
+    const expectedRevision = openCard.status.revision;
+    startTransition(async () => {
+      if (!online) {
+        await queueBoardMutation({
+          userId: snapshot.profile.id,
+          entityType: BOARD_ENTITY.dailyModuleStatus,
+          entityId: statusId,
+          payload: {
+            kind: "daily_status",
+            statusId,
+            expectedRevision,
+            status: "completed",
+            summaryText,
+          },
+        });
+        useSyncStatusStore
+          .getState()
+          .setPendingCount(useSyncStatusStore.getState().pendingCount + 1);
+        setCards((prev) =>
+          prev.map((c) =>
+            c.status?.id === statusId
+              ? {
+                  ...c,
+                  status: {
+                    ...c.status!,
+                    status: "completed",
+                    summary_text: summaryText,
+                  },
+                  statusLabel: summaryText,
+                }
+              : c,
+          ),
+        );
+        setOpenCardId(null);
+        setStatusMessage("Status queued offline");
+        return;
+      }
+
+      const result = await updateDailyStatusAction({
+        statusId,
+        expectedRevision,
+        status: "completed",
+        summaryText,
+      });
+      if (!result.ok) {
+        setError(result.error);
+        setStatusMessage(result.error);
+        return;
+      }
+      setCards((prev) =>
+        prev.map((c) =>
+          c.status?.id === statusId
+            ? {
+                ...c,
+                status: {
+                  ...c.status!,
+                  status: "completed",
+                  summary_text: summaryText,
+                  revision: c.status!.revision + 1,
+                },
+                statusLabel: summaryText,
+              }
+            : c,
+        ),
+      );
+      setOpenCardId(null);
+      setError(null);
+      setStatusMessage("Daily module status saved");
+      router.refresh();
+    });
+  }
 
   return (
     <div className="space-y-4">
       <ScreenReaderStatus message={statusMessage} />
+      <SyncStatusBanner />
+      <div className="flex flex-wrap items-center gap-2">
+        <PixelButton tone="neutral" onClick={() => goDate(-1)} aria-label="Previous day">
+          ← Prev
+        </PixelButton>
+        <label className="sr-only" htmlFor="today-date">
+          Selected local date
+        </label>
+        <input
+          id="today-date"
+          type="date"
+          max={today}
+          className="min-h-11 border-2 border-[var(--mt-neon-yellow)] bg-[var(--mt-paper)] px-2 text-[var(--mt-ink)]"
+          value={snapshot.localDate}
+          onChange={(e) => router.push(`${ROUTES.today}?date=${e.target.value}`)}
+        />
+        <PixelButton
+          tone="neutral"
+          onClick={() => goDate(1)}
+          aria-label="Next day"
+          disabled={atToday}
+        >
+          Next →
+        </PixelButton>
+        <AppLink
+          href={ROUTES.customize}
+          className="inline-flex min-h-11 items-center border-2 border-[var(--mt-neon-lime)] bg-[var(--mt-neon-lime)] px-3 text-sm font-extrabold text-[var(--mt-ink)] no-underline"
+        >
+          Customize board
+        </AppLink>
+      </div>
+
+      {error ? (
+        <p
+          role="alert"
+          className="border-2 border-[var(--mt-danger)] bg-[var(--mt-paper)] px-3 py-2 text-sm font-bold text-[var(--mt-danger)]"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      {cards.length === 0 ? (
+        <p className="border-2 border-[var(--mt-neon-yellow)] bg-[var(--mt-paper-warm)] px-4 py-3 text-[var(--mt-ink)]">
+          No modules enabled. <AppLink href={ROUTES.customize}>Enable modules</AppLink> to
+          build your desk.
+        </p>
+      ) : null}
+
       <FlatLayBoard
         title="TODAY"
-        statusItems={[...DEMO_STATUS_ITEMS]}
+        statusItems={[
+          { label: "Date", value: snapshot.localDate },
+          { label: "Timezone", value: snapshot.profile.timezone },
+          { label: "Name", value: snapshot.profile.display_name || "Athlete" },
+          { label: "Units", value: snapshot.profile.units_system },
+          {
+            label: "Layout",
+            value: `v${snapshot.layout.version}`,
+          },
+        ]}
         targetMetrics={targetMetrics}
         motionPreference={motionPreference}
-        dimmed={openId !== null}
-        inertBoard={openId !== null}
+        dimmed={openCardId !== null}
+        inertBoard={openCardId !== null}
         toolbar={<MotionDevToggle />}
         stickers={
           <div className="pointer-events-none flex flex-wrap gap-2" aria-hidden>
-            <StickerBadge tone="orange">Demo sticker</StickerBadge>
-            <StickerBadge tone="cyan">Pixel vibes</StickerBadge>
+            <StickerBadge tone="lime">Live status</StickerBadge>
+            <StickerBadge tone="pink">Demo details</StickerBadge>
           </div>
         }
       >
-        <div className={cn(boardLayoutStyles.slot ?? "", SLOT_CLASS.breakfast)}>
-          <FlatLayCard
-            id="breakfast"
-            title="Breakfast"
-            status={emptyBreakfast ? "Empty demo card" : state.breakfast.savedLabel}
-            variant="paper"
-            paperTone="cream"
-            rotationDeg={0}
-            sticker="Yum"
-            empty={emptyBreakfast}
-            motionPreference={motionPreference}
-            onOpen={() => {
-              setOpenId("breakfast");
-              setStatusMessage("Breakfast focus opened");
-            }}
-          />
-        </div>
-        <div className={cn(boardLayoutStyles.slot ?? "", SLOT_CLASS.workout)}>
-          <FlatLayCard
-            id="workout"
-            title="Workout"
-            status={state.workout.savedLabel}
-            windowAccent="pink"
-            sticker="Beast"
-            motionPreference={motionPreference}
-            onOpen={() => {
-              setOpenId("workout");
-              setStatusMessage("Workout focus opened");
-            }}
-          />
-        </div>
-        <div className={cn(boardLayoutStyles.slot ?? "", SLOT_CLASS.water)}>
-          <FlatLayCard
-            id="water"
-            title="Water"
-            status={state.water.savedLabel}
-            windowAccent="cyan"
-            motionPreference={motionPreference}
-            onOpen={() => {
-              setOpenId("water");
-              setStatusMessage("Water focus opened");
-            }}
-          >
-            <ProgressMeter
-              label="Water"
-              value={Number((state.water.ml / 1000).toFixed(2))}
-              max={3}
-              unit="L"
-              tone="cyan"
-              segments={8}
-            />
-          </FlatLayCard>
-        </div>
-        <div className={cn(boardLayoutStyles.slot ?? "", SLOT_CLASS.meditation)}>
-          <FlatLayCard
-            id="meditation"
-            title="Meditation"
-            status={state.meditation.savedLabel}
-            windowAccent="purple"
-            motionPreference={motionPreference}
-            onOpen={() => {
-              setOpenId("meditation");
-              setStatusMessage("Meditation focus opened");
-            }}
-          />
-        </div>
-        <div className={cn(boardLayoutStyles.slot ?? "", SLOT_CLASS.measurements)}>
-          <FlatLayCard
-            id="measurements"
-            title="Measurements"
-            status={state.measurements.savedLabel}
-            variant="paper"
-            paperTone="yellow"
-            motionPreference={motionPreference}
-            onOpen={() => {
-              setOpenId("measurements");
-              setStatusMessage("Measurements focus opened");
-            }}
-          />
-        </div>
-        <div className={cn(boardLayoutStyles.slot ?? "", SLOT_CLASS.profile)}>
-          <FlatLayCard
-            id="profile"
-            title="Profile"
-            status={state.profile.savedLabel}
-            windowAccent="blue"
-            motionPreference={motionPreference}
-            onOpen={() => {
-              setOpenId("profile");
-              setStatusMessage("Profile focus opened");
-            }}
-          />
-        </div>
+        {cards.map((view, index) => {
+          const visual = variantToFlatLay(view.card.visual_variant);
+          const rotClass =
+            index % 3 === 0
+              ? boardLayoutStyles.rotBreakfast
+              : index % 3 === 1
+                ? boardLayoutStyles.rotWorkout
+                : boardLayoutStyles.rotWater;
+          return (
+            <div
+              key={view.card.id}
+              className={cn(boardLayoutStyles.slot ?? "", rotClass ?? "")}
+            >
+              <FlatLayCard
+                id={view.card.id}
+                title={view.title}
+                status={view.statusLabel}
+                variant={visual.kind}
+                paperTone={visual.paperTone}
+                windowAccent={visual.windowAccent}
+                motionPreference={motionPreference}
+                onOpen={() => {
+                  setOpenCardId(view.card.id);
+                  setStatusMessage(`${view.title} focus opened`);
+                }}
+              />
+            </div>
+          );
+        })}
       </FlatLayBoard>
 
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          className="min-h-11 border-2 border-[var(--mt-neon-yellow)] px-3 py-2 text-sm font-bold text-[var(--mt-neon-yellow)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mt-focus-ring)]"
-          onClick={() => setEmptyBreakfast((v) => !v)}
-        >
-          Toggle empty Breakfast card (dev)
-        </button>
-        <button
-          type="button"
-          className="min-h-11 border-2 border-[var(--mt-ink-inverse)]/40 px-3 py-2 text-sm font-bold text-[var(--mt-ink-inverse)]/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mt-focus-ring)]"
-          disabled
-          aria-disabled="true"
-        >
-          Disabled demo action
-        </button>
-      </div>
-
       <FocusLayer
-        open={openId !== null}
-        title={focusTitle}
-        titleId={openId ? TITLE_IDS[openId] : "focus-title"}
-        triggerId={openId ? `board-card-${openId}` : "board-card-breakfast"}
+        open={openCard !== null}
+        title={openCard ? `${openCard.title} (status)` : ""}
+        titleId="focus-title-live"
+        triggerId={openCard ? `board-card-${openCard.card.id}` : "board-card-x"}
         motionPreference={motionPreference}
-        onClose={close}
+        onClose={() => setOpenCardId(null)}
       >
-        {openId === "breakfast" ? (
-          <BreakfastFocus
-            titleId={TITLE_IDS.breakfast}
-            initial={
-              emptyBreakfast
-                ? { items: [], savedLabel: "Empty demo card" }
-                : state.breakfast
-            }
-            onSave={(next) => {
-              setState((s) => ({ ...s, breakfast: next }));
-              setEmptyBreakfast(false);
-              setOpenId(null);
-              setStatusMessage("Breakfast demo saved");
-            }}
-            onCancel={close}
-          />
-        ) : null}
-        {openId === "workout" ? (
-          <WorkoutFocus
-            titleId={TITLE_IDS.workout}
-            initial={state.workout}
-            onSave={(next) => {
-              setState((s) => ({ ...s, workout: next }));
-              setOpenId(null);
-              setStatusMessage("Workout demo saved");
-            }}
-            onCancel={close}
-          />
-        ) : null}
-        {openId === "water" ? (
-          <WaterFocus
-            titleId={TITLE_IDS.water}
-            initial={state.water}
-            onSave={(next) => {
-              setState((s) => ({ ...s, water: next }));
-              setOpenId(null);
-              setStatusMessage("Water demo saved");
-            }}
-            onCancel={close}
-          />
-        ) : null}
-        {openId === "meditation" ? (
-          <MeditationFocus
-            titleId={TITLE_IDS.meditation}
-            initial={state.meditation}
-            onSave={(next) => {
-              setState((s) => ({ ...s, meditation: next }));
-              setOpenId(null);
-              setStatusMessage("Meditation demo saved");
-            }}
-            onCancel={close}
-          />
-        ) : null}
-        {openId === "measurements" ? (
-          <MeasurementsFocus
-            titleId={TITLE_IDS.measurements}
-            initial={state.measurements}
-            onSave={(next) => {
-              setState((s) => ({ ...s, measurements: next }));
-              setOpenId(null);
-              setStatusMessage("Measurements demo saved");
-            }}
-            onCancel={close}
-          />
-        ) : null}
-        {openId === "profile" ? (
-          <ProfileFocus
-            titleId={TITLE_IDS.profile}
-            initial={state.profile}
-            onSave={(next) => {
-              setState((s) => ({ ...s, profile: next }));
-              setOpenId(null);
-              setStatusMessage("Profile demo saved");
-            }}
-            onCancel={close}
+        {openCard ? (
+          <ModuleFocusRouter
+            moduleKey={openCard.definition.key}
+            titleId="focus-title-live"
+            demo={demo}
+            pending={pending}
+            onCancel={() => setOpenCardId(null)}
+            onSaveStatus={saveStatus}
           />
         ) : null}
       </FocusLayer>
     </div>
+  );
+}
+
+function ModuleFocusRouter({
+  moduleKey,
+  titleId,
+  demo,
+  pending,
+  onCancel,
+  onSaveStatus,
+}: {
+  moduleKey: string;
+  titleId: string;
+  demo: ReturnType<typeof createInitialDemoState>;
+  pending: boolean;
+  onCancel: () => void;
+  onSaveStatus: (summary: string) => void;
+}) {
+  if (moduleKey === "nutrition") {
+    return (
+      <BreakfastFocus
+        titleId={titleId}
+        initial={demo.breakfast}
+        onSave={() => onSaveStatus("Nutrition demo preview completed")}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "workout") {
+    return (
+      <WorkoutFocus
+        titleId={titleId}
+        initial={demo.workout}
+        onSave={() => onSaveStatus("Demo session completed")}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "hydration") {
+    return (
+      <WaterFocus
+        titleId={titleId}
+        initial={demo.water}
+        onSave={() => onSaveStatus("Hydration demo status saved")}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "meditation") {
+    return (
+      <MeditationFocus
+        titleId={titleId}
+        initial={demo.meditation}
+        onSave={() => onSaveStatus("Meditation demo completed")}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "measurements") {
+    return (
+      <MeasurementsFocus
+        titleId={titleId}
+        initial={demo.measurements}
+        onSave={() => onSaveStatus("Measurements demo logged")}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "progress_photos" || moduleKey === "profile") {
+    return (
+      <ProfileFocus
+        titleId={titleId}
+        initial={demo.profile}
+        onSave={() => onSaveStatus("Profile preview saved (status only)")}
+        onCancel={onCancel}
+      />
+    );
+  }
+
+  return (
+    <FocusPanel
+      title={`${moduleKey} (demo shell)`}
+      titleId={titleId}
+      onClose={onCancel}
+      footer={
+        <>
+          <PixelButton
+            tone="primary"
+            loading={pending}
+            onClick={() => onSaveStatus(`${moduleKey} marked completed (demo)`)}
+          >
+            Save status
+          </PixelButton>
+          <PixelButton tone="danger" onClick={onCancel}>
+            Cancel
+          </PixelButton>
+        </>
+      }
+    >
+      <p className="text-sm text-[var(--mt-ink)]">
+        Domain details for <strong>{moduleKey}</strong> are still preview/demo. Saving
+        only updates <code>daily_module_statuses</code>.
+      </p>
+    </FocusPanel>
   );
 }

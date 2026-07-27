@@ -30,16 +30,15 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 2 — Live GeoCities flat-lay board shell** is complete when verification passes and CI is green.
+**Increment 3 — Auth + customizable board + daily status** is implemented locally (uncommitted until you ask).
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do not start Increment 3 (auth + profile + RLS) without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 4 without authorization.
 
-### Still deferred
+### Still deferred (Increment 4+)
 
-- Supabase Auth / profiles / RLS (Increment 3)
-- Domain Dexie tables and Supabase domain migrations
+- Expanded Dexie domain schema / workout–meal sync kernel
 - Barcode / USDA / OFF client libraries
-- Real module CRUD and persistence
+- Full module CRUD engines (nutrition, workout, rehab, photos, calendar)
 
 ## Source of truth (read these first)
 

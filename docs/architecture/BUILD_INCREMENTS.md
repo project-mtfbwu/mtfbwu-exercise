@@ -68,18 +68,41 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 
 ---
 
-## Increment 3 — Auth + profile + RLS skeleton
+## Increment 3 — Auth + customizable board + daily status
 
-- Supabase Auth
-- `profiles` table + RLS
-- Enabled modules + animation_mode preferences (server-backed)
-- Logout clears Dexie
+**Goal:** Replace development-only board ownership with authenticated, user-owned configuration and date-based module status. No full domain engines yet.
 
-## Increment 4 — Offline kernel
+### Deliverables
 
-- Dexie schema v1 + outbox
-- Sync worker stub against Supabase
-- Idempotent mutation IDs
+- [x] Supabase Auth UI (sign-up / sign-in / sign-out / forgot / reset) + SSR session proxy
+- [x] Protected routes (no client-only flash of private UI when env configured)
+- [x] Migrations: profiles, module_definitions, user_modules, dashboard_layouts/cards, daily_records, daily_module_statuses
+- [x] RLS ownership policies + idempotent `ensure_user_board_defaults`
+- [x] Onboarding (name, timezone, units, modules, motion)
+- [x] Customize board (enable/disable, keyboard reorder, variant, reset)
+- [x] Today date switching + daily status Save (summary only)
+- [x] Dexie outbox for board/status/profile prefs; logout clears local DB
+- [x] Docs: AUTHENTICATION, INCREMENT_3_*, visual review
+
+### Explicitly out of scope for Increment 3
+
+- Full nutrition / workout / rehab / barcode / AI / measurements / photo upload / calendar engines
+- Social providers / magic-link as primary auth
+- Storing domain log rows in `daily_module_statuses`
+
+### Exit criteria
+
+1. Typecheck, lint, format, tests, build, audit green
+2. Migrations apply on local Supabase when Docker is available
+3. User accepts Increment 3 completion report
+
+---
+
+## Increment 4 — Offline kernel (domain)
+
+- Expand Dexie schema beyond board outbox
+- Sync worker hardening against Supabase domain tables
+- Idempotent mutation IDs for workouts/meals
 
 ## Increment 5 — Exercise catalog + workouts MVP
 

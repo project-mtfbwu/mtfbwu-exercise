@@ -7,23 +7,26 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 1 — Application foundation**
+**Increment 3 — Authentication, customizable board, daily-state foundation**
 
-- Next.js App Router + TypeScript + Tailwind
-- Design tokens from approved GeoCities flat-lay references
-- Env validation, Supabase client shells, Dexie outbox shell
-- Route placeholders, CI, tests
-- **No** domain CRUD, FlatLayBoard UI, or auth screens yet
+- Supabase email/password auth (SSR cookies) + protected routes
+- Profiles, module catalog, user modules, dashboard layouts/cards
+- Daily records + per-module summary status (not domain engines yet)
+- Onboarding + Customize board (keyboard reorder)
+- Dexie outbox for board/settings/status offline writes
+- Focus panels may still show **demo** domain details; Save updates status only
 
-Planning checkpoint: see `docs/architecture/BUILD_INCREMENTS.md`.
+Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.  
+Auth notes: `docs/development/AUTHENTICATION.md`.  
+Data model: `docs/development/INCREMENT_3_DATA_MODEL.md`.
 
 ## Stack
 
 - Node **24.18.0** (Active LTS; see `docs/development/NODE_VERSION.md`)
 - pnpm **11.17.0** (see `docs/development/PACKAGE_MANAGER.md`)
 - Next.js App Router
-- Supabase (Auth/Postgres/Storage/RLS) — wired, not fully featured
-- Dexie offline outbox shell
+- Supabase (Auth/Postgres/Storage/RLS)
+- Dexie offline outbox
 
 ## Quick start
 
@@ -32,11 +35,11 @@ corepack enable
 corepack prepare pnpm@11.17.0 --activate
 pnpm install
 cp .env.example .env.local
-# fill placeholder values for local boot
+# Map keys from `npx supabase start` (Docker required for local Auth/DB)
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) → redirects to `/today`.
+Open [http://localhost:3000](http://localhost:3000) → `/today` (login if unauthenticated).
 
 ## Scripts
 
@@ -60,7 +63,7 @@ Open [http://localhost:3000](http://localhost:3000) → redirects to `/today`.
 
 ## Visual warning
 
-Do not replace the GeoCities flat-lay / focus UI with a generic SaaS dashboard. Inspect references before UI work (Increment 2+).
+Do not replace the GeoCities flat-lay / focus UI with a generic SaaS dashboard. Inspect references before UI work.
 
 ## License
 

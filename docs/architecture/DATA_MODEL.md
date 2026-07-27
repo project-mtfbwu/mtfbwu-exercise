@@ -1,6 +1,6 @@
 # DATA_MODEL.md
 
-Logical persistence sketch. **No migrations in this phase.** Names are indicative.
+Logical persistence sketch. Names match Increment 3 migrations where shipped.
 
 ## Systems of record
 
@@ -10,19 +10,27 @@ Logical persistence sketch. **No migrations in this phase.** Names are indicativ
 | Supabase Storage | Private progress photos (and optional meal receipt images later) |
 | Dexie / IndexedDB | Offline mirrors, outbox, food cache, exercise catalog subset |
 
-## Identity
+## Identity & board (Increment 3 — shipped)
+
+See `docs/development/INCREMENT_3_DATA_MODEL.md` for full column/RLS/conflict detail.
 
 ```
 profiles
   id (uuid = auth.users.id)
-  display_name
-  units_preference
-  animation_mode  -- full | reduced | off
-  enabled_modules jsonb
+  display_name, avatar_path, timezone, locale
+  units_system, animation_mode
+  onboarding_completed, onboarding_step
   created_at, updated_at
+
+module_definitions          -- system catalog (seeded)
+user_modules                -- per-user enable/label/targets
+dashboard_layouts           -- versioned; one active layout
+dashboard_cards             -- position + visual_variant
+daily_records               -- unique (user_id, local_date)
+daily_module_statuses       -- summary status only + revision
 ```
 
-RLS: `id = auth.uid()`.
+RLS: owner-scoped; `module_definitions` authenticated read of active rows.
 
 ## Exercise catalog
 

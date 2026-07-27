@@ -4,22 +4,36 @@ import userEvent from "@testing-library/user-event";
 import { TodayBoard } from "@/widgets/today-board/today-board";
 import { MotionPreferenceProvider } from "@/shared/providers/motion-provider";
 import { writeStoredMotionPreference } from "@/shared/providers/motion";
+import { createTestBoardSnapshot } from "@/test/board-snapshot-fixture";
+
+const refresh = vi.fn();
+const push = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push, refresh, replace: vi.fn(), prefetch: vi.fn() }),
+}));
+
+vi.mock("@/shared/board/actions", () => ({
+  updateDailyStatusAction: vi.fn(async () => ({ ok: true, message: "saved" })),
+}));
 
 function renderBoard() {
   return render(
     <MotionPreferenceProvider>
-      <TodayBoard />
+      <TodayBoard snapshot={createTestBoardSnapshot()} />
     </MotionPreferenceProvider>,
   );
 }
 
-describe("Today flat-lay board (Increment 2)", () => {
+describe("Today flat-lay board (Increment 3)", () => {
   beforeEach(() => {
     writeStoredMotionPreference(window.localStorage, "off");
     window.dispatchEvent(new Event("mtfbwu-motion-change"));
+    push.mockClear();
+    refresh.mockClear();
   });
 
-  it("renders the board heading and all demo module cards", () => {
+  it("renders the board heading and enabled module cards", () => {
     renderBoard();
     expect(screen.getByRole("heading", { level: 1, name: /today/i })).toBeInTheDocument();
     expect(screen.getByTestId("flat-lay-board")).toBeInTheDocument();
@@ -69,7 +83,8 @@ describe("Today flat-lay board (Increment 2)", () => {
     expect(board).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("Save updates collapsed demo state; Cancel does not", async () => {
+  it("Save updates daily status label; Cancel does not", async () => {
+    const { updateDailyStatusAction } = await import("@/shared/board/actions");
     const user = userEvent.setup();
     renderBoard();
 
@@ -77,8 +92,9 @@ describe("Today flat-lay board (Increment 2)", () => {
     await user.click(screen.getByRole("button", { name: /\+500 ml/i }));
     await user.click(screen.getByRole("button", { name: /^Save$/i }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(updateDailyStatusAction).toHaveBeenCalled();
     expect(
-      screen.getByRole("button", { name: /1\.25 \/ 3\.0 L \(demo\)/i }),
+      screen.getByRole("button", { name: /Hydration demo status saved/i }),
     ).toBeInTheDocument();
 
     const before = screen
@@ -101,18 +117,7 @@ describe("Today flat-lay board (Increment 2)", () => {
     await user.click(screen.getByRole("button", { name: /Open Meditation/i }));
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("aria-modal", "true");
-    expect(dialog).toHaveAttribute("aria-labelledby", "focus-title-meditation");
-  });
-
-  it("does not call fetch for demo interactions", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch");
-    const user = userEvent.setup();
-    renderBoard();
-    await user.click(screen.getByRole("button", { name: /Open Breakfast/i }));
-    await user.click(screen.getByRole("button", { name: /Add item/i }));
-    await user.click(screen.getByRole("button", { name: /^Save$/i }));
-    expect(fetchSpy).not.toHaveBeenCalled();
-    fetchSpy.mockRestore();
+    expect(dialog).toHaveAttribute("aria-labelledby", "focus-title-live");
   });
 
   it("motion toggle switches pressed mode", async () => {
@@ -128,5 +133,14 @@ describe("Today flat-lay board (Increment 2)", () => {
     const grid = screen.getByTestId("board-module-grid");
     expect(grid.className).toMatch(/grid/);
     expect(within(grid).getAllByRole("button").length).toBeGreaterThanOrEqual(6);
+  });
+
+  it("shows empty state when no modules enabled", () => {
+    render(
+      <MotionPreferenceProvider>
+        <TodayBoard snapshot={createTestBoardSnapshot({ cards: [] })} />
+      </MotionPreferenceProvider>,
+    );
+    expect(screen.getByText(/No modules enabled/i)).toBeInTheDocument();
   });
 });

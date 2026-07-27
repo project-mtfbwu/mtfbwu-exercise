@@ -12,4 +12,26 @@ export const ROUTES = {
   profile: "/profile",
   import: "/import",
   settings: "/settings",
+  login: "/login",
+  signup: "/signup",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+  onboarding: "/onboarding",
+  customize: "/customize",
 } as const;
+
+/** Routes that require an authenticated session. */
+export const PROTECTED_ROUTES = [
+  ROUTES.today,
+  ROUTES.calendar,
+  ROUTES.plans,
+  ROUTES.progress,
+  ROUTES.profile,
+  ROUTES.import,
+  ROUTES.settings,
+  ROUTES.onboarding,
+  ROUTES.customize,
+] as const;
+
+/** Auth screens that bounce signed-in users to Today (except reset-password). */
+export const AUTH_ROUTES = [ROUTES.login, ROUTES.signup, ROUTES.forgotPassword] as const;
