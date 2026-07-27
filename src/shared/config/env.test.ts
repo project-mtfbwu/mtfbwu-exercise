@@ -34,6 +34,18 @@ describe("environment validation", () => {
     }
   });
 
+  it("defaults the optional Open Food Facts User-Agent", () => {
+    const withoutUserAgent: Record<string, string | undefined> = { ...valid };
+    delete withoutUserAgent.OPEN_FOOD_FACTS_USER_AGENT;
+    const parsed = envSchemas.serverEnvSchema.safeParse(withoutUserAgent);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.OPEN_FOOD_FACTS_USER_AGENT).toBe(
+        "MTFBWU/0.1.0 (nutrition@local)",
+      );
+    }
+  });
+
   it("rejects incomplete server schema", () => {
     const parsed = envSchemas.serverEnvSchema.safeParse({
       NEXT_PUBLIC_APP_URL: valid.NEXT_PUBLIC_APP_URL,

@@ -40,8 +40,9 @@ outbox
 | Dashboard reorder / variant | Increment 3 | Version conflict on layout |
 | Daily module status | Increment 3 | Revision + completed protection |
 | Profile prefs (safe fields) | Increment 3 | Not passwords |
-| Workout sessions / sets | Later | Highest priority domain |
-| Meal logs / entries | Later | Cache FoodItems used |
+| Meal logs / entries | Increment 4 | `mealLogDrafts` + primary-keyed upsert payload |
+| Recipes / custom foods / meal templates | Increment 4 | Replayable nutrition payloads; RLS remains authoritative |
+| Workout sessions / sets | Increment 5 | Highest priority next domain |
 | Hydration / meditation domain rows | Later | Status summary already exists |
 | Measurements / photos | Later | |
 
@@ -58,11 +59,23 @@ outbox
 
 Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
 
+## Nutrition writes (Increment 4)
+
+- Dexie v2 stores `mealLogDrafts` by draft ID, user ID, and meal-log ID.
+- Queue a nutrition edit in one Dexie transaction: persist its meal draft (when
+  applicable) and append its outbox record.
+- A payload is restricted to `meal_log`, `recipe`, `custom_food`, or
+  `meal_template`; its rows are ordered by foreign-key dependency and upserted
+  by client-generated primary key. Retrying therefore does not duplicate rows.
+- The online coordinator applies nutrition and existing board payloads. It does
+  not queue authentication, passwords, sessions, provider credentials, or
+  service-role actions.
+
 ## Catalogs offline
 
 - Ship or download a **subset** of exercise DB into Dexie.
 - Cache Open Food Facts products by barcode after first successful fetch (TTL + stale-while-revalidate).
-- USDA: never call from client with API key; if offline, only previously cached FoodItems work.
+- USDA: never call from client with API key; if offline, only previously cached foods work.
 
 ## PWA layering
 
@@ -78,7 +91,7 @@ Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
 
 ## Testing checklist (later increments)
 
-- Airplane mode: create session + meal → kill app → relaunch → still present → go online → appears in Supabase once.
+- Airplane mode: create meal draft → kill app → relaunch → still present → go online → appears in Supabase once.
 - Duplicate delivery of same `client_mutation_id` does not duplicate sets.
 - Partial failure mid-session sync retries without corrupting order.
 

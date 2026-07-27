@@ -38,6 +38,8 @@ USDA FoodData Central ([API Guide](https://fdc.nal.usda.gov/api-guide/)):
 - API key must not be published in repositories or client code; leaked keys are deactivated.
 - Default rate limit ~1000 req/h/IP; use server-side caching and batch `/foods`.
 - Data is CC0 / public domain; cite FoodData Central.
+- Increment 4 requests run only from server modules/routes; `USDA_FDC_API_KEY`
+  is server environment configuration, never a `NEXT_PUBLIC_` variable.
 
 Open Food Facts:
 
@@ -46,6 +48,19 @@ Open Food Facts:
 - Prefer local/cached product reads; bulk via exports if volume grows.
 - Database licensed ODbL; contents DbCL; images CC-BY-SA — track attribution obligations.
 - Do **not** copy AGPL Product Opener server code into this repo; use the HTTP API / exports.
+- Increment 4's OFF client is server-only and uses a configured server-side
+  `OPEN_FOOD_FACTS_USER_AGENT`; it contains no private API credential.
+
+## Nutrition data boundaries
+
+- All nutrition tables have RLS. Catalog reads are authenticated-only; private
+  custom foods, recipes, templates, goals, meal logs, and meal items are
+  owner-scoped.
+- Authenticated clients cannot write provider cache tables (`barcodes`,
+  `branded_products`) or system catalog rows. Only the server/service role may
+  normalize and cache USDA/OFF responses.
+- Offline drafts contain health data but no passwords, JWTs, API keys, service
+  keys, or provider response secrets. Logout deletes the Dexie database.
 
 ## Offline device risk
 

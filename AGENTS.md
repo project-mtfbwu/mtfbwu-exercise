@@ -30,15 +30,15 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 3 — Auth + customizable board + daily status** is implemented locally (uncommitted until you ask).
+**Increment 4 — Nutrition engine** is authorized and in progress locally (uncommitted until you ask).
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 4 without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 5 without authorization.
 
-### Still deferred (Increment 4+)
+### Still deferred (Increment 5+)
 
-- Expanded Dexie domain schema / workout–meal sync kernel
-- Barcode / USDA / OFF client libraries
-- Full module CRUD engines (nutrition, workout, rehab, photos, calendar)
+- Workout engine and offline session logging
+- Camera barcode scanning, OCR, and AI meal parsing
+- Full rehab, measurements/photos, calendar, and custom-tracker engines
 
 ## Source of truth (read these first)
 

@@ -15,7 +15,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     env:
       NEXT_PUBLIC_APP_URL: http://localhost:3000
@@ -43,6 +43,49 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      # Pinned Supabase CLI (npm-installed `supabase` binary is deprecated
+      # upstream). ubuntu-latest ships Docker already running.
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.109.1
+
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Reset local database (apply Increment 3 + 4 migrations and seed)
+        run: supabase db reset
+
+      - name: Run Increment 3 + Increment 4 DB tests
+        run: |
+          set -euo pipefail
+          DB_CONTAINER=$(docker ps --format '{{.Names}}' | grep '^supabase_db_' | head -n1)
+          if [ -z "$DB_CONTAINER" ]; then
+            echo "::error::could not find a running supabase_db_* container"
+            docker ps
+            exit 1
+          fi
+          echo "Using database container: $DB_CONTAINER"
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            < supabase/tests/increment3_auth_board_rls.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            < supabase/tests/increment4_nutrition_rls.sql
+
+      - name: Generate + validate Supabase TypeScript types
+        run: |
+          set -euo pipefail
+          supabase gen types typescript --local > /tmp/types.generated.ts
+          for table in foods barcodes branded_products meal_logs; do
+            if ! grep -qE "^ *${table}: \{" /tmp/types.generated.ts; then
+              echo "::error::generated local schema is missing table '${table}' -- migrations did not apply as expected"
+              exit 1
+            fi
+          done
+          if ! grep -q "branded_product_id" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing branded_product_id -- update committed types for the barcode -> branded_product model"
+            exit 1
+          fi
+
       - name: Typecheck
         run: pnpm typecheck
 
@@ -62,3 +105,7 @@ jobs:
         # pnpm 11 bulk-advisories endpoint via `pnpm run audit` (see PACKAGE_MANAGER.md).
         # Bare `pnpm audit --prod` still breaks on naked-gzip registry responses.
         run: pnpm run audit
+
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup

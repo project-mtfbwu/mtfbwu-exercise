@@ -77,31 +77,28 @@ performed_sets
   completed, protocol_meta jsonb
 ```
 
-## Nutrition
+## Nutrition (Increment 4)
 
 ```
-food_items
-  id
-  source            -- usda | open_food_facts | user | ai_proposed
-  external_id       -- fdcId / barcode / local
-  barcode
-  name, brand
-  nutrients_per_100g jsonb
-  serving jsonb
-  raw_payload jsonb -- optional bounded cache of provider response
-  cached_at
-  review_status     -- trusted | needs_review | rejected
+nutrient_definitions              -- stable nutrient keys and display units
+foods                             -- normalized catalog/user food identity + provenance
+food_aliases, food_portions       -- searchable names and gram conversions
+food_nutrients                    -- amount per 100 g, one row per nutrient
+branded_products, barcodes        -- server-managed provider/cache metadata
+user_custom_foods                 -- owner mapping + private visibility
 
-meal_logs
-  id, user_id, logged_at, label
-
-meal_entries
-  id, meal_log_id, food_item_id
-  quantity, unit
-  nutrients_snapshot jsonb  -- freeze macros at log time
+recipes, recipe_ingredients       -- reusable user-owned composition; snapshots
+meal_templates, meal_template_items -- planned/reusable meal structures
+meal_logs, meal_log_items          -- performed meals; macros and source/nutrient snapshots
+nutrition_goals                   -- user-owned targets effective from a date
 ```
 
-Server-side USDA lookups populate `food_items`; OFF barcode hits populate/cache similarly.
+`foods.source` records `user_custom`, `mtfbwu_curated`, Open Food Facts, USDA
+dataset tier, branded cache, or other provenance. Performed `meal_log_items`
+freeze display name, macros, detailed nutrient JSON, and source JSON; edits to
+catalog rows never rewrite history. Recipes/templates remain separate from
+performed logs. Provider lookup/cache writes are server-only; user custom-food
+writes are RLS owner-scoped.
 
 ## Rehab / hydration / meditation
 
@@ -155,13 +152,16 @@ ai_import_proposals
 
 ## Dexie mirror (indicative)
 
-Tables roughly: `profiles`, `exercises`, `workout_*`, `food_items`, `meal_*`, `outbox`, `meta`. Versioned via Dexie `db.version(n).stores(...)`.
+Increment 4 adds `mealLogDrafts` (`id`, `userId`, `mealLogId`, payload, timestamps)
+alongside `outbox`. Nutrition payloads contain primary-keyed writes for a meal
+log, recipe, custom food, or meal template and can be safely replayed as
+upserts. Food cache mirrors remain a future optimization.
 
 ## Indexes (early)
 
-- `meal_logs (user_id, logged_at)`
+- `meal_logs (user_id, daily_record_id, meal_type)` and `(user_id, consumed_at desc)`
 - `workout_sessions (user_id, started_at)`
-- `food_items (barcode)`, `food_items (source, external_id)` unique
+- `foods (normalized_name)`, `(source, source_id)` unique, `barcodes (normalized_barcode)`
 - `measurement_entries (user_id, recorded_at)`
 
 ## Non-goals in schema

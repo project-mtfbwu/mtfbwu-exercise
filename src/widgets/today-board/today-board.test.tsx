@@ -17,6 +17,23 @@ vi.mock("@/shared/board/actions", () => ({
   updateDailyStatusAction: vi.fn(async () => ({ ok: true, message: "saved" })),
 }));
 
+vi.mock("@/modules/nutrition/meals/actions", () => ({
+  loadMealsForDailyRecord: vi.fn(async () => []),
+  saveMealLogAction: vi.fn(),
+  deleteMealLogAction: vi.fn(),
+  copyMealFromDateAction: vi.fn(),
+  listMealTemplatesAction: vi.fn(async () => []),
+  applyMealTemplateAction: vi.fn(),
+  saveMealAsTemplateAction: vi.fn(),
+  installStarterTemplateAction: vi.fn(),
+  listRecipesAction: vi.fn(async () => []),
+  saveRecipeAction: vi.fn(),
+  deleteRecipeAction: vi.fn(),
+  saveCustomFoodAction: vi.fn(),
+  loadNutritionGoalsAction: vi.fn(async () => null),
+  updateNutritionGoalsAction: vi.fn(),
+}));
+
 function renderBoard() {
   return render(
     <MotionPreferenceProvider>
@@ -58,9 +75,7 @@ describe("Today flat-lay board (Increment 3)", () => {
     expect(breakfast).toHaveFocus();
     await user.keyboard("{Enter}");
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /Breakfast \(demo\)/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Breakfast meal/i })).toBeInTheDocument();
   });
 
   it("closes focus with Escape and restores trigger focus", async () => {

@@ -265,9 +265,15 @@ export async function updateDailyStatusAction(input: unknown): Promise<MutationR
     p_status_id: parsed.data.statusId,
     p_expected_revision: parsed.data.expectedRevision,
     p_status: parsed.data.status,
-    p_summary_text: parsed.data.summaryText ?? null,
-    p_progress_value: parsed.data.progressValue ?? null,
-    p_progress_target: parsed.data.progressTarget ?? null,
+    ...(parsed.data.summaryText !== undefined
+      ? { p_summary_text: parsed.data.summaryText }
+      : {}),
+    ...(parsed.data.progressValue !== undefined
+      ? { p_progress_value: parsed.data.progressValue }
+      : {}),
+    ...(parsed.data.progressTarget !== undefined
+      ? { p_progress_target: parsed.data.progressTarget }
+      : {}),
   });
 
   if (error) {

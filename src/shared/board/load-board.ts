@@ -1,9 +1,14 @@
 import { createSupabaseServerClient } from "@/shared/database/server";
 import type { BoardCardView, BoardSnapshot } from "@/shared/board/board-model";
-import { labelForStatus } from "@/shared/board/board-model";
+import { labelForStatus, nutritionStatusLabel } from "@/shared/board/board-model";
 import { clampToLoggableLocalDate, todayLocalDate } from "@/shared/utils/local-date";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/shared/config/constants";
+import { sumMealMacros } from "@/modules/nutrition/calculations";
+import {
+  loadMealsForDailyRecord,
+  loadNutritionGoalsAction,
+} from "@/modules/nutrition/meals/actions";
 
 export async function requireUser() {
   const supabase = await createSupabaseServerClient();
@@ -119,6 +124,18 @@ export async function loadBoardSnapshot(
 
   if (statusError) throw new Error(statusError.message);
 
+  const meals = await loadMealsForDailyRecord(dailyRecord.id);
+  const nutritionSummary = {
+    ...sumMealMacros(meals.map((meal) => meal.macros)),
+    mealCount: meals.length,
+    itemCount: meals.reduce((count, meal) => count + meal.items.length, 0),
+  };
+  // Loads the most recent goal effective on or before this date; it does not
+  // create one. A blank baseline is only ever created when the user explicitly
+  // opens nutrition goals (see `ensureNutritionGoalsAction`), so an unrelated
+  // board load can never silently shadow a goal set for an earlier date.
+  const nutritionGoals = await loadNutritionGoalsAction(localDate);
+
   const defById = new Map((definitions ?? []).map((d) => [d.id, d]));
   const moduleById = new Map((userModules ?? []).map((m) => [m.id, m]));
   const statusByModule = new Map((statuses ?? []).map((s) => [s.user_module_id, s]));
@@ -136,7 +153,16 @@ export async function loadBoardSnapshot(
       definition,
       status,
       title: userModule.custom_label?.trim() || definition.display_name,
-      statusLabel: labelForStatus(definition, status, userModule.custom_label),
+      statusLabel:
+        definition.key === "nutrition"
+          ? nutritionStatusLabel(
+              nutritionSummary,
+              nutritionGoals,
+              definition,
+              status,
+              userModule.custom_label,
+            )
+          : labelForStatus(definition, status, userModule.custom_label),
     });
   }
 
@@ -146,6 +172,8 @@ export async function loadBoardSnapshot(
     cards: views,
     localDate,
     dailyRecordId: dailyRecord.id,
+    nutritionSummary,
+    nutritionGoals,
     syncBanner: null,
   };
 }

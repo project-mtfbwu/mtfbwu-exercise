@@ -1,0 +1,12 @@
+{
+  "fdcId": 1102644,
+  "description": "Apples, raw, with skin",
+  "dataType": "Foundation",
+  "servingSize": 182,
+  "servingSizeUnit": "g",
+  "foodNutrients": [
+    { "nutrient": { "number": "1008" }, "amount": 52 },
+    { "nutrient": { "number": "1003" }, "amount": 0.26 },
+    { "nutrient": { "number": "1079" }, "amount": 2.4 }
+  ]
+}

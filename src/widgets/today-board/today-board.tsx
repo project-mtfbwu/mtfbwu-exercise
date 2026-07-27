@@ -22,7 +22,7 @@ import {
 import { AppLink } from "@/shared/ui/app-link";
 import { ROUTES } from "@/shared/config/constants";
 import { cn } from "@/shared/utils/cn";
-import { BreakfastFocus } from "@/widgets/today-board/focus/breakfast-focus";
+import { MealFocus } from "@/widgets/today-board/focus/meal-focus";
 import { WorkoutFocus } from "@/widgets/today-board/focus/workout-focus";
 import { WaterFocus } from "@/widgets/today-board/focus/water-focus";
 import { MeditationFocus } from "@/widgets/today-board/focus/meditation-focus";
@@ -286,6 +286,8 @@ export function TodayBoard({ snapshot }: Props) {
             titleId="focus-title-live"
             demo={demo}
             pending={pending}
+            dailyRecordId={snapshot.dailyRecordId}
+            localDate={snapshot.localDate}
             onCancel={() => setOpenCardId(null)}
             onSaveStatus={saveStatus}
           />
@@ -300,6 +302,8 @@ function ModuleFocusRouter({
   titleId,
   demo,
   pending,
+  dailyRecordId,
+  localDate,
   onCancel,
   onSaveStatus,
 }: {
@@ -307,15 +311,18 @@ function ModuleFocusRouter({
   titleId: string;
   demo: ReturnType<typeof createInitialDemoState>;
   pending: boolean;
+  dailyRecordId: string;
+  localDate: string;
   onCancel: () => void;
   onSaveStatus: (summary: string) => void;
 }) {
   if (moduleKey === "nutrition") {
     return (
-      <BreakfastFocus
+      <MealFocus
         titleId={titleId}
-        initial={demo.breakfast}
-        onSave={() => onSaveStatus("Nutrition demo preview completed")}
+        dailyRecordId={dailyRecordId}
+        localDate={localDate}
+        onSaved={onSaveStatus}
         onCancel={onCancel}
       />
     );

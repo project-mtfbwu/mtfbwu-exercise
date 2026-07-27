@@ -1,5 +1,5 @@
 /**
- * Sync coordinator — drains Dexie outbox for Increment 3 board mutations.
+ * Sync coordinator — drains Dexie outbox for board and nutrition mutations.
  * Auth actions are never queued offline.
  */
 import type { createSupabaseBrowserClient } from "@/shared/database/client";
@@ -9,6 +9,10 @@ import {
   isBoardOutboxPayload,
   type BoardOutboxPayload,
 } from "@/shared/offline/board-outbox";
+import {
+  isNutritionOutboxPayload,
+  type NutritionOutboxPayload,
+} from "@/shared/offline/nutrition-outbox";
 import { useSyncStatusStore } from "@/shared/offline/sync-status-store";
 import { isLayoutConflictError, isStatusConflictError } from "@/shared/board/board-model";
 
@@ -84,10 +88,15 @@ export function createBoardSyncCoordinator(
 }
 
 async function applyRecord(client: BrowserClient, record: OutboxRecord) {
-  if (!isBoardOutboxPayload(record.payload)) {
-    throw new Error(`Unsupported outbox payload for ${record.entityType}`);
+  if (isBoardOutboxPayload(record.payload)) {
+    await applyBoardPayload(client, record.payload);
+    return;
   }
-  await applyBoardPayload(client, record.payload);
+  if (isNutritionOutboxPayload(record.payload)) {
+    await applyNutritionPayload(client, record.payload);
+    return;
+  }
+  throw new Error(`Unsupported outbox payload for ${record.entityType}`);
 }
 
 async function applyBoardPayload(client: BrowserClient, payload: BoardOutboxPayload) {
@@ -159,7 +168,9 @@ async function applyBoardPayload(client: BrowserClient, payload: BoardOutboxPayl
         p_status_id: payload.statusId,
         p_expected_revision: payload.expectedRevision,
         p_status: payload.status,
-        p_summary_text: payload.summaryText ?? null,
+        ...(payload.summaryText !== undefined
+          ? { p_summary_text: payload.summaryText }
+          : {}),
       });
       if (error) throw new Error(error.message);
       return;
@@ -191,5 +202,25 @@ async function applyBoardPayload(client: BrowserClient, payload: BoardOutboxPayl
       const _exhaustive: never = payload;
       throw new Error(`Unhandled payload ${JSON.stringify(_exhaustive)}`);
     }
+  }
+}
+
+async function applyNutritionPayload(
+  client: BrowserClient,
+  payload: NutritionOutboxPayload,
+) {
+  for (const write of payload.writes) {
+    // Nutrition tables land in Increment 4. Their generated database types are
+    // refreshed after local migrations; this narrow adapter keeps the shared
+    // coordinator compatible while the checked-in Increment 3 types remain.
+    const nutritionClient = client as unknown as {
+      from: (table: string) => {
+        upsert: (values: Record<string, unknown> | Record<string, unknown>[]) => Promise<{
+          error: { message: string } | null;
+        }>;
+      };
+    };
+    const { error } = await nutritionClient.from(write.table).upsert(write.values);
+    if (error) throw new Error(error.message);
   }
 }

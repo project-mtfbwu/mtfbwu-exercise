@@ -72,6 +72,8 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 
 **Goal:** Replace development-only board ownership with authenticated, user-owned configuration and date-based module status. No full domain engines yet.
 
+**Status:** Complete.
+
 ### Deliverables
 
 - [x] Supabase Auth UI (sign-up / sign-in / sign-out / forgot / reset) + SSR session proxy
@@ -98,11 +100,24 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 
 ---
 
-## Increment 4 — Offline kernel (domain)
+## Increment 4 — Nutrition engine
 
-- Expand Dexie schema beyond board outbox
-- Sync worker hardening against Supabase domain tables
-- Idempotent mutation IDs for workouts/meals
+**Goal:** Ship source-normalized nutrition persistence, calculations, and offline meal drafts with replayable nutrition writes.
+
+### Deliverables
+
+- [x] Nutrition schema + RLS: foods, portions, nutrients, barcodes, custom foods, recipes, meal templates, performed meal logs/items, and goals
+- [x] Curated starter-food migration with explicit provisional/verified status
+- [x] Server-only USDA and Open Food Facts resolution clients; source normalization and calculations
+- [x] Dexie v2 `mealLogDrafts` plus nutrition outbox payloads for meal logs, recipes, custom foods, and meal templates
+- [x] Nutrition source, calculation, local-Supabase, and test documentation
+
+### Deferred from Increment 4
+
+- Camera barcode scanning, nutrition-label OCR, and AI meal parsing
+- Native `meal_log_items.recipe_id` logging (recipe servings expand to food lines today)
+- Workout / rehab / progress-photo persistence
+- Live USDA/OFF integration verification against production APIs in CI
 
 ## Increment 5 — Exercise catalog + workouts MVP
 
@@ -111,31 +126,23 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 - Straight sets + basic superset group id
 - Offline session logging
 
-## Increment 6 — Nutrition MVP
-
-- FoodItem normalization
-- Server USDA proxy + cache
-- OFF barcode path + zxing camera
-- Meal logs offline
-- Source priority per ADR 0004
-
-## Increment 7 — Measurements + private photos
+## Increment 6 — Measurements + private photos
 
 - Measurement entries
 - Private Storage bucket + RLS
 - Progress photo upload/view
 
-## Increment 8 — Rehab, hydration, meditation, calendar
+## Increment 7 — Rehab, hydration, meditation, calendar
 
 - Thin modules on same patterns
 - Calendar read-model
 
-## Increment 9 — Custom trackers + AI import review
+## Increment 8 — Custom trackers + AI import review
 
 - Configurable trackers
 - AI proposal review UI + provenance
 
-## Increment 10 — Hardening
+## Increment 9 — Hardening
 
 - Conflict UX, export/delete, performance, security pass
 - Drop-set and richer protocols if not already done

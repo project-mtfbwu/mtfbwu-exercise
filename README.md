@@ -7,18 +7,17 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 3 — Authentication, customizable board, daily-state foundation**
+**Increment 4 — Nutrition engine**
 
-- Supabase email/password auth (SSR cookies) + protected routes
-- Profiles, module catalog, user modules, dashboard layouts/cards
-- Daily records + per-module summary status (not domain engines yet)
-- Onboarding + Customize board (keyboard reorder)
-- Dexie outbox for board/settings/status offline writes
-- Focus panels may still show **demo** domain details; Save updates status only
+- Nutrition schema, RLS, curated starter foods, recipes, meal templates, meal logs, and goals
+- Server-only USDA/Open Food Facts clients with normalized source priority
+- Nutrition calculations and snapshot-based performed meal records
+- Dexie meal-log drafts plus retry-safe nutrition outbox payloads
+- Camera barcode scanning, OCR, AI meal parsing, and workout logging remain deferred
 
-Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.  
-Auth notes: `docs/development/AUTHENTICATION.md`.  
-Data model: `docs/development/INCREMENT_3_DATA_MODEL.md`.
+Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.
+Nutrition notes: `docs/development/INCREMENT_4_NUTRITION.md`.
+Data model: `docs/architecture/DATA_MODEL.md`.
 
 ## Stack
 

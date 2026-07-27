@@ -17,7 +17,11 @@ const publicEnvSchema = z.object({
 const serverEnvSchema = publicEnvSchema.extend({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   USDA_FDC_API_KEY: z.string().min(1),
-  OPEN_FOOD_FACTS_USER_AGENT: z.string().min(1),
+  OPEN_FOOD_FACTS_USER_AGENT: z
+    .string()
+    .min(1)
+    .optional()
+    .default("MTFBWU/0.1.0 (nutrition@local)"),
 });
 
 export type PublicEnv = z.infer<typeof publicEnvSchema>;

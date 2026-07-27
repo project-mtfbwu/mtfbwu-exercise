@@ -1,0 +1,32 @@
+{
+  "foods": [
+    {
+      "fdcId": 1102644,
+      "description": "Apples, raw, with skin",
+      "dataType": "Foundation",
+      "foodNutrients": [
+        {
+          "nutrientNumber": "1008",
+          "nutrientName": "Energy",
+          "unitName": "KCAL",
+          "value": 52
+        },
+        {
+          "nutrientNumber": "1003",
+          "nutrientName": "Protein",
+          "unitName": "G",
+          "value": 0.26
+        },
+        {
+          "nutrientNumber": "1005",
+          "nutrientName": "Carbohydrate",
+          "unitName": "G",
+          "value": 13.81
+        }
+      ]
+    }
+  ],
+  "totalHits": 1,
+  "currentPage": 1,
+  "totalPages": 1
+}

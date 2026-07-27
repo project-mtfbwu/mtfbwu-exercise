@@ -8,6 +8,10 @@ import type {
   Profile,
   UserModule,
 } from "@/shared/database/types";
+import type {
+  NutritionDayTotals,
+  NutritionGoalsView,
+} from "@/modules/nutrition/meals/types";
 
 export type BoardCardView = {
   card: DashboardCard;
@@ -24,6 +28,8 @@ export type BoardSnapshot = {
   cards: BoardCardView[];
   localDate: string;
   dailyRecordId: string;
+  nutritionSummary?: NutritionDayTotals;
+  nutritionGoals?: NutritionGoalsView | null;
   syncBanner: string | null;
 };
 
@@ -38,6 +44,30 @@ export function labelForStatus(
   }
   if (status.summary_text) return status.summary_text;
   return `${title} · ${status.status.replace("_", " ")}`;
+}
+
+/**
+ * Shows calories against a target when one is set, falling back to the
+ * generic status label so an empty day still reads as "not started" rather
+ * than a bare "0 / — kcal".
+ */
+export function nutritionStatusLabel(
+  totals: NutritionDayTotals,
+  goals: NutritionGoalsView | null | undefined,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  const target = goals?.calorieTarget;
+  if (totals.mealCount === 0 && target == null) {
+    return labelForStatus(definition, status, customLabel);
+  }
+  const targetLabel = target != null ? `${target}` : "—";
+  const mealsLabel =
+    totals.mealCount > 0
+      ? ` · ${totals.mealCount} meal${totals.mealCount === 1 ? "" : "s"}`
+      : "";
+  return `${totals.calories} / ${targetLabel} kcal${mealsLabel}`;
 }
 
 export function variantToFlatLay(variant: CardVisualVariant): {
