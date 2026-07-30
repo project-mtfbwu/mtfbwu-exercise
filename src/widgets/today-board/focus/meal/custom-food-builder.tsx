@@ -34,10 +34,19 @@ type NumberFieldKey =
   | "fatPer100g"
   | "fiberPer100g";
 
+export type CustomFoodBuilderPrefill = {
+  /** Bumped by the caller each time it wants to re-trigger the prefill (e.g. re-clicking "Create custom" with the same barcode). */
+  token: number;
+  barcode: string;
+};
+
 export function CustomFoodBuilder({
   onSaved,
+  prefill,
 }: {
   onSaved: (food: SavedCustomFood) => void;
+  /** Opens the builder and fills the barcode field, e.g. from the barcode "not found" flow. */
+  prefill?: CustomFoodBuilderPrefill | null;
 }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -58,6 +67,16 @@ export function CustomFoodBuilder({
 
   function setField(key: NumberFieldKey, value: string) {
     setFields((previous) => ({ ...previous, [key]: value }));
+  }
+
+  // Adjusts state during render when the caller bumps the prefill token,
+  // per https://react.dev/learn/you-might-not-need-an-effect — avoids the
+  // extra render pass (and the set-state-in-effect lint) an effect would add.
+  const [appliedPrefillToken, setAppliedPrefillToken] = useState(prefill?.token);
+  if (prefill && prefill.token !== appliedPrefillToken) {
+    setAppliedPrefillToken(prefill.token);
+    setBarcode(prefill.barcode);
+    setOpen(true);
   }
 
   function submit() {

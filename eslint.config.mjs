@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "coverage/**",
     "mtfbwu-scaffold/**",
+    "supabase/.temp/**",
     "next-env.d.ts",
   ]),
 ]);

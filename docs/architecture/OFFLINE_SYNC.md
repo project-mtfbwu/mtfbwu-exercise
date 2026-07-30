@@ -42,7 +42,8 @@ outbox
 | Profile prefs (safe fields) | Increment 3 | Not passwords |
 | Meal logs / entries | Increment 4 | `mealLogDrafts` + primary-keyed upsert payload |
 | Recipes / custom foods / meal templates | Increment 4 | Replayable nutrition payloads; RLS remains authoritative |
-| Workout sessions / sets | Increment 5 | Highest priority next domain |
+| Label-capture drafts (uncached barcode / OCR) | Increment 5 | Dexie `labelCaptureDrafts`; OCR assets local after cache |
+| Workout sessions / sets | Increment 6 | Highest priority next domain |
 | Hydration / meditation domain rows | Later | Status summary already exists |
 | Measurements / photos | Later | |
 
@@ -70,6 +71,14 @@ Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
 - The online coordinator applies nutrition and existing board payloads. It does
   not queue authentication, passwords, sessions, provider credentials, or
   service-role actions.
+
+## Label-capture drafts (Increment 5)
+
+- Dexie v3 adds `labelCaptureDrafts` for offline uncached barcodes and in-progress
+  OCR review (barcode, processed blob reference, fields, pending meal add).
+- Do not keep giant original photos in IndexedDB; handle quota errors in UI.
+- Camera decode works offline; remote OFF lookup requires connectivity or a
+  cached barcode hit. Remote lookup is queued only with user confirmation.
 
 ## Catalogs offline
 

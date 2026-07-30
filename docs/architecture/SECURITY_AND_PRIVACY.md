@@ -81,8 +81,18 @@ Open Food Facts:
 
 ## Barcode camera
 
-- `@zxing/browser` (MIT) runs locally in-browser; frames need not leave device for decode.
+- Prefer native `BarcodeDetector` when available; otherwise `@zxing/browser`
+  (MIT) via dynamic import (`ADR/0005`). Frames stay on-device for decode.
 - Only the decoded barcode value is sent to our backend/OFF cache lookup.
+- Camera: video-only, explicit start, tracks stopped on close/unmount.
+  See `docs/development/CAMERA_PRIVACY.md`.
+
+## Nutrition-label images
+
+- Private Storage bucket `nutrition-labels`; path `{user_id}/nutrition-labels/...`.
+- Signed access only; no public URLs. Default delete after reviewed save.
+- OCR runs on-device (`tesseract.js`); raw OCR is never trusted without review
+  (`ADR/0006`). See `docs/development/IMAGE_RETENTION.md`.
 
 ## Checklist before any production data
 

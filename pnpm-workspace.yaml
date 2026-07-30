@@ -8,6 +8,8 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: false
+  # tesseract.js ships WASM/assets; no trusted install script required for app use.
+  tesseract.js: false
   unrs-resolver: false
 
 # Temporary security overrides until stable Next.js ships patched nested deps.

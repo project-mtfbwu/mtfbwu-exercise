@@ -33,9 +33,24 @@ export type MealLogDraft = {
   updatedAt: string;
 };
 
+/**
+ * A device-local nutrition-label capture waiting on connectivity: either a
+ * barcode scanned while offline (no lookup possible yet) or an in-progress
+ * OCR review the user has not finished. Also a JSON payload for the same
+ * forward-compatibility reason as `MealLogDraft`.
+ */
+export type LabelCaptureDraft = {
+  id: string;
+  userId: string;
+  barcode: string | null;
+  payload: unknown;
+  updatedAt: string;
+};
+
 export class MtfbwuDatabase extends Dexie {
   outbox!: EntityTable<OutboxRecord, "id">;
   mealLogDrafts!: EntityTable<MealLogDraft, "id">;
+  labelCaptureDrafts!: EntityTable<LabelCaptureDraft, "id">;
 
   constructor(name = "mtfbwu") {
     super(name);
@@ -45,6 +60,11 @@ export class MtfbwuDatabase extends Dexie {
     this.version(2).stores({
       outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
       mealLogDrafts: "id, userId, mealLogId, updatedAt",
+    });
+    this.version(3).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
     });
   }
 }

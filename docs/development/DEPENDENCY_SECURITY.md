@@ -84,6 +84,15 @@ overrides:
 
 Smoke test: `src/shared/media/sharp-smoke.test.ts` (resolves sharp via Next’s package tree; does not hit `/_next/image` HTTP).
 
+## Increment 5 dependencies (barcode + OCR)
+
+| Package          | Version | License    | Install scripts                   | Notes                               |
+| ---------------- | ------- | ---------- | --------------------------------- | ----------------------------------- |
+| `@zxing/browser` | `0.2.1` | MIT        | none required                     | Dynamic import fallback for barcode |
+| `tesseract.js`   | `7.0.0` | Apache-2.0 | `allowBuilds.tesseract.js: false` | Client OCR worker; English only     |
+
+Native `BarcodeDetector` has no npm dependency. Neither package receives camera frames off-device. Re-run `pnpm run audit` after any version bump.
+
 ## Supply-chain controls (unchanged)
 
 - Exact `packageManager`: `pnpm@11.17.0`

@@ -77,7 +77,7 @@ performed_sets
   completed, protocol_meta jsonb
 ```
 
-## Nutrition (Increment 4)
+## Nutrition (Increment 4–5)
 
 ```
 nutrient_definitions              -- stable nutrient keys and display units
@@ -91,6 +91,9 @@ recipes, recipe_ingredients       -- reusable user-owned composition; snapshots
 meal_templates, meal_template_items -- planned/reusable meal structures
 meal_logs, meal_log_items          -- performed meals; macros and source/nutrient snapshots
 nutrition_goals                   -- user-owned targets effective from a date
+
+nutrition_label_captures          -- OCR drafts; private_image_path; reviewed JSON
+product_review_events             -- append-only review audit (no image payloads)
 ```
 
 `foods.source` records `user_custom`, `mtfbwu_curated`, Open Food Facts, USDA
@@ -99,6 +102,11 @@ freeze display name, macros, detailed nutrient JSON, and source JSON; edits to
 catalog rows never rewrite history. Recipes/templates remain separate from
 performed logs. Provider lookup/cache writes are server-only; user custom-food
 writes are RLS owner-scoped.
+
+Label images live in private Storage bucket `nutrition-labels` under
+`{user_id}/nutrition-labels/{capture_id}.jpg`. Default retention deletes the
+object after a successful reviewed save unless the user opts to keep it.
+OCR suggestions are never trusted without human confirmation (`ADR/0006`).
 
 ## Rehab / hydration / meditation
 

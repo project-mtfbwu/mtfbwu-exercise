@@ -115,34 +115,55 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 ### Deferred from Increment 4
 
 - Camera barcode scanning, nutrition-label OCR, and AI meal parsing
-- Native `meal_log_items.recipe_id` logging (recipe servings expand to food lines today)
 - Workout / rehab / progress-photo persistence
 - Live USDA/OFF integration verification against production APIs in CI
 
-## Increment 5 — Exercise catalog + workouts MVP
+## Increment 5 — Camera barcode + nutrition-label OCR
+
+**Goal:** Fast packaged-food entry with reviewable barcode scans and human-confirmed label OCR.
+
+### Deliverables
+
+- [x] Native `BarcodeDetector` + `@zxing/browser` fallback behind one adapter
+- [x] Meal-focus scanner UI (camera, manual entry, image upload)
+- [x] Product resolution via barcode cache → Open Food Facts
+- [x] Product-not-found → label capture → OCR → mandatory human review
+- [x] Private `nutrition-labels` Storage bucket + capture/review tables + RLS
+- [x] Offline draft for uncached barcodes; Dexie v3 `labelCaptureDrafts`
+- [x] Docs + ADRs 0005/0006 + visual review
+
+### Explicitly out of scope for Increment 5
+
+- AI plate/meal recognition or portion estimation from photos
+- Natural-language food logging
+- Workout / rehab / progress photos / body measurements
+- Cloud OCR or automatic Open Food Facts contributions
+- Silent OCR saves without human confirmation
+
+## Increment 6 — Exercise catalog + workouts MVP
 
 - Import permissive exercise dataset (Unlicense)
 - Templates vs sessions MVP
 - Straight sets + basic superset group id
 - Offline session logging
 
-## Increment 6 — Measurements + private photos
+## Increment 7 — Measurements + private photos
 
 - Measurement entries
 - Private Storage bucket + RLS
 - Progress photo upload/view
 
-## Increment 7 — Rehab, hydration, meditation, calendar
+## Increment 8 — Rehab, hydration, meditation, calendar
 
 - Thin modules on same patterns
 - Calendar read-model
 
-## Increment 8 — Custom trackers + AI import review
+## Increment 9 — Custom trackers + AI import review
 
 - Configurable trackers
 - AI proposal review UI + provenance
 
-## Increment 9 — Hardening
+## Increment 10 — Hardening
 
 - Conflict UX, export/delete, performance, security pass
 - Drop-set and richer protocols if not already done

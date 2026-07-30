@@ -7,16 +7,18 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 4 — Nutrition engine**
+**Increment 5 — Camera barcode + nutrition-label OCR** (complete locally; commit when ready)
 
-- Nutrition schema, RLS, curated starter foods, recipes, meal templates, meal logs, and goals
-- Server-only USDA/Open Food Facts clients with normalized source priority
-- Nutrition calculations and snapshot-based performed meal records
-- Dexie meal-log drafts plus retry-safe nutrition outbox payloads
-- Camera barcode scanning, OCR, AI meal parsing, and workout logging remain deferred
+- Native `BarcodeDetector` with `@zxing/browser` fallback
+- Meal-focus scanner (camera, manual entry, image upload) and product review
+- Open Food Facts / cache resolution with quality warnings
+- Label capture → client OCR (Tesseract) → mandatory human review → private custom product
+- Private `nutrition-labels` Storage; default image deletion after save
+
+Deferred: AI plate recognition, NL food logging, workouts/rehab/photos.
 
 Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.
-Nutrition notes: `docs/development/INCREMENT_4_NUTRITION.md`.
+Increment notes: `docs/development/INCREMENT_5_BARCODE_AND_LABEL.md`.
 Data model: `docs/architecture/DATA_MODEL.md`.
 
 ## Stack

@@ -1,9 +1,10 @@
-﻿/**
- * Generated Supabase Database types (Increment 3 + 4).
+/**
+ * Generated Supabase Database types (Increment 3–5).
  * Regenerate with: `npx supabase gen types typescript --local`
  * after `supabase db reset`; keep this file in sync with migrations.
  * Convenience Row/Enum aliases at the bottom are hand-maintained.
  */
+
 export type Json =
   string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
@@ -945,6 +946,117 @@ export type Database = {
           },
         ];
       };
+      nutrition_label_captures: {
+        Row: {
+          barcode: string | null;
+          confidence_summary: number | null;
+          created_at: string;
+          deleted_at: string | null;
+          extraction_json: Json;
+          id: string;
+          language: string;
+          ocr_text: string | null;
+          private_image_path: string | null;
+          retain_image: boolean;
+          reviewed_values_json: Json;
+          status: Database["public"]["Enums"]["nutrition_label_capture_status"];
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          barcode?: string | null;
+          confidence_summary?: number | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          extraction_json?: Json;
+          id?: string;
+          language?: string;
+          ocr_text?: string | null;
+          private_image_path?: string | null;
+          retain_image?: boolean;
+          reviewed_values_json?: Json;
+          status?: Database["public"]["Enums"]["nutrition_label_capture_status"];
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          barcode?: string | null;
+          confidence_summary?: number | null;
+          created_at?: string;
+          deleted_at?: string | null;
+          extraction_json?: Json;
+          id?: string;
+          language?: string;
+          ocr_text?: string | null;
+          private_image_path?: string | null;
+          retain_image?: boolean;
+          reviewed_values_json?: Json;
+          status?: Database["public"]["Enums"]["nutrition_label_capture_status"];
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "nutrition_label_captures_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      product_review_events: {
+        Row: {
+          branded_product_id: string | null;
+          capture_id: string | null;
+          created_at: string;
+          details_json: Json;
+          event_type: string;
+          id: string;
+          user_id: string;
+        };
+        Insert: {
+          branded_product_id?: string | null;
+          capture_id?: string | null;
+          created_at?: string;
+          details_json?: Json;
+          event_type: string;
+          id?: string;
+          user_id: string;
+        };
+        Update: {
+          branded_product_id?: string | null;
+          capture_id?: string | null;
+          created_at?: string;
+          details_json?: Json;
+          event_type?: string;
+          id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "product_review_events_branded_product_id_fkey";
+            columns: ["branded_product_id"];
+            isOneToOne: false;
+            referencedRelation: "branded_products";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "product_review_events_capture_id_fkey";
+            columns: ["capture_id"];
+            isOneToOne: false;
+            referencedRelation: "nutrition_label_captures";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "product_review_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           animation_mode: Database["public"]["Enums"]["animation_mode"];
@@ -1302,6 +1414,14 @@ export type Database = {
         | "custom";
       module_category:
         "nutrition" | "training" | "recovery" | "body" | "lifestyle" | "custom";
+      nutrition_label_capture_status:
+        | "draft"
+        | "ocr_running"
+        | "ocr_failed"
+        | "awaiting_review"
+        | "reviewed"
+        | "saved"
+        | "discarded";
       units_system: "metric" | "imperial";
     };
     CompositeTypes: {
@@ -1473,6 +1593,15 @@ export const Constants = {
         "lifestyle",
         "custom",
       ],
+      nutrition_label_capture_status: [
+        "draft",
+        "ocr_running",
+        "ocr_failed",
+        "awaiting_review",
+        "reviewed",
+        "saved",
+        "discarded",
+      ],
       units_system: ["metric", "imperial"],
     },
   },
@@ -1488,6 +1617,8 @@ export type FoodSource = Database["public"]["Enums"]["food_source"];
 export type FoodState = Database["public"]["Enums"]["food_state"];
 export type MealItemType = Database["public"]["Enums"]["meal_item_type"];
 export type DbMealType = Database["public"]["Enums"]["meal_type"];
+export type NutritionLabelCaptureStatus =
+  Database["public"]["Enums"]["nutrition_label_capture_status"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ModuleDefinition = Database["public"]["Tables"]["module_definitions"]["Row"];
@@ -1506,3 +1637,7 @@ export type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
 export type NutritionGoal = Database["public"]["Tables"]["nutrition_goals"]["Row"];
 export type BrandedProduct = Database["public"]["Tables"]["branded_products"]["Row"];
 export type Barcode = Database["public"]["Tables"]["barcodes"]["Row"];
+export type NutritionLabelCapture =
+  Database["public"]["Tables"]["nutrition_label_captures"]["Row"];
+export type ProductReviewEvent =
+  Database["public"]["Tables"]["product_review_events"]["Row"];

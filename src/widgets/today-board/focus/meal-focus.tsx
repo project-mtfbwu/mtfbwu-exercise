@@ -39,10 +39,23 @@ import {
 } from "@/shared/offline/nutrition-outbox";
 import {
   CustomFoodBuilder,
+  type CustomFoodBuilderPrefill,
   type SavedCustomFood,
 } from "@/widgets/today-board/focus/meal/custom-food-builder";
 import { RecipeBuilder } from "@/widgets/today-board/focus/meal/recipe-builder";
 import { SavedMealsSection } from "@/widgets/today-board/focus/meal/saved-meals-section";
+import { BarcodeScannerPanel } from "@/widgets/today-board/focus/meal/barcode-scanner-panel";
+import { LabelCapturePanel } from "@/widgets/today-board/focus/meal/label-capture-panel";
+import type { ProductReviewFood } from "@/widgets/today-board/focus/meal/product-review-card";
+
+/** Which nested "scan" window is currently open inside this meal focus panel. */
+type ScanSubPanel =
+  { kind: "scan-barcode" } | { kind: "scan-label"; barcode: string | null };
+
+const OFF_SOURCE_LABELS: Record<string, string> = {
+  open_food_facts: "Open Food Facts",
+  branded_cache: "Cached product",
+};
 
 type SearchFood = {
   id: string;
@@ -150,6 +163,9 @@ export function MealFocus({
   const [templates, setTemplates] = useState<MealTemplateView[]>([]);
   const [recipes, setRecipes] = useState<RecipeView[]>([]);
   const [goals, setGoals] = useState<NutritionGoalsView | null>(null);
+  const [scanSubPanel, setScanSubPanel] = useState<ScanSubPanel | null>(null);
+  const [customFoodPrefill, setCustomFoodPrefill] =
+    useState<CustomFoodBuilderPrefill | null>(null);
   const [pending, startTransition] = useTransition();
   const onlineStatus = useOnlineStore((s) => s.status);
   const online = onlineStatus !== "offline";
@@ -331,6 +347,64 @@ export function MealFocus({
         macros: macrosFromPer100g(food.per100g, food.servingGrams),
       },
     ]);
+  }
+
+  /** Adds a barcode-matched product (already a real catalog `foods` row) to the current meal. */
+  function addConfirmedProduct(food: ProductReviewFood, amountG: number) {
+    const per100g: MacroNutrients = {
+      calories: food.nutrientsPer100g.energy_kcal ?? null,
+      protein_g: food.nutrientsPer100g.protein_g ?? null,
+      carbs_g: food.nutrientsPer100g.carbohydrate_g ?? null,
+      fat_g: food.nutrientsPer100g.fat_g ?? null,
+      fiber_g: food.nutrientsPer100g.fiber_g ?? null,
+    };
+    setItems((previous) => [
+      ...previous,
+      {
+        id: `new-${food.id}-${crypto.randomUUID()}`,
+        itemType: "food",
+        foodId: food.id,
+        recipeId: null,
+        displayName: food.name,
+        amountG,
+        source: food.source,
+        per100g,
+        macros: macrosFromPer100g(per100g, amountG),
+      },
+    ]);
+    setScanSubPanel(null);
+  }
+
+  /** Adds a just-saved, human-reviewed label-capture product to the current meal. */
+  function addSavedLabelProduct(
+    foodId: string,
+    name: string,
+    per100g: MacroNutrients,
+    servingGrams: number,
+  ) {
+    setItems((previous) => [
+      ...previous,
+      {
+        id: `new-${foodId}-${crypto.randomUUID()}`,
+        itemType: "food",
+        foodId,
+        recipeId: null,
+        displayName: name,
+        amountG: servingGrams,
+        source: "user_custom",
+        per100g,
+        macros: macrosFromPer100g(per100g, servingGrams),
+      },
+    ]);
+    setScanSubPanel(null);
+  }
+
+  function openCreateCustomFromScan(barcode: string | null) {
+    setScanSubPanel(null);
+    setCustomFoodPrefill((previous) => ({
+      token: (previous?.token ?? 0) + 1,
+      barcode: barcode ?? "",
+    }));
   }
 
   function addRecipeServing(recipe: RecipeView) {
@@ -618,7 +692,7 @@ export function MealFocus({
           </PixelButton>
         ))}
       </div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+      <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
         <label className="text-sm font-bold" htmlFor="meal-title">
           Meal title
           <input
@@ -630,13 +704,49 @@ export function MealFocus({
             placeholder={`${labels[mealType]} (optional)`}
           />
         </label>
-        <PixelButton tone="cyan" disabled={pending || !online} onClick={copyPrevious}>
-          Copy previous
-        </PixelButton>
-        <PixelButton tone="neutral" disabled aria-label="Scan barcode (later)">
-          Scan barcode (later)
-        </PixelButton>
+        <div className="flex flex-wrap items-end gap-2">
+          <PixelButton tone="cyan" disabled={pending || !online} onClick={copyPrevious}>
+            Copy previous
+          </PixelButton>
+          <PixelButton
+            tone="cyan"
+            disabled={pending || Boolean(scanSubPanel)}
+            onClick={() => setScanSubPanel({ kind: "scan-barcode" })}
+          >
+            Scan barcode
+          </PixelButton>
+          <PixelButton
+            tone="cyan"
+            disabled={pending || Boolean(scanSubPanel)}
+            onClick={() => setScanSubPanel({ kind: "scan-label", barcode: null })}
+          >
+            Scan label
+          </PixelButton>
+        </div>
       </div>
+
+      {scanSubPanel?.kind === "scan-barcode" ? (
+        <div className="mt-3">
+          <BarcodeScannerPanel
+            titleId={`${titleId}-scan-barcode`}
+            online={online}
+            onClose={() => setScanSubPanel(null)}
+            onProductConfirmed={addConfirmedProduct}
+            onCaptureLabel={(barcode) => setScanSubPanel({ kind: "scan-label", barcode })}
+            onCreateCustom={openCreateCustomFromScan}
+          />
+        </div>
+      ) : null}
+      {scanSubPanel?.kind === "scan-label" ? (
+        <div className="mt-3">
+          <LabelCapturePanel
+            titleId={`${titleId}-scan-label`}
+            barcode={scanSubPanel.barcode}
+            onClose={() => setScanSubPanel(null)}
+            onSaved={addSavedLabelProduct}
+          />
+        </div>
+      ) : null}
       <label className="mt-3 block text-sm font-bold" htmlFor="food-search">
         Search food
         <input
@@ -702,6 +812,11 @@ export function MealFocus({
                 ) : null}
               </p>
               <p className="text-xs">
+                {OFF_SOURCE_LABELS[item.source] ? (
+                  <span className="mr-1 inline-block border-2 border-[var(--mt-ink)] bg-[var(--mt-neon-cyan)] px-1 py-0.5 align-middle text-[10px] font-extrabold uppercase">
+                    {OFF_SOURCE_LABELS[item.source]}
+                  </span>
+                ) : null}
                 {item.source} · {item.macros.calories} kcal · P {item.macros.protein_g} ·
                 C {item.macros.carbs_g} · F {item.macros.fat_g}
               </p>
@@ -759,7 +874,7 @@ export function MealFocus({
         onSaveAsTemplate={saveAsTemplate}
         onInstallStarter={installStarter}
       />
-      <CustomFoodBuilder onSaved={addCustomFood} />
+      <CustomFoodBuilder onSaved={addCustomFood} prefill={customFoodPrefill} />
       <RecipeBuilder
         recipes={recipes}
         onRecipesChanged={setRecipes}

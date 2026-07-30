@@ -7,3 +7,4 @@ export * from "./sync-status-store";
 export * from "./board-outbox";
 export * from "./nutrition-outbox";
 export * from "./clear-local";
+export * from "./label-capture-draft";

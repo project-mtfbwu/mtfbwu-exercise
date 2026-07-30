@@ -13,4 +13,9 @@ provider cache rows.
 
 Respect OFF's published rate limits and attribution/license obligations
 (database ODbL, contents DbCL, images CC-BY-SA). Do not copy Product Opener's
-AGPL application code. Camera scanning itself is deferred.
+AGPL application code.
+
+Camera barcode scanning (Increment 5) uses native `BarcodeDetector` or
+`@zxing/browser`, then calls this server adapter for cache miss / refresh.
+Decoded QR URLs are never treated as food barcodes. See
+`docs/development/BARCODE_SCANNER.md` and `ADR/0005`.
