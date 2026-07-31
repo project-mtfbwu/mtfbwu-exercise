@@ -78,6 +78,8 @@ export type Recipe = Database["public"]["Tables"]["recipes"]["Row"];
 export type NutritionGoal = Database["public"]["Tables"]["nutrition_goals"]["Row"];
 export type BrandedProduct = Database["public"]["Tables"]["branded_products"]["Row"];
 export type Barcode = Database["public"]["Tables"]["barcodes"]["Row"];
+/** Barcode → branded_product ownership (Increment 4 model marker). */
+export type BarcodeBrandedProductId = Barcode["branded_product_id"];
 export type NutritionLabelCapture =
   Database["public"]["Tables"]["nutrition_label_captures"]["Row"];
 export type ProductReviewEvent =

@@ -87,8 +87,13 @@ jobs:
               exit 1
             fi
           done
+          # Canonical generated schema lives in database.types.ts; types.ts re-exports aliases.
+          if ! grep -q "branded_product_id" src/shared/database/database.types.ts; then
+            echo "::error::src/shared/database/database.types.ts is missing branded_product_id -- regenerate types for the barcode -> branded_product model"
+            exit 1
+          fi
           if ! grep -q "branded_product_id" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing branded_product_id -- update committed types for the barcode -> branded_product model"
+            echo "::error::src/shared/database/types.ts is missing branded_product_id alias -- keep BarcodeBrandedProductId (or equivalent) in the aliases module"
             exit 1
           fi
           if ! grep -q "nutrition_label_captures" src/shared/database/types.ts; then
@@ -109,6 +114,10 @@ jobs:
           fi
           if ! grep -q "rehab_plans" src/shared/database/types.ts; then
             echo "::error::src/shared/database/types.ts is missing rehab_plans -- regenerate types after Increment 7 migration"
+            exit 1
+          fi
+          if ! grep -q "rehab_sessions" src/shared/database/database.types.ts; then
+            echo "::error::src/shared/database/database.types.ts is missing rehab_sessions -- regenerate after Increment 7"
             exit 1
           fi
 
