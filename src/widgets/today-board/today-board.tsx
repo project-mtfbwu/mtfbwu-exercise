@@ -24,6 +24,7 @@ import { ROUTES } from "@/shared/config/constants";
 import { cn } from "@/shared/utils/cn";
 import { MealFocus } from "@/widgets/today-board/focus/meal-focus";
 import { WorkoutFocus } from "@/widgets/today-board/focus/workout-focus";
+import { RehabFocus } from "@/widgets/today-board/focus/rehab-focus";
 import { WaterFocus } from "@/widgets/today-board/focus/water-focus";
 import { MeditationFocus } from "@/widgets/today-board/focus/meditation-focus";
 import { MeasurementsFocus } from "@/widgets/today-board/focus/measurements-focus";
@@ -190,6 +191,30 @@ export function TodayBoard({ snapshot }: Props) {
     router.refresh();
   }
 
+  function rehabSaved(summaryText: string) {
+    setCards((prev) =>
+      prev.map((c) =>
+        c.definition.key === "rehab"
+          ? {
+              ...c,
+              status: c.status
+                ? {
+                    ...c.status,
+                    status: "completed",
+                    summary_text: summaryText,
+                  }
+                : c.status,
+              statusLabel: summaryText,
+            }
+          : c,
+      ),
+    );
+    setOpenCardId(null);
+    setError(null);
+    setStatusMessage("Rehab session finished");
+    router.refresh();
+  }
+
   return (
     <div className="space-y-4">
       <ScreenReaderStatus message={statusMessage} />
@@ -315,9 +340,11 @@ export function TodayBoard({ snapshot }: Props) {
             localDate={snapshot.localDate}
             timezone={snapshot.profile.timezone}
             workoutDaySummary={snapshot.workoutDaySummary}
+            rehabDaySummary={snapshot.rehabDaySummary}
             onCancel={() => setOpenCardId(null)}
             onSaveStatus={saveStatus}
             onWorkoutSaved={workoutSaved}
+            onRehabSaved={rehabSaved}
           />
         ) : null}
       </FocusLayer>
@@ -335,9 +362,11 @@ function ModuleFocusRouter({
   localDate,
   timezone,
   workoutDaySummary,
+  rehabDaySummary,
   onCancel,
   onSaveStatus,
   onWorkoutSaved,
+  onRehabSaved,
 }: {
   moduleKey: string;
   titleId: string;
@@ -348,9 +377,11 @@ function ModuleFocusRouter({
   localDate: string;
   timezone: string;
   workoutDaySummary?: BoardSnapshot["workoutDaySummary"];
+  rehabDaySummary?: BoardSnapshot["rehabDaySummary"];
   onCancel: () => void;
   onSaveStatus: (summary: string) => void;
   onWorkoutSaved: (summary: string) => void;
+  onRehabSaved: (summary: string) => void;
 }) {
   if (moduleKey === "nutrition") {
     return (
@@ -372,7 +403,22 @@ function ModuleFocusRouter({
         localDate={localDate}
         timezone={timezone}
         workoutDaySummary={workoutDaySummary}
+        hasActiveRehabRestrictions={rehabDaySummary?.hasActiveRestrictions ?? false}
         onSaved={onWorkoutSaved}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "rehab") {
+    return (
+      <RehabFocus
+        titleId={titleId}
+        userId={userId}
+        dailyRecordId={dailyRecordId}
+        localDate={localDate}
+        timezone={timezone}
+        rehabDaySummary={rehabDaySummary}
+        onSaved={onRehabSaved}
         onCancel={onCancel}
       />
     );

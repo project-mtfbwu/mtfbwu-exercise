@@ -44,6 +44,7 @@ outbox
 | Recipes / custom foods / meal templates | Increment 4 | Replayable nutrition payloads; RLS remains authoritative |
 | Label-capture drafts (uncached barcode / OCR) | Increment 5 | Dexie `labelCaptureDrafts`; OCR assets local after cache |
 | Workout sessions / sets | Increment 6 | Dexie v4 `activeWorkoutSessions`, `workoutSetDrafts`, `workoutNoteDrafts`; outbox `kind: workout`; coordinator apply wired |
+| Rehab sessions / sets / alerts | Increment 7 | Dexie v6 `activeRehabSessions`, `rehabSetDrafts`, `rehabObservationDrafts`, `rehabAlertDrafts`; outbox `kind: rehab`; ordered finish fold |
 | Hydration / meditation domain rows | Later | Status summary already exists |
 | Measurements / photos | Later | |
 
@@ -107,6 +108,17 @@ Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
 - Coordinator apply: `isWorkoutOutboxPayload` upserts writes in order and
   rejects stale `in_progress` updates against completed/discarded sessions and
   stale skips against completed sets. See `docs/development/WORKOUT_OFFLINE_SYNC.md`.
+
+## Rehab writes (Increment 7)
+
+- Dexie v6 adds `activeRehabSessions`, `rehabSetDrafts`,
+  `rehabObservationDrafts`, and `rehabAlertDrafts`.
+- Replay order: session → exercises → sets → observations/alerts → notes →
+  finish. Finish folds pending drafts before the completion write.
+- Conflict rules: completed/discarded cannot reopen; stopped set cannot become
+  completed from stale mutation; alert acknowledgment cannot be silently
+  removed; plan version and restriction freshness checks apply.
+- See `docs/development/REHAB_OFFLINE_SYNC.md`.
 
 ## Catalogs offline
 

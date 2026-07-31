@@ -74,12 +74,14 @@ jobs:
             < supabase/tests/increment5_label_rls.sql
           docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
             < supabase/tests/increment6_workout_rls.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            < supabase/tests/increment7_rehab_rls.sql
 
       - name: Generate + validate Supabase TypeScript types
         run: |
           set -euo pipefail
           supabase gen types typescript --local > /tmp/types.generated.ts
-          for table in foods barcodes branded_products meal_logs nutrition_label_captures workout_sessions exercise_definitions; do
+          for table in foods barcodes branded_products meal_logs nutrition_label_captures workout_sessions exercise_definitions rehab_sessions rehab_plans rehab_exercise_definitions rehab_alert_events; do
             if ! grep -qE "^ *${table}: \{" /tmp/types.generated.ts; then
               echo "::error::generated local schema is missing table '${table}' -- migrations did not apply as expected"
               exit 1
@@ -99,6 +101,14 @@ jobs:
           fi
           if ! grep -q "exercise_definitions" src/shared/database/types.ts; then
             echo "::error::src/shared/database/types.ts is missing exercise_definitions -- regenerate types after Increment 6 migration"
+            exit 1
+          fi
+          if ! grep -q "rehab_sessions" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing rehab_sessions -- regenerate types after Increment 7 migration"
+            exit 1
+          fi
+          if ! grep -q "rehab_plans" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing rehab_plans -- regenerate types after Increment 7 migration"
             exit 1
           fi
 

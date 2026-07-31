@@ -2,7 +2,26 @@
   "name": "mtfbwu-exercise",
   "version": "0.1.0",
   "private": true,
-  "description": "MTFBWU — personal body-and-training tracker (Increment 1 foundation)",
+  "description": "MTFBWU — personal body-and-training tracker by Anjay Nilmek (Parvat and Shifu Learning Studio LLP). Not medical advice.",
+  "author": {
+    "name": "Anjay Nilmek",
+    "url": "https://github.com/project-mtfbwu"
+  },
+  "contributors": [
+    {
+      "name": "Parvat and Shifu Learning Studio LLP",
+      "url": "https://github.com/project-mtfbwu"
+    }
+  ],
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/project-mtfbwu/mtfbwu-exercise.git"
+  },
+  "homepage": "https://github.com/project-mtfbwu/mtfbwu-exercise#readme",
+  "bugs": {
+    "url": "https://github.com/project-mtfbwu/mtfbwu-exercise/issues"
+  },
   "packageManager": "pnpm@11.17.0",
   "engines": {
     "node": ">=24.18.0 <25",

@@ -109,6 +109,20 @@ Open Food Facts:
 - No cross-user read of plans, sessions, sets, or notes. Service role for seeds
   only — never in client bundles.
 
+## Rehab catalog and sessions (Increment 7)
+
+- **Catalog RLS:** `rehab_body_areas`, `rehab_movements`,
+  `rehab_exercise_definitions`, `rehab_exercise_aliases` are select-only for
+  authenticated clients (no write grants).
+- **User data:** exercises, clinician sources, plans (and children),
+  restrictions, scheduled sessions, performed sessions/sets/observations/alerts
+  are owner-scoped through plan or session chains.
+- **Archive:** `archive_rehab_plan` security-definer RPC (authenticated UPDATE
+  soft-delete conflicts with SELECT `deleted_at IS NULL` policies).
+- Clinician sources are private; a stored name does not imply clinical
+  verification. Restriction `value_text` is the primary instruction record.
+- No cross-user read of rehab plans, sessions, symptoms, or alerts.
+
 ## Checklist before any production data
 
 - [ ] RLS enabled + policies tested with anon key

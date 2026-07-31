@@ -8,6 +8,7 @@ export const ROUTES = {
   today: "/today",
   calendar: "/calendar",
   plans: "/plans",
+  rehabPlans: "/rehab/plans",
   progress: "/progress",
   profile: "/profile",
   import: "/import",
@@ -20,11 +21,20 @@ export const ROUTES = {
   customize: "/customize",
 } as const;
 
+export function rehabPlanRoute(planId: string): string {
+  return `${ROUTES.rehabPlans}/${planId}`;
+}
+
+export function rehabSessionSummaryRoute(sessionId: string): string {
+  return `/rehab/sessions/${sessionId}/summary`;
+}
+
 /** Routes that require an authenticated session. */
 export const PROTECTED_ROUTES = [
   ROUTES.today,
   ROUTES.calendar,
   ROUTES.plans,
+  ROUTES.rehabPlans,
   ROUTES.progress,
   ROUTES.profile,
   ROUTES.import,

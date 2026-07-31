@@ -30,16 +30,17 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 6 — Exercise catalog + workout engine** is implemented locally (uncommitted until you ask).
+**Increment 7 — Rehab engine** is implemented locally (uncommitted until you ask).
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 7 (measurements/photos) without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 8
+(measurements/photos) without authorization.
 
-### Still deferred (Increment 7+)
+### Still deferred (Increment 8+)
 
 - Measurements engine and private progress photos
-- Rehab merge with workouts, hydration/meditation/calendar engines
-- AI meal-photo estimation / natural-language food logging / AI workout generation
-- Wearables, pose detection, social/trainer features
+- Hydration/meditation/calendar engines
+- AI meal-photo estimation / natural-language food logging / AI workout or rehab generation
+- Wearables, pose detection, social/trainer features, clinician portal
 
 ## Source of truth (read these first)
 

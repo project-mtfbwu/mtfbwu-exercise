@@ -1,5 +1,5 @@
 /**
- * Sync coordinator — drains Dexie outbox for board, nutrition, and workout
+ * Sync coordinator — drains Dexie outbox for board, nutrition, workout, and rehab
  * mutations. Auth actions are never queued offline.
  */
 import type { createSupabaseBrowserClient } from "@/shared/database/client";
@@ -20,6 +20,12 @@ import {
   isWorkoutOutboxPayload,
   type WorkoutOutboxPayload,
 } from "@/shared/offline/workout-outbox";
+import {
+  isAlertAckRemovalConflict,
+  isRehabOutboxPayload,
+  isStoppedToCompletedConflict,
+  type RehabOutboxPayload,
+} from "@/shared/offline/rehab-outbox";
 import { useSyncStatusStore } from "@/shared/offline/sync-status-store";
 import { isLayoutConflictError, isStatusConflictError } from "@/shared/board/board-model";
 
@@ -105,6 +111,10 @@ async function applyRecord(client: BrowserClient, record: OutboxRecord) {
   }
   if (isWorkoutOutboxPayload(record.payload)) {
     await applyWorkoutPayload(client, record.payload);
+    return;
+  }
+  if (isRehabOutboxPayload(record.payload)) {
+    await applyRehabPayload(client, record.payload);
     return;
   }
   throw new Error(`Unsupported outbox payload for ${record.entityType}`);
@@ -334,6 +344,136 @@ async function applyWorkoutPayload(client: BrowserClient, payload: WorkoutOutbox
     }
 
     const { error } = await workoutClient.from(write.table).upsert(write.values);
+    if (error) throw new Error(error.message);
+  }
+}
+
+async function applyRehabPayload(client: BrowserClient, payload: RehabOutboxPayload) {
+  const rehabClient = client as unknown as {
+    from: (table: string) => {
+      select: (columns: string) => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => {
+          maybeSingle: () => Promise<{
+            data: Record<string, unknown> | null;
+            error: { message: string } | null;
+          }>;
+        };
+      };
+      upsert: (values: Record<string, unknown> | Record<string, unknown>[]) => Promise<{
+        error: { message: string } | null;
+      }>;
+      delete: () => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => Promise<{ error: { message: string } | null }>;
+      };
+    };
+  };
+
+  for (const write of payload.writes) {
+    const rows = Array.isArray(write.values) ? write.values : [write.values];
+
+    if (write.operation === "delete") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id !== "string") continue;
+        const { error } = await rehabClient.from(write.table).delete().eq("id", id);
+        if (error) throw new Error(error.message);
+      }
+      continue;
+    }
+
+    if (write.table === "rehab_sessions") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id === "string") {
+          const { data: existing, error: readError } = await rehabClient
+            .from("rehab_sessions")
+            .select("id, status, version")
+            .eq("id", id)
+            .maybeSingle();
+          if (readError) throw new Error(readError.message);
+          if (
+            isSessionReopenConflict(existing?.status as string | undefined, row.status)
+          ) {
+            throw new Error(
+              "Completed rehab session conflict — stale offline update cannot reopen this session.",
+            );
+          }
+          if (
+            row.status === "discarded" &&
+            isSessionVersionConflict(
+              existing ? Number(existing.version) : undefined,
+              payload.expectedSessionVersion,
+            )
+          ) {
+            throw new Error(
+              "Rehab session changed elsewhere — refresh before discarding.",
+            );
+          }
+        }
+      }
+    }
+
+    if (write.table === "rehab_sets") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id === "string") {
+          const { data: existing, error: readError } = await rehabClient
+            .from("rehab_sets")
+            .select("id, status")
+            .eq("id", id)
+            .maybeSingle();
+          if (readError) throw new Error(readError.message);
+          if (
+            isStaleSetWrite(existing?.status as string | undefined, {
+              status: row.status,
+              completed_at: row.completed_at,
+            })
+          ) {
+            throw new Error("Stale skip cannot overwrite completed rehab set");
+          }
+          if (
+            isStoppedToCompletedConflict(
+              existing?.status as string | undefined,
+              row.status,
+            )
+          ) {
+            throw new Error(
+              "Stopped rehab set cannot become completed from stale mutation",
+            );
+          }
+        }
+      }
+    }
+
+    if (write.table === "rehab_alert_events") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id === "string") {
+          const { data: existing, error: readError } = await rehabClient
+            .from("rehab_alert_events")
+            .select("id, acknowledged_at")
+            .eq("id", id)
+            .maybeSingle();
+          if (readError) throw new Error(readError.message);
+          if (
+            isAlertAckRemovalConflict(
+              existing?.acknowledged_at as string | null | undefined,
+              row.acknowledged_at,
+            )
+          ) {
+            throw new Error("Alert acknowledgment cannot be silently removed");
+          }
+        }
+      }
+    }
+
+    const { error } = await rehabClient.from(write.table).upsert(write.values);
     if (error) throw new Error(error.message);
   }
 }

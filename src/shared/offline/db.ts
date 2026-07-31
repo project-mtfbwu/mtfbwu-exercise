@@ -106,6 +106,55 @@ export type WorkoutNoteDraft = {
   updatedAt: string;
 };
 
+/** Device-local in-progress rehab session waiting to sync. */
+export type ActiveRehabSessionDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const REHAB_SET_DRAFT_STATUSES = [
+  "pending",
+  "completed",
+  "skipped",
+  "stopped",
+] as const;
+export type RehabSetDraftStatus = (typeof REHAB_SET_DRAFT_STATUSES)[number];
+
+export type RehabSetDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  setId: string;
+  payload: unknown;
+  status?: RehabSetDraftStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RehabObservationDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  observationId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RehabAlertDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  alertId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export class MtfbwuDatabase extends Dexie {
   outbox!: EntityTable<OutboxRecord, "id">;
   mealLogDrafts!: EntityTable<MealLogDraft, "id">;
@@ -113,6 +162,10 @@ export class MtfbwuDatabase extends Dexie {
   activeWorkoutSessions!: EntityTable<ActiveWorkoutSessionDraft, "id">;
   workoutSetDrafts!: EntityTable<WorkoutSetDraft, "id">;
   workoutNoteDrafts!: EntityTable<WorkoutNoteDraft, "id">;
+  activeRehabSessions!: EntityTable<ActiveRehabSessionDraft, "id">;
+  rehabSetDrafts!: EntityTable<RehabSetDraft, "id">;
+  rehabObservationDrafts!: EntityTable<RehabObservationDraft, "id">;
+  rehabAlertDrafts!: EntityTable<RehabAlertDraft, "id">;
 
   constructor(name = "mtfbwu") {
     super(name);
@@ -142,6 +195,18 @@ export class MtfbwuDatabase extends Dexie {
       activeWorkoutSessions: "id, userId, sessionId, updatedAt",
       workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
       workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
+    });
+    this.version(6).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
+      activeRehabSessions: "id, userId, sessionId, updatedAt",
+      rehabSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      rehabObservationDrafts: "id, userId, sessionId, observationId, updatedAt",
+      rehabAlertDrafts: "id, userId, sessionId, alertId, updatedAt",
     });
   }
 }

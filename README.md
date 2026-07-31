@@ -7,19 +7,19 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 6 — Exercise catalog + workout engine** (implemented locally; commit when ready)
+**Increment 7 — Rehab engine** (implemented locally; commit when ready)
 
-- Curated exercise catalog (`mtfbwu_curated` descriptions; free-exercise-db naming reference only)
-- Workout plans (days/blocks/prescriptions) vs performed sessions with snapshots
-- Scheduling, session lifecycle, set logging (`weight_kg` + `load_unit`)
-- Dexie v4 offline session/set drafts + workout outbox payloads
-- Block types: straight sets, supersets, circuits, AMRAP/EMOM/for-time, drop sets
-- ADRs 0007–0008; RLS test `increment6_workout_rls.sql`
+- Curated rehab catalog + clinician-guided plans/phases/days/prescriptions
+- Restrictions with original wording + optional structured fields
+- Performed sessions with pain/swelling/instability/confidence + alerts
+- Dexie v6 offline rehab drafts + ordered outbox replay
+- Real Rehab board card + focus runner; workout restriction notice only
+- ADRs 0009–0010; RLS test `increment7_rehab_rls.sql`
 
-Still deferred: rehab merge, AI workout generation, wearables/pose, measurements/photos.
+Still deferred: diagnosis/AI rehab, pose/wearables, measurements/photos, clinician portal.
 
 Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.
-Increment notes: `docs/development/INCREMENT_6_WORKOUT_ENGINE.md`.
+Increment notes: `docs/development/INCREMENT_7_REHAB_ENGINE.md`.
 Data model: `docs/architecture/DATA_MODEL.md`.
 
 ## Stack

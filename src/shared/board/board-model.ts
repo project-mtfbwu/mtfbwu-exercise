@@ -13,6 +13,7 @@ import type {
   NutritionGoalsView,
 } from "@/modules/nutrition/meals/types";
 import type { WorkoutDaySummary } from "@/modules/workout/sessions/load-workout-day";
+import type { RehabDaySummary } from "@/modules/rehab/sessions/load-rehab-day";
 
 export type BoardCardView = {
   card: DashboardCard;
@@ -32,6 +33,7 @@ export type BoardSnapshot = {
   nutritionSummary?: NutritionDayTotals;
   nutritionGoals?: NutritionGoalsView | null;
   workoutDaySummary?: WorkoutDaySummary;
+  rehabDaySummary?: RehabDaySummary;
   syncBanner: string | null;
 };
 
@@ -86,6 +88,33 @@ export function workoutStatusLabel(
     const { title, completedSets, totalSets } = summary.activeSession;
     const progress = totalSets > 0 ? `${completedSets}/${totalSets} sets` : "in progress";
     return `${title} · ${progress}`;
+  }
+  if (summary.scheduled && summary.scheduled.status === "planned") {
+    return `${summary.scheduled.title} scheduled`;
+  }
+  if (status?.summary_text) return status.summary_text;
+  return labelForStatus(definition, status, customLabel);
+}
+
+/**
+ * Active in-progress rehab sessions take priority, then today's scheduled rehab,
+ * then pain/confidence summaries, then the generic daily-module status label.
+ */
+export function rehabStatusLabel(
+  summary: RehabDaySummary,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  if (summary.activeSession) {
+    const { title, completedSets, totalSets, unacknowledgedAlerts } =
+      summary.activeSession;
+    const progress = totalSets > 0 ? `${completedSets}/${totalSets} sets` : "in progress";
+    const alertSuffix =
+      unacknowledgedAlerts > 0
+        ? ` · ${unacknowledgedAlerts} alert${unacknowledgedAlerts === 1 ? "" : "s"}`
+        : "";
+    return `${title} · ${progress}${alertSuffix}`;
   }
   if (summary.scheduled && summary.scheduled.status === "planned") {
     return `${summary.scheduled.title} scheduled`;

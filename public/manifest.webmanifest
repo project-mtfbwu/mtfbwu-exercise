@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "MTFBWU",
   "short_name": "MTFBWU",
   "description": "Personal body-and-training tracker. Not medical advice.",
@@ -20,7 +21,13 @@
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

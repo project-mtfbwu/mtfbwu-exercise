@@ -105,9 +105,33 @@ Label images live in private Storage bucket `nutrition-labels` under
 object after a successful reviewed save unless the user opts to keep it.
 OCR suggestions are never trusted without human confirmation (`ADR/0006`).
 
-## Rehab / hydration / meditation
+## Rehab (Increment 7 — shipped)
 
-Mirror workout pattern at smaller scale: protocol/template optional + session/log tables. Exact columns deferred to increment design; keep template≠session invariant.
+```
+rehab_body_areas / rehab_movements / rehab_exercise_definitions / rehab_exercise_aliases
+user_rehab_exercises
+rehab_clinician_sources
+rehab_plans (+ version, soft deleted_at via archive_rehab_plan)
+  rehab_plan_phases
+    rehab_plan_days
+      rehab_plan_exercises   -- catalog XOR user exercise
+        rehab_set_prescriptions
+  rehab_restrictions         -- value_text primary
+scheduled_rehab_sessions
+rehab_sessions               -- clinician/restriction/session snapshots; version
+  rehab_session_exercises    -- name/instructions/stop snapshots
+  rehab_sets                 -- pain/swelling/instability/confidence
+  rehab_session_observations
+  rehab_alert_events
+```
+
+Plan ≠ scheduled ≠ performed. See `docs/development/REHAB_PLAN_MODEL.md`,
+`REHAB_SESSION_MODEL.md`, ADRs 0009–0010.
+
+## Hydration / meditation
+
+Mirror workout/rehab pattern at smaller scale when implemented: template optional
++ session/log tables; keep template≠session invariant.
 
 ## Measurements
 
@@ -159,17 +183,17 @@ ai_import_proposals
 
 Increment 4 adds `mealLogDrafts` alongside `outbox`. Increment 5 adds
 `labelCaptureDrafts`. Increment 6 (Dexie v4) adds `activeWorkoutSessions`,
-`workoutSetDrafts`, and `workoutNoteDrafts` for in-progress session JSON,
-optimistic set mutations, and queued notes. Workout outbox payloads mirror
-nutrition: primary-keyed upserts for `workout_sessions`, `workout_session_exercises`,
-`workout_sets`, and `workout_session_notes`. The sync coordinator applies
-`kind: "workout"` payloads (finish bundles pending set writes atomically).
+`workoutSetDrafts`, and `workoutNoteDrafts`. Increment 7 (Dexie v6) adds
+`activeRehabSessions`, `rehabSetDrafts`, `rehabObservationDrafts`, and
+`rehabAlertDrafts`. Sync coordinator applies `kind: "workout"` and
+`kind: "rehab"` payloads (finish bundles pending writes atomically).
 Full catalog mirror in IndexedDB remains a future optimization.
 
 ## Indexes (early)
 
 - `meal_logs (user_id, daily_record_id, meal_type)` and `(user_id, consumed_at desc)`
 - `workout_sessions (user_id, started_at)`
+- `rehab_sessions (user_id, started_at)`
 - `foods (normalized_name)`, `(source, source_id)` unique, `barcodes (normalized_barcode)`
 - `measurement_entries (user_id, recorded_at)`
 

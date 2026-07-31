@@ -155,6 +155,7 @@ export type WorkoutFocusProps = {
   localDate: string;
   timezone: string;
   workoutDaySummary?: WorkoutDaySummary | null;
+  hasActiveRehabRestrictions?: boolean;
   onCancel: () => void;
   onSaved: (summaryText: string) => void;
 };
@@ -180,6 +181,7 @@ export function WorkoutFocus({
   localDate,
   timezone,
   workoutDaySummary,
+  hasActiveRehabRestrictions = false,
   onCancel,
   onSaved,
 }: WorkoutFocusProps) {
@@ -810,6 +812,11 @@ export function WorkoutFocus({
       <p className="mt-2 border-2 border-[var(--mt-ink)] bg-[var(--mt-neon-pink)]/40 p-2 text-xs font-bold">
         {SAFETY_NOTE}
       </p>
+      {hasActiveRehabRestrictions ? (
+        <p className="mt-2 border-2 border-[var(--mt-ink-muted)] bg-[var(--mt-paper-warm)] p-2 text-xs font-bold text-[var(--mt-ink)]">
+          You have active rehab restrictions. Review them before training.
+        </p>
+      ) : null}
       {session.exercises.length === 0 ? (
         <div className="mt-4 border-2 border-[var(--mt-ink)] bg-white/80 p-3">
           <h3 className="font-black uppercase">Add an exercise</h3>

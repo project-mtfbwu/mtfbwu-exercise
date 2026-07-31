@@ -164,27 +164,57 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 ### Explicitly out of scope for Increment 6
 
 - Rehab engine merge, AI workout generation, wearables/pose detection
-- Progress photos, measurements engine (Increment 7)
+- Progress photos, measurements engine (later increments)
 - Social feeds, trainer/coach multi-user admin
 - Pointer drag-and-drop plan reorder (keyboard reorder ships)
 - Medical diagnosis or clinical protocol modeling
-## Increment 7 — Measurements + private photos
+
+## Increment 7 — Rehab engine
+
+**Goal:** Clinician-guided rehab tracking — catalog, plans, restrictions,
+performed sessions with symptom scales, alerts, board status, offline logging.
+
+**Status:** Complete locally (uncommitted until user requests commit).
+
+### Deliverables
+
+- [x] Migrations: rehab catalog taxonomy + seed, plans/phases/days/prescriptions,
+  restrictions, clinician sources, scheduling, sessions/sets/observations/alerts,
+  `archive_rehab_plan` RPC
+- [x] RLS: catalog authenticated read-only; owner chains; `increment7_rehab_rls.sql`
+- [x] Plan builder at `/rehab/plans` (phases, days, exercises, prescriptions,
+  restrictions, archive/copy/version)
+- [x] Session runner replacing Rehab demo focus; scales + stop/alert UX
+- [x] Dexie v6 rehab drafts + ordered outbox; sync-coordinator apply
+- [x] Board `rehabStatusLabel` + day summary; workout neutral restriction notice
+- [x] Session summary foundation (exportable view, not a medical report)
+- [x] Docs + ADRs 0009/0010 + visual review checklist
+
+### Explicitly out of scope for Increment 7
+
+- Diagnosis, AI rehab plans, pose analysis, wearables
+- Automatic progression / return-to-sport clearance
+- Auto-modifying workouts from rehab data
+- Clinician portal, appointment booking, emergency triage
+- Measurements / progress photos (later)
+
+## Increment 8 — Measurements + private photos
 
 - Measurement entries
 - Private Storage bucket + RLS
 - Progress photo upload/view
 
-## Increment 8 — Rehab, hydration, meditation, calendar
+## Increment 9 — Hydration, meditation, calendar polish
 
 - Thin modules on same patterns
 - Calendar read-model
 
-## Increment 9 — Custom trackers + AI import review
+## Increment 10 — Custom trackers + AI import review
 
 - Configurable trackers
 - AI proposal review UI + provenance
 
-## Increment 10 — Hardening
+## Increment 11 — Hardening
 
 - Conflict UX, export/delete, performance, security pass
 - Drop-set and richer protocols if not already done
