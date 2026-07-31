@@ -1,6 +1,6 @@
 /**
- * Sync coordinator — drains Dexie outbox for board and nutrition mutations.
- * Auth actions are never queued offline.
+ * Sync coordinator — drains Dexie outbox for board, nutrition, and workout
+ * mutations. Auth actions are never queued offline.
  */
 import type { createSupabaseBrowserClient } from "@/shared/database/client";
 import { createDexieOutboxRepository } from "@/shared/offline/outbox";
@@ -13,6 +13,13 @@ import {
   isNutritionOutboxPayload,
   type NutritionOutboxPayload,
 } from "@/shared/offline/nutrition-outbox";
+import {
+  isSessionReopenConflict,
+  isSessionVersionConflict,
+  isStaleSetWrite,
+  isWorkoutOutboxPayload,
+  type WorkoutOutboxPayload,
+} from "@/shared/offline/workout-outbox";
 import { useSyncStatusStore } from "@/shared/offline/sync-status-store";
 import { isLayoutConflictError, isStatusConflictError } from "@/shared/board/board-model";
 
@@ -94,6 +101,10 @@ async function applyRecord(client: BrowserClient, record: OutboxRecord) {
   }
   if (isNutritionOutboxPayload(record.payload)) {
     await applyNutritionPayload(client, record.payload);
+    return;
+  }
+  if (isWorkoutOutboxPayload(record.payload)) {
+    await applyWorkoutPayload(client, record.payload);
     return;
   }
   throw new Error(`Unsupported outbox payload for ${record.entityType}`);
@@ -221,6 +232,108 @@ async function applyNutritionPayload(
       };
     };
     const { error } = await nutritionClient.from(write.table).upsert(write.values);
+    if (error) throw new Error(error.message);
+  }
+}
+
+/**
+ * Replays workout session/set/note/schedule upserts in dependency order.
+ * Terminal sessions must not be reopened or silently discarded past a stale
+ * version, and a completed set must never be clobbered by a stale skip — see
+ * the pure predicates in `workout-outbox.ts` for the exact rules.
+ */
+async function applyWorkoutPayload(client: BrowserClient, payload: WorkoutOutboxPayload) {
+  const workoutClient = client as unknown as {
+    from: (table: string) => {
+      select: (columns: string) => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => {
+          maybeSingle: () => Promise<{
+            data: Record<string, unknown> | null;
+            error: { message: string } | null;
+          }>;
+        };
+      };
+      upsert: (values: Record<string, unknown> | Record<string, unknown>[]) => Promise<{
+        error: { message: string } | null;
+      }>;
+      delete: () => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => Promise<{ error: { message: string } | null }>;
+      };
+    };
+  };
+
+  for (const write of payload.writes) {
+    const rows = Array.isArray(write.values) ? write.values : [write.values];
+
+    if (write.operation === "delete") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id !== "string") continue;
+        const { error } = await workoutClient.from(write.table).delete().eq("id", id);
+        if (error) throw new Error(error.message);
+      }
+      continue;
+    }
+
+    if (write.table === "workout_sessions") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id === "string") {
+          const { data: existing, error: readError } = await workoutClient
+            .from("workout_sessions")
+            .select("id, status, version")
+            .eq("id", id)
+            .maybeSingle();
+          if (readError) throw new Error(readError.message);
+          if (
+            isSessionReopenConflict(existing?.status as string | undefined, row.status)
+          ) {
+            throw new Error(
+              "Completed session conflict — stale offline update cannot reopen this workout.",
+            );
+          }
+          if (
+            row.status === "discarded" &&
+            isSessionVersionConflict(
+              existing ? Number(existing.version) : undefined,
+              payload.expectedSessionVersion,
+            )
+          ) {
+            throw new Error("Workout changed elsewhere — refresh before discarding.");
+          }
+        }
+      }
+    }
+
+    if (write.table === "workout_sets") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id === "string") {
+          const { data: existing, error: readError } = await workoutClient
+            .from("workout_sets")
+            .select("id, status")
+            .eq("id", id)
+            .maybeSingle();
+          if (readError) throw new Error(readError.message);
+          if (
+            isStaleSetWrite(existing?.status as string | undefined, {
+              status: row.status,
+              completed_at: row.completed_at,
+            })
+          ) {
+            throw new Error("Stale skip cannot overwrite completed set");
+          }
+        }
+      }
+    }
+
+    const { error } = await workoutClient.from(write.table).upsert(write.values);
     if (error) throw new Error(error.message);
   }
 }

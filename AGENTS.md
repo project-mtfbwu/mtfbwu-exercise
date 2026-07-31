@@ -30,15 +30,16 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 5 — Camera barcode + nutrition-label OCR** is implemented locally (uncommitted until you ask).
+**Increment 6 — Exercise catalog + workout engine** is implemented locally (uncommitted until you ask).
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 6 (workouts) without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 7 (measurements/photos) without authorization.
 
-### Still deferred (Increment 6+)
+### Still deferred (Increment 7+)
 
-- Workout engine and offline session logging
-- AI meal-photo estimation / natural-language food logging
-- Full rehab, measurements/photos, calendar, and custom-tracker engines
+- Measurements engine and private progress photos
+- Rehab merge with workouts, hydration/meditation/calendar engines
+- AI meal-photo estimation / natural-language food logging / AI workout generation
+- Wearables, pose detection, social/trainer features
 
 ## Source of truth (read these first)
 

@@ -34,6 +34,34 @@ vi.mock("@/modules/nutrition/meals/actions", () => ({
   updateNutritionGoalsAction: vi.fn(),
 }));
 
+vi.mock("@/modules/workout/sessions/actions", () => ({
+  getActiveSessionAction: vi.fn(async () => null),
+  listPlansAction: vi.fn(async () => []),
+  listExercisesAction: vi.fn(async () => []),
+  getSessionStartOptionsAction: vi.fn(async () => ({
+    scheduled: null,
+    lastCompleted: null,
+    yesterdayCompleted: null,
+    activeSession: null,
+  })),
+  listPendingPersonalRecordsAction: vi.fn(async () => []),
+  copyYesterdaySessionAction: vi.fn(),
+  repeatLastSessionAction: vi.fn(),
+  confirmPersonalRecordAction: vi.fn(),
+  dismissPersonalRecordAction: vi.fn(),
+  startBlankSessionAction: vi.fn(),
+  startFromPlanDayAction: vi.fn(),
+  startScheduledSessionAction: vi.fn(),
+  installArnoldStarterPlanAction: vi.fn(),
+  completeSetAction: vi.fn(),
+  skipSetAction: vi.fn(),
+  addSetAction: vi.fn(),
+  finishSessionAction: vi.fn(),
+  cancelSessionAction: vi.fn(),
+  getExerciseHistoryAction: vi.fn(async () => []),
+  addExerciseToSessionAction: vi.fn(),
+}));
+
 function renderBoard() {
   return render(
     <MotionPreferenceProvider>

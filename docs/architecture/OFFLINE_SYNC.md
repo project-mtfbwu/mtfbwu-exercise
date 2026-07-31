@@ -43,7 +43,7 @@ outbox
 | Meal logs / entries | Increment 4 | `mealLogDrafts` + primary-keyed upsert payload |
 | Recipes / custom foods / meal templates | Increment 4 | Replayable nutrition payloads; RLS remains authoritative |
 | Label-capture drafts (uncached barcode / OCR) | Increment 5 | Dexie `labelCaptureDrafts`; OCR assets local after cache |
-| Workout sessions / sets | Increment 6 | Highest priority next domain |
+| Workout sessions / sets | Increment 6 | Dexie v4 `activeWorkoutSessions`, `workoutSetDrafts`, `workoutNoteDrafts`; outbox `kind: workout`; coordinator apply wired |
 | Hydration / meditation domain rows | Later | Status summary already exists |
 | Measurements / photos | Later | |
 
@@ -79,6 +79,34 @@ Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
 - Do not keep giant original photos in IndexedDB; handle quota errors in UI.
 - Camera decode works offline; remote OFF lookup requires connectivity or a
   cached barcode hit. Remote lookup is queued only with user confirmation.
+
+## Workout writes (Increment 6)
+
+- Dexie v4 adds `activeWorkoutSessions` (in-progress session JSON),
+  `workoutSetDrafts` (optimistic set mutations), and `workoutNoteDrafts`
+  (queued session notes).
+- Queue session or set mutations in one Dexie transaction with the outbox row
+  (`queueWorkoutMutation`, `queueSetCompletion`, `queueSetSkip`, `queueSetAdd`,
+  `queueSetUpdate`, `queueSetDelete`, `queueSessionNote`, `queueSessionFinish`,
+  `queueSessionDiscard` in `workout-outbox.ts`).
+- Payload shape: `{ kind: "workout", entity, writes[] }` with tables
+  `workout_sessions`, `workout_session_exercises`, `workout_sets`,
+  `workout_session_notes`, `scheduled_workouts` — client UUIDs, upsert replay
+  idempotent. Finish prepends all pending set writes for the session before the
+  completion row.
+- **Conflict rules (exact):**
+  - Plan update: stale `workout_plans.version` → rejected
+  - Session completion wins over stale offline `in_progress` mutations
+  - No silent dual active `in_progress` sessions per user
+  - Completed session not reopened by stale offline mutation
+  - Stale skip cannot overwrite a completed set
+  - Destructive discard/delete requires current session `version` when supplied
+  - Plan edits never rewrite historical snapshots on replay
+- Session mutations use `workout_sessions.version` optimistic concurrency (sets
+  have no row version). Mismatch → failed outbox + user-visible conflict.
+- Coordinator apply: `isWorkoutOutboxPayload` upserts writes in order and
+  rejects stale `in_progress` updates against completed/discarded sessions and
+  stale skips against completed sets. See `docs/development/WORKOUT_OFFLINE_SYNC.md`.
 
 ## Catalogs offline
 

@@ -47,10 +47,72 @@ export type LabelCaptureDraft = {
   updatedAt: string;
 };
 
+/**
+ * A device-local in-progress workout session waiting to sync. JSON payload
+ * for the same forward-compatibility reason as `MealLogDraft` — the
+ * persisted `workout_sessions` shape can evolve independently of an
+ * already-started offline draft.
+ */
+export type ActiveWorkoutSessionDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Local lifecycle mirror for a queued `workout_sets` mutation. */
+export const WORKOUT_SET_DRAFT_STATUSES = ["pending", "completed", "skipped"] as const;
+export type WorkoutSetDraftStatus = (typeof WORKOUT_SET_DRAFT_STATUSES)[number];
+
+export const WORKOUT_SET_MUTATION_KINDS = [
+  "complete",
+  "skip",
+  "unskip",
+  "add",
+  "update",
+  "delete",
+] as const;
+export type WorkoutSetMutationKind = (typeof WORKOUT_SET_MUTATION_KINDS)[number];
+
+/**
+ * A device-local set mutation (complete/skip/unskip/add/update/delete) queued
+ * against a session while offline. `localOnly` marks a set created entirely
+ * on this device with no synced server row yet — only those may be deleted
+ * offline (see `queueSetDelete` in `workout-outbox.ts`).
+ */
+export type WorkoutSetDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  setId: string;
+  payload: unknown;
+  status?: WorkoutSetDraftStatus;
+  localOnly?: boolean;
+  mutationKind?: WorkoutSetMutationKind;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** A device-local `workout_session_notes` entry queued while offline. */
+export type WorkoutNoteDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  noteId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export class MtfbwuDatabase extends Dexie {
   outbox!: EntityTable<OutboxRecord, "id">;
   mealLogDrafts!: EntityTable<MealLogDraft, "id">;
   labelCaptureDrafts!: EntityTable<LabelCaptureDraft, "id">;
+  activeWorkoutSessions!: EntityTable<ActiveWorkoutSessionDraft, "id">;
+  workoutSetDrafts!: EntityTable<WorkoutSetDraft, "id">;
+  workoutNoteDrafts!: EntityTable<WorkoutNoteDraft, "id">;
 
   constructor(name = "mtfbwu") {
     super(name);
@@ -65,6 +127,21 @@ export class MtfbwuDatabase extends Dexie {
       outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
       mealLogDrafts: "id, userId, mealLogId, updatedAt",
       labelCaptureDrafts: "id, userId, barcode, updatedAt",
+    });
+    this.version(4).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+    });
+    this.version(5).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
     });
   }
 }

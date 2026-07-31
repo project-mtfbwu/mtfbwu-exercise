@@ -1,6 +1,11 @@
 import { createSupabaseServerClient } from "@/shared/database/server";
 import type { BoardCardView, BoardSnapshot } from "@/shared/board/board-model";
-import { labelForStatus, nutritionStatusLabel } from "@/shared/board/board-model";
+import {
+  labelForStatus,
+  nutritionStatusLabel,
+  workoutStatusLabel,
+} from "@/shared/board/board-model";
+import { loadWorkoutDaySummary } from "@/modules/workout/sessions/load-workout-day";
 import { clampToLoggableLocalDate, todayLocalDate } from "@/shared/utils/local-date";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/shared/config/constants";
@@ -135,6 +140,7 @@ export async function loadBoardSnapshot(
   // opens nutrition goals (see `ensureNutritionGoalsAction`), so an unrelated
   // board load can never silently shadow a goal set for an earlier date.
   const nutritionGoals = await loadNutritionGoalsAction(localDate);
+  const workoutDaySummary = await loadWorkoutDaySummary(localDate);
 
   const defById = new Map((definitions ?? []).map((d) => [d.id, d]));
   const moduleById = new Map((userModules ?? []).map((m) => [m.id, m]));
@@ -162,7 +168,14 @@ export async function loadBoardSnapshot(
               status,
               userModule.custom_label,
             )
-          : labelForStatus(definition, status, userModule.custom_label),
+          : definition.key === "workout"
+            ? workoutStatusLabel(
+                workoutDaySummary,
+                definition,
+                status,
+                userModule.custom_label,
+              )
+            : labelForStatus(definition, status, userModule.custom_label),
     });
   }
 
@@ -174,6 +187,7 @@ export async function loadBoardSnapshot(
     dailyRecordId: dailyRecord.id,
     nutritionSummary,
     nutritionGoals,
+    workoutDaySummary,
     syncBanner: null,
   };
 }

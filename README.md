@@ -7,18 +7,19 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 5 — Camera barcode + nutrition-label OCR** (complete locally; commit when ready)
+**Increment 6 — Exercise catalog + workout engine** (implemented locally; commit when ready)
 
-- Native `BarcodeDetector` with `@zxing/browser` fallback
-- Meal-focus scanner (camera, manual entry, image upload) and product review
-- Open Food Facts / cache resolution with quality warnings
-- Label capture → client OCR (Tesseract) → mandatory human review → private custom product
-- Private `nutrition-labels` Storage; default image deletion after save
+- Curated exercise catalog (`mtfbwu_curated` descriptions; free-exercise-db naming reference only)
+- Workout plans (days/blocks/prescriptions) vs performed sessions with snapshots
+- Scheduling, session lifecycle, set logging (`weight_kg` + `load_unit`)
+- Dexie v4 offline session/set drafts + workout outbox payloads
+- Block types: straight sets, supersets, circuits, AMRAP/EMOM/for-time, drop sets
+- ADRs 0007–0008; RLS test `increment6_workout_rls.sql`
 
-Deferred: AI plate recognition, NL food logging, workouts/rehab/photos.
+Still deferred: rehab merge, AI workout generation, wearables/pose, measurements/photos.
 
 Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.
-Increment notes: `docs/development/INCREMENT_5_BARCODE_AND_LABEL.md`.
+Increment notes: `docs/development/INCREMENT_6_WORKOUT_ENGINE.md`.
 Data model: `docs/architecture/DATA_MODEL.md`.
 
 ## Stack

@@ -32,50 +32,47 @@ daily_module_statuses       -- summary status only + revision
 
 RLS: owner-scoped; `module_definitions` authenticated read of active rows.
 
-## Exercise catalog
+## Exercise catalog (Increment 6 — shipped)
 
 ```
-exercises
-  id, slug, name
-  force, level, mechanic, equipment
-  primary_muscles text[]
-  secondary_muscles text[]
-  category
-  instructions jsonb
-  image_paths jsonb
-  source  -- free_exercise_db | user | ...
-  source_id
+muscle_groups, equipment_types, movement_patterns   -- taxonomy (seeded)
+exercise_definitions
+  stable_key, name, normalized_name, description
+  exercise_type, movement_pattern_id, primary_equipment_id
+  unilateral, bodyweight, timed, distance_based
+  source exercise_source   -- mtfbwu_curated | free_exercise_db | other
+  source_id, verified, active
+exercise_aliases, exercise_muscle_groups
+user_exercises          -- catalog wrapper OR custom_name (exactly one)
 ```
 
-User may add private custom exercises (`owner_id` nullable for global catalog rows).
+Catalog rows are **authenticated read-only** (no client writes). Seed descriptions
+are original `mtfbwu_curated` text; `free_exercise_db` is reference-only for naming
+— do not claim copied descriptions.
 
-## Workouts — templates vs sessions
+## Workouts — plans vs sessions (Increment 6 — shipped)
 
 ```
-workout_templates
-  id, user_id, name, notes, updated_at
+workout_plans (+ version, soft deleted_at)
+workout_plan_days       -- day_of_week + sort_order (no day_index)
+workout_blocks          -- block_type enum; transition_seconds (align migration)
+workout_block_exercises
+workout_set_prescriptions   -- target_weight_kg, completion_rule, set_role, target_rir, tempo_* columns
 
-workout_template_items
-  id, template_id, exercise_id, sort_order
-  group_id          -- superset/circuit grouping
-  protocol          -- straight | superset | dropset | ...
-  target_sets jsonb -- [{reps, weight, rir, rest_sec}]
+scheduled_workouts      -- local_date, title, timezone, status
 
-workout_sessions
-  id, user_id, template_id null
-  started_at, ended_at, status
-  notes, perceived_effort
-
-workout_session_items
-  id, session_id, exercise_id, sort_order
-  group_id, protocol
-  snapshot_name     -- denormalized at session start
-
-performed_sets
-  id, session_item_id, set_index
-  reps, weight, weight_unit, duration_sec, rir
-  completed, protocol_meta jsonb
+workout_sessions        -- status in_progress|paused|completed|discarded; version; snapshot_json; source_plan_version
+workout_session_exercises   -- display_name_snapshot, block_type_snapshot, block_order, exercise_order
+workout_sets            -- weight_kg + load_unit; status includes partial
+workout_session_notes, personal_records   -- status pending|confirmed|dismissed (align migration)
 ```
+
+Detail: `docs/development/WORKOUT_PLAN_MODEL.md`, `WORKOUT_SESSION_MODEL.md`.
+Editing a plan never rewrites completed session snapshots (`ADR/0007`).
+
+Plan editor UI at `/plans` and `/plans/[planId]` mutates the template hierarchy
+only; copy/repeat session actions materialize new performed rows from prior
+sessions without rewriting history.
 
 ## Nutrition (Increment 4–5)
 
@@ -160,10 +157,14 @@ ai_import_proposals
 
 ## Dexie mirror (indicative)
 
-Increment 4 adds `mealLogDrafts` (`id`, `userId`, `mealLogId`, payload, timestamps)
-alongside `outbox`. Nutrition payloads contain primary-keyed writes for a meal
-log, recipe, custom food, or meal template and can be safely replayed as
-upserts. Food cache mirrors remain a future optimization.
+Increment 4 adds `mealLogDrafts` alongside `outbox`. Increment 5 adds
+`labelCaptureDrafts`. Increment 6 (Dexie v4) adds `activeWorkoutSessions`,
+`workoutSetDrafts`, and `workoutNoteDrafts` for in-progress session JSON,
+optimistic set mutations, and queued notes. Workout outbox payloads mirror
+nutrition: primary-keyed upserts for `workout_sessions`, `workout_session_exercises`,
+`workout_sets`, and `workout_session_notes`. The sync coordinator applies
+`kind: "workout"` payloads (finish bundles pending set writes atomically).
+Full catalog mirror in IndexedDB remains a future optimization.
 
 ## Indexes (early)
 

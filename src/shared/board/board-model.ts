@@ -12,6 +12,7 @@ import type {
   NutritionDayTotals,
   NutritionGoalsView,
 } from "@/modules/nutrition/meals/types";
+import type { WorkoutDaySummary } from "@/modules/workout/sessions/load-workout-day";
 
 export type BoardCardView = {
   card: DashboardCard;
@@ -30,6 +31,7 @@ export type BoardSnapshot = {
   dailyRecordId: string;
   nutritionSummary?: NutritionDayTotals;
   nutritionGoals?: NutritionGoalsView | null;
+  workoutDaySummary?: WorkoutDaySummary;
   syncBanner: string | null;
 };
 
@@ -68,6 +70,28 @@ export function nutritionStatusLabel(
       ? ` · ${totals.mealCount} meal${totals.mealCount === 1 ? "" : "s"}`
       : "";
   return `${totals.calories} / ${targetLabel} kcal${mealsLabel}`;
+}
+
+/**
+ * Active in-progress sessions take priority, then today's scheduled plan day,
+ * then the generic daily-module status label.
+ */
+export function workoutStatusLabel(
+  summary: WorkoutDaySummary,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  if (summary.activeSession) {
+    const { title, completedSets, totalSets } = summary.activeSession;
+    const progress = totalSets > 0 ? `${completedSets}/${totalSets} sets` : "in progress";
+    return `${title} · ${progress}`;
+  }
+  if (summary.scheduled && summary.scheduled.status === "planned") {
+    return `${summary.scheduled.title} scheduled`;
+  }
+  if (status?.summary_text) return status.summary_text;
+  return labelForStatus(definition, status, customLabel);
 }
 
 export function variantToFlatLay(variant: CardVisualVariant): {

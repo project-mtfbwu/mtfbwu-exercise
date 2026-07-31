@@ -94,6 +94,21 @@ Open Food Facts:
 - OCR runs on-device (`tesseract.js`); raw OCR is never trusted without review
   (`ADR/0006`). See `docs/development/IMAGE_RETENTION.md`.
 
+## Workout catalog and sessions (Increment 6)
+
+- **Catalog RLS:** `muscle_groups`, `equipment_types`, `movement_patterns`,
+  `exercise_definitions`, `exercise_aliases`, and `exercise_muscle_groups` are
+  select-only for authenticated clients (no insert/update/delete grants).
+- **User exercises:** `user_exercises` owner-scoped CRUD.
+- **Plans:** `workout_plans` and child plan tables enforce ownership via parent
+  plan `user_id`; soft-deleted plans hidden from select.
+- **Sessions:** `workout_sessions` require `user_id = auth.uid()` and owned
+  `daily_record_id`; child exercises/sets inherit session ownership in policies.
+- **Scheduling / PRs:** `scheduled_workouts`, `personal_records`,
+  `workout_session_notes` owner-scoped.
+- No cross-user read of plans, sessions, sets, or notes. Service role for seeds
+  only — never in client bundles.
+
 ## Checklist before any production data
 
 - [ ] RLS enabled + policies tested with anon key

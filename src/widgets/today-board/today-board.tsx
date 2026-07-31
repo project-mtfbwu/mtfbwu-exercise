@@ -166,6 +166,30 @@ export function TodayBoard({ snapshot }: Props) {
     });
   }
 
+  function workoutSaved(summaryText: string) {
+    setCards((prev) =>
+      prev.map((c) =>
+        c.definition.key === "workout"
+          ? {
+              ...c,
+              status: c.status
+                ? {
+                    ...c.status,
+                    status: "completed",
+                    summary_text: summaryText,
+                  }
+                : c.status,
+              statusLabel: summaryText,
+            }
+          : c,
+      ),
+    );
+    setOpenCardId(null);
+    setError(null);
+    setStatusMessage("Workout finished");
+    router.refresh();
+  }
+
   return (
     <div className="space-y-4">
       <ScreenReaderStatus message={statusMessage} />
@@ -286,10 +310,14 @@ export function TodayBoard({ snapshot }: Props) {
             titleId="focus-title-live"
             demo={demo}
             pending={pending}
+            userId={snapshot.profile.id}
             dailyRecordId={snapshot.dailyRecordId}
             localDate={snapshot.localDate}
+            timezone={snapshot.profile.timezone}
+            workoutDaySummary={snapshot.workoutDaySummary}
             onCancel={() => setOpenCardId(null)}
             onSaveStatus={saveStatus}
+            onWorkoutSaved={workoutSaved}
           />
         ) : null}
       </FocusLayer>
@@ -302,19 +330,27 @@ function ModuleFocusRouter({
   titleId,
   demo,
   pending,
+  userId,
   dailyRecordId,
   localDate,
+  timezone,
+  workoutDaySummary,
   onCancel,
   onSaveStatus,
+  onWorkoutSaved,
 }: {
   moduleKey: string;
   titleId: string;
   demo: ReturnType<typeof createInitialDemoState>;
   pending: boolean;
+  userId: string;
   dailyRecordId: string;
   localDate: string;
+  timezone: string;
+  workoutDaySummary?: BoardSnapshot["workoutDaySummary"];
   onCancel: () => void;
   onSaveStatus: (summary: string) => void;
+  onWorkoutSaved: (summary: string) => void;
 }) {
   if (moduleKey === "nutrition") {
     return (
@@ -331,8 +367,12 @@ function ModuleFocusRouter({
     return (
       <WorkoutFocus
         titleId={titleId}
-        initial={demo.workout}
-        onSave={() => onSaveStatus("Demo session completed")}
+        userId={userId}
+        dailyRecordId={dailyRecordId}
+        localDate={localDate}
+        timezone={timezone}
+        workoutDaySummary={workoutDaySummary}
+        onSaved={onWorkoutSaved}
         onCancel={onCancel}
       />
     );

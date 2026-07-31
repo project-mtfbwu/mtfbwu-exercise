@@ -140,13 +140,34 @@ Phased delivery. **Stop before coding** until Increment 0 exit criteria are met 
 - Cloud OCR or automatic Open Food Facts contributions
 - Silent OCR saves without human confirmation
 
-## Increment 6 — Exercise catalog + workouts MVP
+## Increment 6 — Exercise catalog + workout engine
 
-- Import permissive exercise dataset (Unlicense)
-- Templates vs sessions MVP
-- Straight sets + basic superset group id
-- Offline session logging
+**Goal:** Curated catalog, plan/template model, performed sessions with snapshots, scheduling, plan editor, copy/repeat session, PR review, and offline session/set logging.
 
+**Status:** Complete (local; uncommitted until user requests commit).
+
+### Deliverables
+
+- [x] Migrations: exercise taxonomy + catalog seed + expansion, plans/days/blocks/prescriptions, scheduling, sessions/sets/notes/PRs, align columns, plan-editor align (`transition_seconds`, tempo/RIR, `personal_records.status`)
+- [x] RLS: catalog authenticated read-only; user plans/sessions owner-scoped (`increment6_workout_rls.sql`)
+- [x] Plan editor UI at `/plans` and `/plans/[planId]` — meta, days, blocks, exercises, prescriptions, archive, copy, new version; keyboard reorder; version conflict refresh
+- [x] Session actions: start/finish/discard, set complete/skip/add/update/delete, schedule, copy yesterday, repeat last
+- [x] Personal records: pending candidate detection on finish; confirm/dismiss UI; unique per `(workout_set_id, record_type)`; warmup excluded
+- [x] Calculations: volume, 1RM estimates, units, duration
+- [x] Dexie v4 `activeWorkoutSessions` + `workoutSetDrafts` + `workoutNoteDrafts` + workout outbox payload builders
+- [x] Workout outbox apply in `sync-coordinator.ts` (finish atomic with pending set writes; stale skip / completed-session guards)
+- [x] Live workout focus UI replacing demo `WorkoutFocus`
+- [x] Arnold Phase One optional starter install
+- [x] Real board workout status from scheduled + active session summaries
+- [x] Docs + ADRs 0007/0008 + visual review checklist
+
+### Explicitly out of scope for Increment 6
+
+- Rehab engine merge, AI workout generation, wearables/pose detection
+- Progress photos, measurements engine (Increment 7)
+- Social feeds, trainer/coach multi-user admin
+- Pointer drag-and-drop plan reorder (keyboard reorder ships)
+- Medical diagnosis or clinical protocol modeling
 ## Increment 7 — Measurements + private photos
 
 - Measurement entries

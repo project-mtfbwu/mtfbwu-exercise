@@ -1,7 +1,6 @@
 /**
- * Generated Supabase Database types (Increment 3–5).
- * Regenerate with: `npx supabase gen types typescript --local`
- * after `supabase db reset`; keep this file in sync with migrations.
+ * Generated Supabase Database types (Increment 3–6).
+ * Regenerate with: px supabase gen types typescript --local\n * after supabase db reset; keep this file in sync with migrations.
  * Convenience Row/Enum aliases at the bottom are hand-maintained.
  */
 
@@ -337,6 +336,176 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      equipment_types: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          stable_key: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          stable_key: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          stable_key?: string;
+        };
+        Relationships: [];
+      };
+      exercise_aliases: {
+        Row: {
+          alias: string;
+          created_at: string;
+          exercise_definition_id: string;
+          id: string;
+          normalized_alias: string;
+          updated_at: string;
+        };
+        Insert: {
+          alias: string;
+          created_at?: string;
+          exercise_definition_id: string;
+          id?: string;
+          normalized_alias: string;
+          updated_at?: string;
+        };
+        Update: {
+          alias?: string;
+          created_at?: string;
+          exercise_definition_id?: string;
+          id?: string;
+          normalized_alias?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exercise_aliases_exercise_definition_id_fkey";
+            columns: ["exercise_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "exercise_definitions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      exercise_definitions: {
+        Row: {
+          active: boolean;
+          bodyweight: boolean;
+          created_at: string;
+          description: string | null;
+          distance_based: boolean;
+          exercise_type: Database["public"]["Enums"]["exercise_type"];
+          id: string;
+          movement_pattern_id: string | null;
+          name: string;
+          normalized_name: string;
+          primary_equipment_id: string | null;
+          source: Database["public"]["Enums"]["exercise_source"];
+          source_id: string | null;
+          stable_key: string;
+          timed: boolean;
+          unilateral: boolean;
+          updated_at: string;
+          verified: boolean;
+        };
+        Insert: {
+          active?: boolean;
+          bodyweight?: boolean;
+          created_at?: string;
+          description?: string | null;
+          distance_based?: boolean;
+          exercise_type?: Database["public"]["Enums"]["exercise_type"];
+          id?: string;
+          movement_pattern_id?: string | null;
+          name: string;
+          normalized_name: string;
+          primary_equipment_id?: string | null;
+          source?: Database["public"]["Enums"]["exercise_source"];
+          source_id?: string | null;
+          stable_key: string;
+          timed?: boolean;
+          unilateral?: boolean;
+          updated_at?: string;
+          verified?: boolean;
+        };
+        Update: {
+          active?: boolean;
+          bodyweight?: boolean;
+          created_at?: string;
+          description?: string | null;
+          distance_based?: boolean;
+          exercise_type?: Database["public"]["Enums"]["exercise_type"];
+          id?: string;
+          movement_pattern_id?: string | null;
+          name?: string;
+          normalized_name?: string;
+          primary_equipment_id?: string | null;
+          source?: Database["public"]["Enums"]["exercise_source"];
+          source_id?: string | null;
+          stable_key?: string;
+          timed?: boolean;
+          unilateral?: boolean;
+          updated_at?: string;
+          verified?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exercise_definitions_movement_pattern_id_fkey";
+            columns: ["movement_pattern_id"];
+            isOneToOne: false;
+            referencedRelation: "movement_patterns";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exercise_definitions_primary_equipment_id_fkey";
+            columns: ["primary_equipment_id"];
+            isOneToOne: false;
+            referencedRelation: "equipment_types";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      exercise_muscle_groups: {
+        Row: {
+          created_at: string;
+          exercise_definition_id: string;
+          muscle_group_id: string;
+          role: Database["public"]["Enums"]["exercise_muscle_role"];
+        };
+        Insert: {
+          created_at?: string;
+          exercise_definition_id: string;
+          muscle_group_id: string;
+          role?: Database["public"]["Enums"]["exercise_muscle_role"];
+        };
+        Update: {
+          created_at?: string;
+          exercise_definition_id?: string;
+          muscle_group_id?: string;
+          role?: Database["public"]["Enums"]["exercise_muscle_role"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "exercise_muscle_groups_exercise_definition_id_fkey";
+            columns: ["exercise_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "exercise_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "exercise_muscle_groups_muscle_group_id_fkey";
+            columns: ["muscle_group_id"];
+            isOneToOne: false;
+            referencedRelation: "muscle_groups";
             referencedColumns: ["id"];
           },
         ];
@@ -860,6 +1029,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      movement_patterns: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          stable_key: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          stable_key: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          stable_key?: string;
+        };
+        Relationships: [];
+      };
+      muscle_groups: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          stable_key: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          stable_key: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          stable_key?: string;
+        };
+        Relationships: [];
+      };
       nutrient_definitions: {
         Row: {
           active: boolean;
@@ -1001,6 +1212,92 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      personal_records: {
+        Row: {
+          achieved_at: string;
+          confirmed: boolean;
+          created_at: string;
+          dismissed: boolean;
+          exercise_definition_id: string | null;
+          exercise_label_snapshot: string;
+          id: string;
+          notes: string | null;
+          record_type: string;
+          status: string;
+          unit: string;
+          updated_at: string;
+          user_exercise_id: string | null;
+          user_id: string;
+          value: number;
+          workout_set_id: string | null;
+        };
+        Insert: {
+          achieved_at?: string;
+          confirmed?: boolean;
+          created_at?: string;
+          dismissed?: boolean;
+          exercise_definition_id?: string | null;
+          exercise_label_snapshot: string;
+          id?: string;
+          notes?: string | null;
+          record_type: string;
+          status?: string;
+          unit: string;
+          updated_at?: string;
+          user_exercise_id?: string | null;
+          user_id: string;
+          value: number;
+          workout_set_id?: string | null;
+        };
+        Update: {
+          achieved_at?: string;
+          confirmed?: boolean;
+          created_at?: string;
+          dismissed?: boolean;
+          exercise_definition_id?: string | null;
+          exercise_label_snapshot?: string;
+          id?: string;
+          notes?: string | null;
+          record_type?: string;
+          status?: string;
+          unit?: string;
+          updated_at?: string;
+          user_exercise_id?: string | null;
+          user_id?: string;
+          value?: number;
+          workout_set_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "personal_records_exercise_definition_id_fkey";
+            columns: ["exercise_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "exercise_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "personal_records_user_exercise_id_fkey";
+            columns: ["user_exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "user_exercises";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "personal_records_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "personal_records_workout_set_id_fkey";
+            columns: ["workout_set_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_sets";
             referencedColumns: ["id"];
           },
         ];
@@ -1225,6 +1522,70 @@ export type Database = {
           },
         ];
       };
+      scheduled_workouts: {
+        Row: {
+          created_at: string;
+          id: string;
+          local_date: string;
+          notes: string | null;
+          status: Database["public"]["Enums"]["scheduled_workout_status"];
+          timezone: string;
+          title: string;
+          updated_at: string;
+          user_id: string;
+          workout_plan_day_id: string | null;
+          workout_plan_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          local_date: string;
+          notes?: string | null;
+          status?: Database["public"]["Enums"]["scheduled_workout_status"];
+          timezone?: string;
+          title: string;
+          updated_at?: string;
+          user_id: string;
+          workout_plan_day_id?: string | null;
+          workout_plan_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          local_date?: string;
+          notes?: string | null;
+          status?: Database["public"]["Enums"]["scheduled_workout_status"];
+          timezone?: string;
+          title?: string;
+          updated_at?: string;
+          user_id?: string;
+          workout_plan_day_id?: string | null;
+          workout_plan_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_workouts_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "scheduled_workouts_workout_plan_day_id_fkey";
+            columns: ["workout_plan_day_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_plan_days";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "scheduled_workouts_workout_plan_id_fkey";
+            columns: ["workout_plan_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_plans";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_custom_foods: {
         Row: {
           created_at: string;
@@ -1263,6 +1624,54 @@ export type Database = {
           },
           {
             foreignKeyName: "user_custom_foods_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_exercises: {
+        Row: {
+          created_at: string;
+          custom_name: string | null;
+          custom_video_url: string | null;
+          exercise_definition_id: string | null;
+          id: string;
+          private_notes: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          custom_name?: string | null;
+          custom_video_url?: string | null;
+          exercise_definition_id?: string | null;
+          id?: string;
+          private_notes?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          custom_name?: string | null;
+          custom_video_url?: string | null;
+          exercise_definition_id?: string | null;
+          id?: string;
+          private_notes?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_exercises_exercise_definition_id_fkey";
+            columns: ["exercise_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "exercise_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_exercises_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
@@ -1317,6 +1726,582 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_block_exercises: {
+        Row: {
+          created_at: string;
+          exercise_definition_id: string | null;
+          id: string;
+          notes: string | null;
+          sort_order: number;
+          updated_at: string;
+          user_exercise_id: string | null;
+          workout_block_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          exercise_definition_id?: string | null;
+          id?: string;
+          notes?: string | null;
+          sort_order?: number;
+          updated_at?: string;
+          user_exercise_id?: string | null;
+          workout_block_id: string;
+        };
+        Update: {
+          created_at?: string;
+          exercise_definition_id?: string | null;
+          id?: string;
+          notes?: string | null;
+          sort_order?: number;
+          updated_at?: string;
+          user_exercise_id?: string | null;
+          workout_block_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_block_exercises_exercise_definition_id_fkey";
+            columns: ["exercise_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "exercise_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_block_exercises_user_exercise_id_fkey";
+            columns: ["user_exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "user_exercises";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_block_exercises_workout_block_id_fkey";
+            columns: ["workout_block_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_blocks";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_blocks: {
+        Row: {
+          block_type: Database["public"]["Enums"]["workout_block_type"];
+          created_at: string;
+          id: string;
+          notes: string | null;
+          rest_seconds: number | null;
+          rounds: number | null;
+          sort_order: number;
+          title: string | null;
+          transition_seconds: number | null;
+          updated_at: string;
+          workout_plan_day_id: string;
+        };
+        Insert: {
+          block_type?: Database["public"]["Enums"]["workout_block_type"];
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          rest_seconds?: number | null;
+          rounds?: number | null;
+          sort_order?: number;
+          title?: string | null;
+          transition_seconds?: number | null;
+          updated_at?: string;
+          workout_plan_day_id: string;
+        };
+        Update: {
+          block_type?: Database["public"]["Enums"]["workout_block_type"];
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          rest_seconds?: number | null;
+          rounds?: number | null;
+          sort_order?: number;
+          title?: string | null;
+          transition_seconds?: number | null;
+          updated_at?: string;
+          workout_plan_day_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_blocks_workout_plan_day_id_fkey";
+            columns: ["workout_plan_day_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_plan_days";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_plan_days: {
+        Row: {
+          created_at: string;
+          day_of_week: number | null;
+          id: string;
+          name: string;
+          notes: string | null;
+          rest_day: boolean;
+          sort_order: number;
+          updated_at: string;
+          workout_plan_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          day_of_week?: number | null;
+          id?: string;
+          name?: string;
+          notes?: string | null;
+          rest_day?: boolean;
+          sort_order?: number;
+          updated_at?: string;
+          workout_plan_id: string;
+        };
+        Update: {
+          created_at?: string;
+          day_of_week?: number | null;
+          id?: string;
+          name?: string;
+          notes?: string | null;
+          rest_day?: boolean;
+          sort_order?: number;
+          updated_at?: string;
+          workout_plan_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_plan_days_workout_plan_id_fkey";
+            columns: ["workout_plan_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_plans";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_plans: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          deleted_at: string | null;
+          description: string | null;
+          id: string;
+          name: string;
+          objective: string | null;
+          source: string;
+          updated_at: string;
+          user_id: string;
+          version: number;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name: string;
+          objective?: string | null;
+          source?: string;
+          updated_at?: string;
+          user_id: string;
+          version?: number;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          objective?: string | null;
+          source?: string;
+          updated_at?: string;
+          user_id?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_plans_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_session_exercises: {
+        Row: {
+          block_order: number;
+          block_type_snapshot: string | null;
+          completed_at: string | null;
+          created_at: string;
+          display_name_snapshot: string;
+          exercise_definition_id: string | null;
+          exercise_order: number;
+          id: string;
+          notes: string | null;
+          sort_order: number;
+          started_at: string | null;
+          updated_at: string;
+          user_exercise_id: string | null;
+          workout_session_id: string;
+        };
+        Insert: {
+          block_order?: number;
+          block_type_snapshot?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          display_name_snapshot: string;
+          exercise_definition_id?: string | null;
+          exercise_order?: number;
+          id?: string;
+          notes?: string | null;
+          sort_order?: number;
+          started_at?: string | null;
+          updated_at?: string;
+          user_exercise_id?: string | null;
+          workout_session_id: string;
+        };
+        Update: {
+          block_order?: number;
+          block_type_snapshot?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          display_name_snapshot?: string;
+          exercise_definition_id?: string | null;
+          exercise_order?: number;
+          id?: string;
+          notes?: string | null;
+          sort_order?: number;
+          started_at?: string | null;
+          updated_at?: string;
+          user_exercise_id?: string | null;
+          workout_session_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_session_exercises_exercise_definition_id_fkey";
+            columns: ["exercise_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "exercise_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_session_exercises_user_exercise_id_fkey";
+            columns: ["user_exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "user_exercises";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_session_exercises_workout_session_id_fkey";
+            columns: ["workout_session_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_sessions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_session_notes: {
+        Row: {
+          body: string;
+          body_area: string | null;
+          created_at: string;
+          id: string;
+          note_type: string;
+          updated_at: string;
+          user_id: string;
+          value_text: string | null;
+          workout_session_id: string;
+        };
+        Insert: {
+          body: string;
+          body_area?: string | null;
+          created_at?: string;
+          id?: string;
+          note_type?: string;
+          updated_at?: string;
+          user_id: string;
+          value_text?: string | null;
+          workout_session_id: string;
+        };
+        Update: {
+          body?: string;
+          body_area?: string | null;
+          created_at?: string;
+          id?: string;
+          note_type?: string;
+          updated_at?: string;
+          user_id?: string;
+          value_text?: string | null;
+          workout_session_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_session_notes_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_session_notes_workout_session_id_fkey";
+            columns: ["workout_session_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_sessions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_sessions: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          daily_record_id: string;
+          duration_seconds: number | null;
+          id: string;
+          notes: string | null;
+          scheduled_workout_id: string | null;
+          session_rpe: number | null;
+          snapshot_json: Json;
+          source_plan_version: number | null;
+          started_at: string;
+          status: Database["public"]["Enums"]["workout_session_status"];
+          title: string;
+          total_volume: number | null;
+          updated_at: string;
+          user_id: string;
+          version: number;
+          workout_plan_day_id: string | null;
+          workout_plan_id: string | null;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          daily_record_id: string;
+          duration_seconds?: number | null;
+          id?: string;
+          notes?: string | null;
+          scheduled_workout_id?: string | null;
+          session_rpe?: number | null;
+          snapshot_json?: Json;
+          source_plan_version?: number | null;
+          started_at?: string;
+          status?: Database["public"]["Enums"]["workout_session_status"];
+          title?: string;
+          total_volume?: number | null;
+          updated_at?: string;
+          user_id: string;
+          version?: number;
+          workout_plan_day_id?: string | null;
+          workout_plan_id?: string | null;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          daily_record_id?: string;
+          duration_seconds?: number | null;
+          id?: string;
+          notes?: string | null;
+          scheduled_workout_id?: string | null;
+          session_rpe?: number | null;
+          snapshot_json?: Json;
+          source_plan_version?: number | null;
+          started_at?: string;
+          status?: Database["public"]["Enums"]["workout_session_status"];
+          title?: string;
+          total_volume?: number | null;
+          updated_at?: string;
+          user_id?: string;
+          version?: number;
+          workout_plan_day_id?: string | null;
+          workout_plan_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_sessions_daily_record_id_fkey";
+            columns: ["daily_record_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_records";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_sessions_scheduled_workout_id_fkey";
+            columns: ["scheduled_workout_id"];
+            isOneToOne: false;
+            referencedRelation: "scheduled_workouts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_sessions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_sessions_workout_plan_day_id_fkey";
+            columns: ["workout_plan_day_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_plan_days";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_sessions_workout_plan_id_fkey";
+            columns: ["workout_plan_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_plans";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_set_prescriptions: {
+        Row: {
+          completion_rule: Database["public"]["Enums"]["workout_set_completion_rule"];
+          created_at: string;
+          id: string;
+          notes: string | null;
+          rest_seconds: number | null;
+          set_index: number;
+          set_role: Database["public"]["Enums"]["workout_set_role"];
+          target_distance_meters: number | null;
+          target_duration_seconds: number | null;
+          target_reps_max: number | null;
+          target_reps_min: number | null;
+          target_rir: number | null;
+          target_rpe: number | null;
+          target_weight_kg: number | null;
+          tempo_concentric_seconds: number | null;
+          tempo_eccentric_seconds: number | null;
+          tempo_pause_bottom_seconds: number | null;
+          tempo_pause_top_seconds: number | null;
+          updated_at: string;
+          workout_block_exercise_id: string;
+        };
+        Insert: {
+          completion_rule?: Database["public"]["Enums"]["workout_set_completion_rule"];
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          rest_seconds?: number | null;
+          set_index?: number;
+          set_role?: Database["public"]["Enums"]["workout_set_role"];
+          target_distance_meters?: number | null;
+          target_duration_seconds?: number | null;
+          target_reps_max?: number | null;
+          target_reps_min?: number | null;
+          target_rir?: number | null;
+          target_rpe?: number | null;
+          target_weight_kg?: number | null;
+          tempo_concentric_seconds?: number | null;
+          tempo_eccentric_seconds?: number | null;
+          tempo_pause_bottom_seconds?: number | null;
+          tempo_pause_top_seconds?: number | null;
+          updated_at?: string;
+          workout_block_exercise_id: string;
+        };
+        Update: {
+          completion_rule?: Database["public"]["Enums"]["workout_set_completion_rule"];
+          created_at?: string;
+          id?: string;
+          notes?: string | null;
+          rest_seconds?: number | null;
+          set_index?: number;
+          set_role?: Database["public"]["Enums"]["workout_set_role"];
+          target_distance_meters?: number | null;
+          target_duration_seconds?: number | null;
+          target_reps_max?: number | null;
+          target_reps_min?: number | null;
+          target_rir?: number | null;
+          target_rpe?: number | null;
+          target_weight_kg?: number | null;
+          tempo_concentric_seconds?: number | null;
+          tempo_eccentric_seconds?: number | null;
+          tempo_pause_bottom_seconds?: number | null;
+          tempo_pause_top_seconds?: number | null;
+          updated_at?: string;
+          workout_block_exercise_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_set_prescriptions_workout_block_exercise_id_fkey";
+            columns: ["workout_block_exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_block_exercises";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_sets: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          distance_meters: number | null;
+          distance_unit: string | null;
+          duration_seconds: number | null;
+          id: string;
+          load_unit: string;
+          notes: string | null;
+          reps: number | null;
+          rest_seconds_actual: number | null;
+          rir: number | null;
+          rpe: number | null;
+          set_index: number;
+          set_role: Database["public"]["Enums"]["workout_set_role"];
+          status: Database["public"]["Enums"]["workout_set_status"];
+          tempo_snapshot: string | null;
+          updated_at: string;
+          weight_kg: number | null;
+          workout_session_exercise_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          distance_meters?: number | null;
+          distance_unit?: string | null;
+          duration_seconds?: number | null;
+          id?: string;
+          load_unit?: string;
+          notes?: string | null;
+          reps?: number | null;
+          rest_seconds_actual?: number | null;
+          rir?: number | null;
+          rpe?: number | null;
+          set_index?: number;
+          set_role?: Database["public"]["Enums"]["workout_set_role"];
+          status?: Database["public"]["Enums"]["workout_set_status"];
+          tempo_snapshot?: string | null;
+          updated_at?: string;
+          weight_kg?: number | null;
+          workout_session_exercise_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          distance_meters?: number | null;
+          distance_unit?: string | null;
+          duration_seconds?: number | null;
+          id?: string;
+          load_unit?: string;
+          notes?: string | null;
+          reps?: number | null;
+          rest_seconds_actual?: number | null;
+          rir?: number | null;
+          rpe?: number | null;
+          set_index?: number;
+          set_role?: Database["public"]["Enums"]["workout_set_role"];
+          status?: Database["public"]["Enums"]["workout_set_status"];
+          tempo_snapshot?: string | null;
+          updated_at?: string;
+          weight_kg?: number | null;
+          workout_session_exercise_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_sets_workout_session_exercise_id_fkey";
+            columns: ["workout_session_exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_session_exercises";
             referencedColumns: ["id"];
           },
         ];
@@ -1391,6 +2376,21 @@ export type Database = {
         | "window_lime"
         | "window_blue";
       daily_module_status_kind: "not_started" | "in_progress" | "completed" | "skipped";
+      exercise_muscle_role: "primary" | "secondary" | "stabilizer";
+      exercise_source: "mtfbwu_curated" | "free_exercise_db" | "other";
+      exercise_type:
+        | "strength"
+        | "cardio"
+        | "mobility"
+        | "plyometric"
+        | "isometric"
+        | "balance"
+        | "conditioning"
+        | "other"
+        | "hypertrophy"
+        | "skill"
+        | "custom"
+        | "bodyweight";
       food_source:
         | "user_custom"
         | "mtfbwu_curated"
@@ -1422,7 +2422,59 @@ export type Database = {
         | "reviewed"
         | "saved"
         | "discarded";
+      scheduled_workout_status:
+        | "planned"
+        | "completed"
+        | "skipped"
+        | "missed"
+        | "rescheduled"
+        | "started"
+        | "cancelled";
       units_system: "metric" | "imperial";
+      workout_block_type:
+        | "warmup"
+        | "straight_sets"
+        | "superset"
+        | "circuit"
+        | "amrap"
+        | "emom"
+        | "for_time"
+        | "drop_set"
+        | "cooldown"
+        | "triset"
+        | "stripping_set"
+        | "one_to_ten"
+        | "cardio"
+        | "mobility"
+        | "custom";
+      workout_session_status: "in_progress" | "paused" | "completed" | "discarded";
+      workout_set_completion_rule:
+        | "fixed_reps"
+        | "rep_range"
+        | "time_based"
+        | "distance_based"
+        | "amrap_to_failure"
+        | "exact"
+        | "range"
+        | "amrap"
+        | "to_failure"
+        | "max_effort"
+        | "duration"
+        | "distance"
+        | "manual";
+      workout_set_role:
+        | "warmup"
+        | "working"
+        | "top_set"
+        | "backoff"
+        | "drop_set"
+        | "amrap"
+        | "drop"
+        | "max_effort"
+        | "failure"
+        | "timed_hold"
+        | "technique";
+      workout_set_status: "pending" | "completed" | "skipped" | "failed" | "partial";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -1562,6 +2614,22 @@ export const Constants = {
         "window_blue",
       ],
       daily_module_status_kind: ["not_started", "in_progress", "completed", "skipped"],
+      exercise_muscle_role: ["primary", "secondary", "stabilizer"],
+      exercise_source: ["mtfbwu_curated", "free_exercise_db", "other"],
+      exercise_type: [
+        "strength",
+        "cardio",
+        "mobility",
+        "plyometric",
+        "isometric",
+        "balance",
+        "conditioning",
+        "other",
+        "hypertrophy",
+        "skill",
+        "custom",
+        "bodyweight",
+      ],
       food_source: [
         "user_custom",
         "mtfbwu_curated",
@@ -1602,7 +2670,63 @@ export const Constants = {
         "saved",
         "discarded",
       ],
+      scheduled_workout_status: [
+        "planned",
+        "completed",
+        "skipped",
+        "missed",
+        "rescheduled",
+        "started",
+        "cancelled",
+      ],
       units_system: ["metric", "imperial"],
+      workout_block_type: [
+        "warmup",
+        "straight_sets",
+        "superset",
+        "circuit",
+        "amrap",
+        "emom",
+        "for_time",
+        "drop_set",
+        "cooldown",
+        "triset",
+        "stripping_set",
+        "one_to_ten",
+        "cardio",
+        "mobility",
+        "custom",
+      ],
+      workout_session_status: ["in_progress", "paused", "completed", "discarded"],
+      workout_set_completion_rule: [
+        "fixed_reps",
+        "rep_range",
+        "time_based",
+        "distance_based",
+        "amrap_to_failure",
+        "exact",
+        "range",
+        "amrap",
+        "to_failure",
+        "max_effort",
+        "duration",
+        "distance",
+        "manual",
+      ],
+      workout_set_role: [
+        "warmup",
+        "working",
+        "top_set",
+        "backoff",
+        "drop_set",
+        "amrap",
+        "drop",
+        "max_effort",
+        "failure",
+        "timed_hold",
+        "technique",
+      ],
+      workout_set_status: ["pending", "completed", "skipped", "failed", "partial"],
     },
   },
 } as const;
@@ -1619,6 +2743,17 @@ export type MealItemType = Database["public"]["Enums"]["meal_item_type"];
 export type DbMealType = Database["public"]["Enums"]["meal_type"];
 export type NutritionLabelCaptureStatus =
   Database["public"]["Enums"]["nutrition_label_capture_status"];
+export type ExerciseType = Database["public"]["Enums"]["exercise_type"];
+export type ExerciseSource = Database["public"]["Enums"]["exercise_source"];
+export type ExerciseMuscleRole = Database["public"]["Enums"]["exercise_muscle_role"];
+export type WorkoutBlockType = Database["public"]["Enums"]["workout_block_type"];
+export type WorkoutSetRole = Database["public"]["Enums"]["workout_set_role"];
+export type WorkoutSetCompletionRule =
+  Database["public"]["Enums"]["workout_set_completion_rule"];
+export type ScheduledWorkoutStatus =
+  Database["public"]["Enums"]["scheduled_workout_status"];
+export type WorkoutSessionStatus = Database["public"]["Enums"]["workout_session_status"];
+export type WorkoutSetStatus = Database["public"]["Enums"]["workout_set_status"];
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ModuleDefinition = Database["public"]["Tables"]["module_definitions"]["Row"];
@@ -1641,3 +2776,27 @@ export type NutritionLabelCapture =
   Database["public"]["Tables"]["nutrition_label_captures"]["Row"];
 export type ProductReviewEvent =
   Database["public"]["Tables"]["product_review_events"]["Row"];
+export type MuscleGroup = Database["public"]["Tables"]["muscle_groups"]["Row"];
+export type EquipmentType = Database["public"]["Tables"]["equipment_types"]["Row"];
+export type MovementPattern = Database["public"]["Tables"]["movement_patterns"]["Row"];
+export type ExerciseDefinition =
+  Database["public"]["Tables"]["exercise_definitions"]["Row"];
+export type ExerciseAlias = Database["public"]["Tables"]["exercise_aliases"]["Row"];
+export type ExerciseMuscleGroup =
+  Database["public"]["Tables"]["exercise_muscle_groups"]["Row"];
+export type UserExercise = Database["public"]["Tables"]["user_exercises"]["Row"];
+export type WorkoutPlan = Database["public"]["Tables"]["workout_plans"]["Row"];
+export type WorkoutPlanDay = Database["public"]["Tables"]["workout_plan_days"]["Row"];
+export type WorkoutBlock = Database["public"]["Tables"]["workout_blocks"]["Row"];
+export type WorkoutBlockExercise =
+  Database["public"]["Tables"]["workout_block_exercises"]["Row"];
+export type WorkoutSetPrescription =
+  Database["public"]["Tables"]["workout_set_prescriptions"]["Row"];
+export type ScheduledWorkout = Database["public"]["Tables"]["scheduled_workouts"]["Row"];
+export type WorkoutSession = Database["public"]["Tables"]["workout_sessions"]["Row"];
+export type WorkoutSessionExercise =
+  Database["public"]["Tables"]["workout_session_exercises"]["Row"];
+export type WorkoutSet = Database["public"]["Tables"]["workout_sets"]["Row"];
+export type WorkoutSessionNote =
+  Database["public"]["Tables"]["workout_session_notes"]["Row"];
+export type PersonalRecord = Database["public"]["Tables"]["personal_records"]["Row"];
