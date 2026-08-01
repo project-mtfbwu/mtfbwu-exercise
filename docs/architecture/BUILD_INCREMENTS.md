@@ -200,9 +200,20 @@ performed sessions with symptom scales, alerts, board status, offline logging.
 
 ## Increment 8 — Measurements + private photos
 
-- Measurement entries
-- Private Storage bucket + RLS
-- Progress photo upload/view
+**Status:** Implemented locally (uncommitted until user asks).
+
+- [x] Migrations: weight, measurements, photo sets, comparisons, notes, summary prefs, catalog seed
+- [x] RLS + `increment8_progress_rls.sql`
+- [x] Modules: measurements, progress-photos, progress timeline/compare/prefs
+- [x] Dexie v8 + `progressPhotoBlobs` + progress outbox; sync-coordinator apply
+- [x] UI: Measurements focus, Progress photos focus, `/progress` page, comparison viewer, SVG charts
+- [x] Board `progressStatusLabel`; profile summary counts
+- [x] Docs under `docs/development/` + ADRs 0011/0012 + `INCREMENT_8_VISUAL_REVIEW.md`
+
+### Explicitly out of scope for Increment 8
+
+- Hydration, meditation, calendar (Increment 9)
+- Chart libraries, AI body analysis, body scoring
 
 ## Increment 9 — Hydration, meditation, calendar polish
 

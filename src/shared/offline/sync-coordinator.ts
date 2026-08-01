@@ -26,6 +26,11 @@ import {
   isStoppedToCompletedConflict,
   type RehabOutboxPayload,
 } from "@/shared/offline/rehab-outbox";
+import {
+  isProgressConflict,
+  isProgressOutboxPayload,
+  type ProgressOutboxPayload,
+} from "@/shared/offline/progress-outbox";
 import { useSyncStatusStore } from "@/shared/offline/sync-status-store";
 import { isLayoutConflictError, isStatusConflictError } from "@/shared/board/board-model";
 
@@ -115,6 +120,10 @@ async function applyRecord(client: BrowserClient, record: OutboxRecord) {
   }
   if (isRehabOutboxPayload(record.payload)) {
     await applyRehabPayload(client, record.payload);
+    return;
+  }
+  if (isProgressOutboxPayload(record.payload)) {
+    await applyProgressPayload(client, record.payload);
     return;
   }
   throw new Error(`Unsupported outbox payload for ${record.entityType}`);
@@ -474,6 +483,104 @@ async function applyRehabPayload(client: BrowserClient, payload: RehabOutboxPayl
     }
 
     const { error } = await rehabClient.from(write.table).upsert(write.values);
+    if (error) throw new Error(error.message);
+  }
+}
+
+async function applyProgressPayload(
+  client: BrowserClient,
+  payload: ProgressOutboxPayload,
+) {
+  if (payload.storageUpload) {
+    const db = getDatabase();
+    const blobRow = await db.progressPhotoBlobs.get(payload.storageUpload.blobId);
+    if (!blobRow) {
+      throw new Error("Offline photo blob missing — re-capture the photo to upload.");
+    }
+    const storageClient = client as unknown as {
+      storage: {
+        from: (bucket: string) => {
+          upload: (
+            path: string,
+            body: ArrayBuffer,
+            options: { contentType: string; upsert: boolean },
+          ) => Promise<{ error: { message: string } | null }>;
+        };
+      };
+    };
+    const { error: uploadError } = await storageClient.storage
+      .from(payload.storageUpload.bucket)
+      .upload(payload.storageUpload.storagePath, blobRow.blob, {
+        contentType: payload.storageUpload.mimeType,
+        upsert: true,
+      });
+    if (uploadError) throw new Error(uploadError.message);
+    await db.progressPhotoBlobs.delete(payload.storageUpload.blobId);
+    await db.progressPhotoDrafts.delete(payload.storageUpload.blobId);
+  }
+
+  const progressClient = client as unknown as {
+    from: (table: string) => {
+      select: (columns: string) => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => {
+          maybeSingle: () => Promise<{
+            data: Record<string, unknown> | null;
+            error: { message: string } | null;
+          }>;
+        };
+      };
+      upsert: (values: Record<string, unknown> | Record<string, unknown>[]) => Promise<{
+        error: { message: string } | null;
+      }>;
+      delete: () => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => Promise<{ error: { message: string } | null }>;
+      };
+    };
+  };
+
+  for (const write of payload.writes) {
+    const rows = Array.isArray(write.values) ? write.values : [write.values];
+
+    if (write.operation === "delete") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id !== "string") continue;
+        const { error } = await progressClient.from(write.table).delete().eq("id", id);
+        if (error) throw new Error(error.message);
+      }
+      continue;
+    }
+
+    if (write.conflictIfServerUpdatedAfter) {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id !== "string") continue;
+        const { data: existing, error: readError } = await progressClient
+          .from(write.table)
+          .select("id, updated_at")
+          .eq("id", id)
+          .maybeSingle();
+        if (readError) throw new Error(readError.message);
+        if (
+          isProgressConflict(
+            existing?.updated_at as string | undefined,
+            write.conflictIfServerUpdatedAfter,
+          )
+        ) {
+          throw new Error(
+            "Progress entry changed elsewhere — refresh before overwriting.",
+          );
+        }
+      }
+    }
+
+    const { error } = await progressClient.from(write.table).upsert(write.values);
     if (error) throw new Error(error.message);
   }
 }

@@ -29,5 +29,22 @@ export {
   isStoppedToCompletedConflict,
   isAlertAckRemovalConflict,
 } from "./rehab-outbox";
+export {
+  PROGRESS_ENTITY,
+  isProgressOutboxPayload,
+  isProgressConflict,
+  queueProgressMutation,
+  buildWeightUpsertWrites,
+  buildPhotoSetWrites,
+  buildPhotoMetadataWrites,
+  sortProgressRecordsForReplay,
+  PHOTO_SEQUENCE,
+  queueProgressPhotoUpload,
+  storeProgressPhotoBlob,
+  deleteProgressPhotoBlob,
+  listProgressPhotoDrafts,
+  progressPhotoBlobId,
+  MAX_OFFLINE_PROGRESS_PHOTO_BYTES,
+} from "./progress-outbox";
 export * from "./clear-local";
 export * from "./label-capture-draft";

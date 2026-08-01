@@ -62,6 +62,26 @@ vi.mock("@/modules/workout/sessions/actions", () => ({
   addExerciseToSessionAction: vi.fn(),
 }));
 
+vi.mock("@/modules/measurements/actions", () => ({
+  listRecentWeightEntriesAction: vi.fn(async () => []),
+  listUserMeasurementsAction: vi.fn(async () => []),
+  saveWeightEntryAction: vi.fn(async () => ({ ok: true, message: "saved" })),
+  saveMeasurementEntryAction: vi.fn(async () => ({ ok: true, message: "saved" })),
+}));
+
+vi.mock("@/modules/progress-photos/actions", () => ({
+  createPhotoSetAction: vi.fn(async () => ({
+    ok: true,
+    message: "created",
+    id: "set-1",
+  })),
+  uploadPhotoMetadataAction: vi.fn(async () => ({ ok: true, message: "saved" })),
+  buildPhotoStoragePathAction: vi.fn(async () => ({
+    path: "user/progress/set-1/front-p1.jpg",
+    photoId: "p1",
+  })),
+}));
+
 function renderBoard() {
   return render(
     <MotionPreferenceProvider>
@@ -89,7 +109,7 @@ describe("Today flat-lay board (Increment 3)", () => {
       /Open Water/i,
       /Open Meditation/i,
       /Open Measurements/i,
-      /Open Profile/i,
+      /Open Progress photos/i,
     ]) {
       expect(screen.getByRole("button", { name })).toBeInTheDocument();
     }
@@ -141,14 +161,11 @@ describe("Today flat-lay board (Increment 3)", () => {
     ).toBeInTheDocument();
 
     const before = screen
-      .getByRole("button", { name: /Open Profile/i })
+      .getByRole("button", { name: /Open Meditation/i })
       .getAttribute("aria-label");
-    await user.click(screen.getByRole("button", { name: /Open Profile/i }));
-    const nameInput = screen.getByLabelText(/Display name/i);
-    await user.clear(nameInput);
-    await user.type(nameInput, "Changed Name");
+    await user.click(screen.getByRole("button", { name: /Open Meditation/i }));
     await user.click(screen.getByRole("button", { name: /^Cancel$/i }));
-    expect(screen.getByRole("button", { name: /Open Profile/i })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /Open Meditation/i })).toHaveAttribute(
       "aria-label",
       before,
     );

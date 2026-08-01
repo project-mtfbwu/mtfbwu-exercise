@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
@@ -57,6 +57,163 @@ export type Database = {
             columns: ["branded_product_id"];
             isOneToOne: false;
             referencedRelation: "branded_products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      body_measurement_entries: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          local_date: string;
+          note: string | null;
+          recorded_at: string;
+          source: Database["public"]["Enums"]["progress_record_source"];
+          timezone: string;
+          title: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date: string;
+          note?: string | null;
+          recorded_at?: string;
+          source?: Database["public"]["Enums"]["progress_record_source"];
+          timezone?: string;
+          title?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date?: string;
+          note?: string | null;
+          recorded_at?: string;
+          source?: Database["public"]["Enums"]["progress_record_source"];
+          timezone?: string;
+          title?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "body_measurement_entries_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      body_measurement_values: {
+        Row: {
+          body_measurement_entry_id: string;
+          created_at: string;
+          id: string;
+          normalized_value: number;
+          side: Database["public"]["Enums"]["measurement_value_side"];
+          unit: string;
+          updated_at: string;
+          user_measurement_definition_id: string;
+          value: number;
+        };
+        Insert: {
+          body_measurement_entry_id: string;
+          created_at?: string;
+          id?: string;
+          normalized_value: number;
+          side?: Database["public"]["Enums"]["measurement_value_side"];
+          unit: string;
+          updated_at?: string;
+          user_measurement_definition_id: string;
+          value: number;
+        };
+        Update: {
+          body_measurement_entry_id?: string;
+          created_at?: string;
+          id?: string;
+          normalized_value?: number;
+          side?: Database["public"]["Enums"]["measurement_value_side"];
+          unit?: string;
+          updated_at?: string;
+          user_measurement_definition_id?: string;
+          value?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "body_measurement_values_body_measurement_entry_id_fkey";
+            columns: ["body_measurement_entry_id"];
+            isOneToOne: false;
+            referencedRelation: "body_measurement_entries";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "body_measurement_values_user_measurement_definition_id_fkey";
+            columns: ["user_measurement_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "user_measurement_definitions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      body_weight_entries: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          local_date: string;
+          normalized_kg: number | null;
+          note: string | null;
+          recorded_at: string;
+          source: Database["public"]["Enums"]["progress_record_source"];
+          timezone: string;
+          updated_at: string;
+          user_id: string;
+          weight_unit: string;
+          weight_value: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date: string;
+          normalized_kg?: number | null;
+          note?: string | null;
+          recorded_at?: string;
+          source?: Database["public"]["Enums"]["progress_record_source"];
+          timezone?: string;
+          updated_at?: string;
+          user_id: string;
+          weight_unit?: string;
+          weight_value?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date?: string;
+          normalized_kg?: number | null;
+          note?: string | null;
+          recorded_at?: string;
+          source?: Database["public"]["Enums"]["progress_record_source"];
+          timezone?: string;
+          updated_at?: string;
+          user_id?: string;
+          weight_unit?: string;
+          weight_value?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "body_weight_entries_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -972,6 +1129,45 @@ export type Database = {
           },
         ];
       };
+      measurement_definitions: {
+        Row: {
+          active: boolean;
+          category: Database["public"]["Enums"]["measurement_category"];
+          created_at: string;
+          default_unit: string;
+          display_name: string;
+          display_order: number;
+          id: string;
+          stable_key: string;
+          supports_side: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          category?: Database["public"]["Enums"]["measurement_category"];
+          created_at?: string;
+          default_unit: string;
+          display_name: string;
+          display_order?: number;
+          id?: string;
+          stable_key: string;
+          supports_side?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          category?: Database["public"]["Enums"]["measurement_category"];
+          created_at?: string;
+          default_unit?: string;
+          display_name?: string;
+          display_order?: number;
+          id?: string;
+          stable_key?: string;
+          supports_side?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       module_definitions: {
         Row: {
           category: Database["public"]["Enums"]["module_category"];
@@ -1389,6 +1585,273 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      progress_comparisons: {
+        Row: {
+          comparison_type: Database["public"]["Enums"]["progress_comparison_type"];
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          left_date: string | null;
+          left_photo_set_id: string | null;
+          measurement_keys: string[] | null;
+          right_date: string | null;
+          right_photo_set_id: string | null;
+          title: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          comparison_type?: Database["public"]["Enums"]["progress_comparison_type"];
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          left_date?: string | null;
+          left_photo_set_id?: string | null;
+          measurement_keys?: string[] | null;
+          right_date?: string | null;
+          right_photo_set_id?: string | null;
+          title?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          comparison_type?: Database["public"]["Enums"]["progress_comparison_type"];
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          left_date?: string | null;
+          left_photo_set_id?: string | null;
+          measurement_keys?: string[] | null;
+          right_date?: string | null;
+          right_photo_set_id?: string | null;
+          title?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "progress_comparisons_left_photo_set_id_fkey";
+            columns: ["left_photo_set_id"];
+            isOneToOne: false;
+            referencedRelation: "progress_photo_sets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "progress_comparisons_right_photo_set_id_fkey";
+            columns: ["right_photo_set_id"];
+            isOneToOne: false;
+            referencedRelation: "progress_photo_sets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "progress_comparisons_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      progress_notes: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          local_date: string;
+          note_type: Database["public"]["Enums"]["progress_note_type"];
+          updated_at: string;
+          user_id: string;
+          value_text: string;
+        };
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date: string;
+          note_type?: Database["public"]["Enums"]["progress_note_type"];
+          updated_at?: string;
+          user_id: string;
+          value_text: string;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date?: string;
+          note_type?: Database["public"]["Enums"]["progress_note_type"];
+          updated_at?: string;
+          user_id?: string;
+          value_text?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "progress_notes_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      progress_photo_sets: {
+        Row: {
+          captured_at: string;
+          created_at: string;
+          deleted_at: string | null;
+          id: string;
+          local_date: string;
+          note: string | null;
+          retained: boolean;
+          source: Database["public"]["Enums"]["progress_record_source"];
+          timezone: string;
+          title: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          captured_at?: string;
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date: string;
+          note?: string | null;
+          retained?: boolean;
+          source?: Database["public"]["Enums"]["progress_record_source"];
+          timezone?: string;
+          title?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          captured_at?: string;
+          created_at?: string;
+          deleted_at?: string | null;
+          id?: string;
+          local_date?: string;
+          note?: string | null;
+          retained?: boolean;
+          source?: Database["public"]["Enums"]["progress_record_source"];
+          timezone?: string;
+          title?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "progress_photo_sets_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      progress_photos: {
+        Row: {
+          captured_at: string;
+          checksum: string | null;
+          created_at: string;
+          custom_label: string | null;
+          deleted_at: string | null;
+          file_size_bytes: number | null;
+          height: number | null;
+          id: string;
+          mime_type: string;
+          private_storage_path: string;
+          processed: boolean;
+          progress_photo_set_id: string;
+          slot: Database["public"]["Enums"]["progress_photo_slot"];
+          updated_at: string;
+          width: number | null;
+        };
+        Insert: {
+          captured_at?: string;
+          checksum?: string | null;
+          created_at?: string;
+          custom_label?: string | null;
+          deleted_at?: string | null;
+          file_size_bytes?: number | null;
+          height?: number | null;
+          id?: string;
+          mime_type?: string;
+          private_storage_path: string;
+          processed?: boolean;
+          progress_photo_set_id: string;
+          slot: Database["public"]["Enums"]["progress_photo_slot"];
+          updated_at?: string;
+          width?: number | null;
+        };
+        Update: {
+          captured_at?: string;
+          checksum?: string | null;
+          created_at?: string;
+          custom_label?: string | null;
+          deleted_at?: string | null;
+          file_size_bytes?: number | null;
+          height?: number | null;
+          id?: string;
+          mime_type?: string;
+          private_storage_path?: string;
+          processed?: boolean;
+          progress_photo_set_id?: string;
+          slot?: Database["public"]["Enums"]["progress_photo_slot"];
+          updated_at?: string;
+          width?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "progress_photos_progress_photo_set_id_fkey";
+            columns: ["progress_photo_set_id"];
+            isOneToOne: false;
+            referencedRelation: "progress_photo_sets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      progress_summary_preferences: {
+        Row: {
+          created_at: string;
+          default_date_range: Database["public"]["Enums"]["progress_date_range"];
+          id: string;
+          selected_measurement_keys: string[];
+          show_measurements: boolean;
+          show_photos: boolean;
+          show_weight: boolean;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          default_date_range?: Database["public"]["Enums"]["progress_date_range"];
+          id?: string;
+          selected_measurement_keys?: string[];
+          show_measurements?: boolean;
+          show_photos?: boolean;
+          show_weight?: boolean;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          default_date_range?: Database["public"]["Enums"]["progress_date_range"];
+          id?: string;
+          selected_measurement_keys?: string[];
+          show_measurements?: boolean;
+          show_photos?: boolean;
+          show_weight?: boolean;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "progress_summary_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       recipe_ingredients: {
         Row: {
@@ -2667,6 +3130,60 @@ export type Database = {
           },
         ];
       };
+      user_measurement_definitions: {
+        Row: {
+          created_at: string;
+          custom_name: string | null;
+          display_order: number;
+          enabled: boolean;
+          id: string;
+          measurement_definition_id: string | null;
+          side_mode: Database["public"]["Enums"]["measurement_side_mode"];
+          unit: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          custom_name?: string | null;
+          display_order?: number;
+          enabled?: boolean;
+          id?: string;
+          measurement_definition_id?: string | null;
+          side_mode?: Database["public"]["Enums"]["measurement_side_mode"];
+          unit: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          custom_name?: string | null;
+          display_order?: number;
+          enabled?: boolean;
+          id?: string;
+          measurement_definition_id?: string | null;
+          side_mode?: Database["public"]["Enums"]["measurement_side_mode"];
+          unit?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_measurement_definitions_measurement_definition_id_fkey";
+            columns: ["measurement_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "measurement_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_measurement_definitions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_modules: {
         Row: {
           created_at: string;
@@ -3472,6 +3989,10 @@ export type Database = {
         | "dinner"
         | "snack"
         | "custom";
+      measurement_category:
+        "weight" | "circumference" | "width" | "composition" | "custom";
+      measurement_side_mode: "not_applicable" | "left_right" | "single_value";
+      measurement_value_side: "left" | "right" | "not_applicable";
       module_category:
         "nutrition" | "training" | "recovery" | "body" | "lifestyle" | "custom";
       nutrition_label_capture_status:
@@ -3482,6 +4003,11 @@ export type Database = {
         | "reviewed"
         | "saved"
         | "discarded";
+      progress_comparison_type: "photo" | "weight" | "measurement" | "mixed";
+      progress_date_range: "7d" | "30d" | "90d" | "180d" | "365d" | "all";
+      progress_note_type: "general" | "weight" | "measurement" | "photo" | "milestone";
+      progress_photo_slot: "front" | "side_left" | "side_right" | "back" | "custom";
+      progress_record_source: "manual" | "imported_future" | "device_future";
       rehab_alert_type:
         | "pain_threshold"
         | "severe_swelling"
@@ -3777,6 +4303,9 @@ export const Constants = {
         "snack",
         "custom",
       ],
+      measurement_category: ["weight", "circumference", "width", "composition", "custom"],
+      measurement_side_mode: ["not_applicable", "left_right", "single_value"],
+      measurement_value_side: ["left", "right", "not_applicable"],
       module_category: [
         "nutrition",
         "training",
@@ -3794,6 +4323,11 @@ export const Constants = {
         "saved",
         "discarded",
       ],
+      progress_comparison_type: ["photo", "weight", "measurement", "mixed"],
+      progress_date_range: ["7d", "30d", "90d", "180d", "365d", "all"],
+      progress_note_type: ["general", "weight", "measurement", "photo", "milestone"],
+      progress_photo_slot: ["front", "side_left", "side_right", "back", "custom"],
+      progress_record_source: ["manual", "imported_future", "device_future"],
       rehab_alert_type: [
         "pain_threshold",
         "severe_swelling",

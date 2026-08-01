@@ -3,11 +3,13 @@ import type { BoardCardView, BoardSnapshot } from "@/shared/board/board-model";
 import {
   labelForStatus,
   nutritionStatusLabel,
+  progressStatusLabel,
   rehabStatusLabel,
   workoutStatusLabel,
 } from "@/shared/board/board-model";
 import { loadWorkoutDaySummary } from "@/modules/workout/sessions/load-workout-day";
 import { loadRehabDaySummary } from "@/modules/rehab/sessions/load-rehab-day";
+import { loadProgressDaySummary } from "@/modules/progress/load-progress-day";
 import { clampToLoggableLocalDate, todayLocalDate } from "@/shared/utils/local-date";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/shared/config/constants";
@@ -144,6 +146,7 @@ export async function loadBoardSnapshot(
   const nutritionGoals = await loadNutritionGoalsAction(localDate);
   const workoutDaySummary = await loadWorkoutDaySummary(localDate);
   const rehabDaySummary = await loadRehabDaySummary(localDate);
+  const progressDaySummary = await loadProgressDaySummary(localDate);
 
   const defById = new Map((definitions ?? []).map((d) => [d.id, d]));
   const moduleById = new Map((userModules ?? []).map((m) => [m.id, m]));
@@ -185,7 +188,15 @@ export async function loadBoardSnapshot(
                   status,
                   userModule.custom_label,
                 )
-              : labelForStatus(definition, status, userModule.custom_label),
+              : definition.key === "measurements" || definition.key === "progress_photos"
+                ? progressStatusLabel(
+                    progressDaySummary,
+                    definition,
+                    status,
+                    userModule.custom_label,
+                    definition.key,
+                  )
+                : labelForStatus(definition, status, userModule.custom_label),
     });
   }
 
@@ -199,6 +210,7 @@ export async function loadBoardSnapshot(
     nutritionGoals,
     workoutDaySummary,
     rehabDaySummary,
+    progressDaySummary,
     syncBanner: null,
   };
 }

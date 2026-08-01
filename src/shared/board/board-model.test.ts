@@ -1,116 +1,90 @@
 import { describe, expect, it } from "vitest";
-import { rehabStatusLabel, workoutStatusLabel } from "@/shared/board/board-model";
-import type { ModuleDefinition, DailyModuleStatus } from "@/shared/database/types";
+import { progressStatusLabel } from "@/shared/board/board-model";
+import type { DailyModuleStatus, ModuleDefinition } from "@/shared/database/types";
+import type { ProgressDaySummary } from "@/modules/progress/load-progress-day";
 
-const workoutDefinition = {
-  id: "def-workout",
-  key: "workout",
-  display_name: "Workout",
-} as ModuleDefinition;
+const baseDefinition = {
+  id: "d1",
+  key: "measurements",
+  display_name: "Measurements",
+  category: "body",
+  description: "",
+  default_enabled: true,
+  default_order: 60,
+  visual_variant: "paper_yellow",
+  icon_key: "tape",
+  supports_calendar: false,
+  supports_target: false,
+  is_active: true,
+  created_at: "",
+  updated_at: "",
+} satisfies ModuleDefinition;
 
-const rehabDefinition = {
-  id: "def-rehab",
-  key: "rehab",
-  display_name: "Rehab",
-} as ModuleDefinition;
+const emptySummary: ProgressDaySummary = {
+  weightEntry: null,
+  measurementCount: 0,
+  photoSetCount: 0,
+  noteCount: 0,
+  latestPhotoSetDate: null,
+};
 
-describe("workoutStatusLabel", () => {
-  it("shows active session progress", () => {
-    expect(
-      workoutStatusLabel(
-        {
-          scheduled: null,
-          activeSession: {
-            id: "s1",
-            title: "Push day",
-            startedAt: "2026-07-30T10:00:00Z",
-            totalSets: 12,
-            completedSets: 4,
-          },
-        },
-        workoutDefinition,
-        null,
-        null,
-      ),
-    ).toBe("Push day · 4/12 sets");
+describe("progressStatusLabel", () => {
+  it("shows weight when logged today", () => {
+    const label = progressStatusLabel(
+      { ...emptySummary, weightEntry: { normalizedKg: 75, display: "75 kg" } },
+      baseDefinition,
+      null,
+      null,
+      "measurements",
+    );
+    expect(label).toBe("75 kg logged");
   });
 
-  it("shows scheduled workout when no active session", () => {
-    expect(
-      workoutStatusLabel(
-        {
-          scheduled: { id: "sch-1", title: "Leg day", status: "planned" },
-          activeSession: null,
-        },
-        workoutDefinition,
-        null,
-        null,
-      ),
-    ).toBe("Leg day scheduled");
+  it("shows measurement count", () => {
+    const label = progressStatusLabel(
+      { ...emptySummary, measurementCount: 2 },
+      baseDefinition,
+      null,
+      null,
+      "measurements",
+    );
+    expect(label).toBe("2 measurement entries today");
   });
 
-  it("falls back to daily status label", () => {
-    const status = { status: "not_started", summary_text: null } as DailyModuleStatus;
-    expect(
-      workoutStatusLabel(
-        { scheduled: null, activeSession: null },
-        workoutDefinition,
-        status,
-        null,
-      ),
-    ).toBe("Workout · not started");
-  });
-});
-
-describe("rehabStatusLabel", () => {
-  it("shows active session progress with alerts", () => {
-    expect(
-      rehabStatusLabel(
-        {
-          scheduled: null,
-          hasActiveRestrictions: false,
-          activeSession: {
-            id: "s1",
-            title: "Knee day",
-            startedAt: "2026-07-31T10:00:00Z",
-            totalSets: 8,
-            completedSets: 3,
-            unacknowledgedAlerts: 1,
-            averageConfidence: 6,
-            maxPain: 4,
-          },
-        },
-        rehabDefinition,
-        null,
-        null,
-      ),
-    ).toBe("Knee day · 3/8 sets · 1 alert");
+  it("shows photo set count for progress_photos module", () => {
+    const photosDef = {
+      ...baseDefinition,
+      key: "progress_photos",
+      display_name: "Progress photos",
+    };
+    const label = progressStatusLabel(
+      { ...emptySummary, photoSetCount: 1 },
+      photosDef,
+      null,
+      null,
+      "progress_photos",
+    );
+    expect(label).toBe("1 photo set today");
   });
 
-  it("shows scheduled rehab when no active session", () => {
-    expect(
-      rehabStatusLabel(
-        {
-          scheduled: { id: "sch-1", title: "Mobility", status: "planned" },
-          activeSession: null,
-          hasActiveRestrictions: false,
-        },
-        rehabDefinition,
-        null,
-        null,
-      ),
-    ).toBe("Mobility scheduled");
-  });
-
-  it("falls back to daily status label", () => {
-    const status = { status: "not_started", summary_text: null } as DailyModuleStatus;
-    expect(
-      rehabStatusLabel(
-        { scheduled: null, activeSession: null, hasActiveRestrictions: false },
-        rehabDefinition,
-        status,
-        null,
-      ),
-    ).toBe("Rehab · not started");
+  it("falls back to generic status", () => {
+    const status = {
+      id: "s1",
+      daily_record_id: "dr1",
+      user_module_id: "um1",
+      status: "not_started",
+      summary_text: null,
+      revision: 0,
+      created_at: "",
+      updated_at: "",
+    } as DailyModuleStatus;
+    const label = progressStatusLabel(
+      emptySummary,
+      baseDefinition,
+      status,
+      null,
+      "measurements",
+    );
+    expect(label).toContain("not started");
   });
 });

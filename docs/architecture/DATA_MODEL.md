@@ -133,25 +133,29 @@ Plan ≠ scheduled ≠ performed. See `docs/development/REHAB_PLAN_MODEL.md`,
 Mirror workout/rehab pattern at smaller scale when implemented: template optional
 + session/log tables; keep template≠session invariant.
 
-## Measurements
+## Measurements (Increment 8 — shipped)
 
 ```
-measurement_types  -- system + user custom
-measurement_entries
-  id, user_id, type_id, value, unit, recorded_at, notes
+measurement_definitions       -- system catalog (seed)
+user_measurement_definitions  -- enabled catalog or custom_name
+body_weight_entries           -- dated weight snapshots, normalized_kg
+body_measurement_entries      -- dated measurement sets
+body_measurement_values       -- per definition + side
 ```
 
-## Progress photos
+See `docs/development/WEIGHT_AND_MEASUREMENTS.md`.
+
+## Progress photos (Increment 8 — shipped)
 
 ```
 progress_photo_sets
-  id, user_id, taken_on, pose, notes
-
-progress_photos
-  id, set_id, storage_path, sort_order, width, height
+progress_photos               -- private_storage_path
+progress_comparisons
+progress_notes
+progress_summary_preferences
 ```
 
-Storage path convention: `{user_id}/{set_id}/{photo_id}.jpg` in a **private** bucket. RLS on `storage.objects` must match owner folder. See `SECURITY_AND_PRIVACY.md`.
+Storage path: `{user_id}/progress/{set_id}/{slot}-{photo_id}.jpg` in bucket `progress-photos`. See `docs/development/PROGRESS_PHOTOS.md`, ADR 0011; comparisons ADR 0012.
 
 ## Calendar & custom trackers
 
@@ -185,8 +189,11 @@ Increment 4 adds `mealLogDrafts` alongside `outbox`. Increment 5 adds
 `labelCaptureDrafts`. Increment 6 (Dexie v4) adds `activeWorkoutSessions`,
 `workoutSetDrafts`, and `workoutNoteDrafts`. Increment 7 (Dexie v6) adds
 `activeRehabSessions`, `rehabSetDrafts`, `rehabObservationDrafts`, and
-`rehabAlertDrafts`. Sync coordinator applies `kind: "workout"` and
-`kind: "rehab"` payloads (finish bundles pending writes atomically).
+`rehabAlertDrafts`. Increment 8 (Dexie v8) adds `weightDrafts`,
+`measurementDrafts`, `progressPhotoDrafts`, `progressPhotoBlobs`, and
+`progressNoteDrafts`. Sync
+coordinator applies `kind: "workout"`, `kind: "rehab"`, and `kind: "progress"`
+payloads (photo replay: set → blob upload → metadata → notes → complete).
 Full catalog mirror in IndexedDB remains a future optimization.
 
 ## Indexes (early)

@@ -14,6 +14,7 @@ import type {
 } from "@/modules/nutrition/meals/types";
 import type { WorkoutDaySummary } from "@/modules/workout/sessions/load-workout-day";
 import type { RehabDaySummary } from "@/modules/rehab/sessions/load-rehab-day";
+import type { ProgressDaySummary } from "@/modules/progress/load-progress-day";
 
 export type BoardCardView = {
   card: DashboardCard;
@@ -34,6 +35,7 @@ export type BoardSnapshot = {
   nutritionGoals?: NutritionGoalsView | null;
   workoutDaySummary?: WorkoutDaySummary;
   rehabDaySummary?: RehabDaySummary;
+  progressDaySummary?: ProgressDaySummary;
   syncBanner: string | null;
 };
 
@@ -118,6 +120,39 @@ export function rehabStatusLabel(
   }
   if (summary.scheduled && summary.scheduled.status === "planned") {
     return `${summary.scheduled.title} scheduled`;
+  }
+  if (status?.summary_text) return status.summary_text;
+  return labelForStatus(definition, status, customLabel);
+}
+
+/**
+ * Progress status for measurements and/or progress_photos board modules.
+ * Prefers today's weight, then measurement/photo counts, then generic status.
+ */
+export function progressStatusLabel(
+  summary: ProgressDaySummary,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+  moduleKey: "measurements" | "progress_photos",
+): string {
+  if (moduleKey === "measurements") {
+    if (summary.weightEntry) {
+      return `${summary.weightEntry.display} logged`;
+    }
+    if (summary.measurementCount > 0) {
+      const n = summary.measurementCount;
+      return `${n} measurement entr${n === 1 ? "y" : "ies"} today`;
+    }
+  }
+  if (moduleKey === "progress_photos") {
+    if (summary.photoSetCount > 0) {
+      const n = summary.photoSetCount;
+      return `${n} photo set${n === 1 ? "" : "s"} today`;
+    }
+    if (summary.latestPhotoSetDate) {
+      return `Last photos ${summary.latestPhotoSetDate}`;
+    }
   }
   if (status?.summary_text) return status.summary_text;
   return labelForStatus(definition, status, customLabel);

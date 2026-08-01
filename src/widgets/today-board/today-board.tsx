@@ -28,6 +28,7 @@ import { RehabFocus } from "@/widgets/today-board/focus/rehab-focus";
 import { WaterFocus } from "@/widgets/today-board/focus/water-focus";
 import { MeditationFocus } from "@/widgets/today-board/focus/meditation-focus";
 import { MeasurementsFocus } from "@/widgets/today-board/focus/measurements-focus";
+import { ProgressPhotosFocus } from "@/widgets/today-board/focus/progress-photos-focus";
 import { ProfileFocus } from "@/widgets/today-board/focus/profile-focus";
 import { createInitialDemoState } from "@/widgets/today-board/demo-state";
 import { SyncStatusBanner } from "@/widgets/sync/sync-status-banner";
@@ -341,6 +342,8 @@ export function TodayBoard({ snapshot }: Props) {
             timezone={snapshot.profile.timezone}
             workoutDaySummary={snapshot.workoutDaySummary}
             rehabDaySummary={snapshot.rehabDaySummary}
+            progressDaySummary={snapshot.progressDaySummary}
+            unitsSystem={snapshot.profile.units_system}
             onCancel={() => setOpenCardId(null)}
             onSaveStatus={saveStatus}
             onWorkoutSaved={workoutSaved}
@@ -363,6 +366,8 @@ function ModuleFocusRouter({
   timezone,
   workoutDaySummary,
   rehabDaySummary,
+  progressDaySummary,
+  unitsSystem,
   onCancel,
   onSaveStatus,
   onWorkoutSaved,
@@ -378,6 +383,8 @@ function ModuleFocusRouter({
   timezone: string;
   workoutDaySummary?: BoardSnapshot["workoutDaySummary"];
   rehabDaySummary?: BoardSnapshot["rehabDaySummary"];
+  progressDaySummary?: BoardSnapshot["progressDaySummary"];
+  unitsSystem: "metric" | "imperial";
   onCancel: () => void;
   onSaveStatus: (summary: string) => void;
   onWorkoutSaved: (summary: string) => void;
@@ -447,13 +454,30 @@ function ModuleFocusRouter({
     return (
       <MeasurementsFocus
         titleId={titleId}
-        initial={demo.measurements}
-        onSave={() => onSaveStatus("Measurements demo logged")}
+        userId={userId}
+        localDate={localDate}
+        timezone={timezone}
+        unitsSystem={unitsSystem}
+        progressDaySummary={progressDaySummary}
+        onSaved={onSaveStatus}
         onCancel={onCancel}
       />
     );
   }
-  if (moduleKey === "progress_photos" || moduleKey === "profile") {
+  if (moduleKey === "progress_photos") {
+    return (
+      <ProgressPhotosFocus
+        titleId={titleId}
+        userId={userId}
+        localDate={localDate}
+        timezone={timezone}
+        progressDaySummary={progressDaySummary}
+        onSaved={onSaveStatus}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "profile") {
     return (
       <ProfileFocus
         titleId={titleId}

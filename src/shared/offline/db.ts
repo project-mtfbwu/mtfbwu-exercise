@@ -155,6 +155,60 @@ export type RehabAlertDraft = {
   updatedAt: string;
 };
 
+/** Device-local body weight entry waiting to sync (Increment 8). */
+export type WeightDraft = {
+  id: string;
+  userId: string;
+  entryId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local body measurement entry waiting to sync (Increment 8). */
+export type MeasurementDraft = {
+  id: string;
+  userId: string;
+  entryId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Processed JPEG bytes waiting for Storage upload (Increment 8 offline). */
+export type ProgressPhotoBlob = {
+  id: string;
+  userId: string;
+  setId: string;
+  photoId: string;
+  storagePath: string;
+  mimeType: string;
+  blob: ArrayBuffer;
+  byteLength: number;
+  createdAt: string;
+};
+
+/** Device-local progress photo metadata waiting to sync (Increment 8). */
+export type ProgressPhotoDraft = {
+  id: string;
+  userId: string;
+  setId: string;
+  photoId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local progress note waiting to sync (Increment 8). */
+export type ProgressNoteDraft = {
+  id: string;
+  userId: string;
+  noteId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export class MtfbwuDatabase extends Dexie {
   outbox!: EntityTable<OutboxRecord, "id">;
   mealLogDrafts!: EntityTable<MealLogDraft, "id">;
@@ -166,6 +220,11 @@ export class MtfbwuDatabase extends Dexie {
   rehabSetDrafts!: EntityTable<RehabSetDraft, "id">;
   rehabObservationDrafts!: EntityTable<RehabObservationDraft, "id">;
   rehabAlertDrafts!: EntityTable<RehabAlertDraft, "id">;
+  weightDrafts!: EntityTable<WeightDraft, "id">;
+  measurementDrafts!: EntityTable<MeasurementDraft, "id">;
+  progressPhotoDrafts!: EntityTable<ProgressPhotoDraft, "id">;
+  progressPhotoBlobs!: EntityTable<ProgressPhotoBlob, "id">;
+  progressNoteDrafts!: EntityTable<ProgressNoteDraft, "id">;
 
   constructor(name = "mtfbwu") {
     super(name);
@@ -207,6 +266,39 @@ export class MtfbwuDatabase extends Dexie {
       rehabSetDrafts: "id, userId, sessionId, setId, updatedAt",
       rehabObservationDrafts: "id, userId, sessionId, observationId, updatedAt",
       rehabAlertDrafts: "id, userId, sessionId, alertId, updatedAt",
+    });
+    this.version(7).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
+      activeRehabSessions: "id, userId, sessionId, updatedAt",
+      rehabSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      rehabObservationDrafts: "id, userId, sessionId, observationId, updatedAt",
+      rehabAlertDrafts: "id, userId, sessionId, alertId, updatedAt",
+      weightDrafts: "id, userId, entryId, updatedAt",
+      measurementDrafts: "id, userId, entryId, updatedAt",
+      progressPhotoDrafts: "id, userId, setId, photoId, updatedAt",
+      progressNoteDrafts: "id, userId, noteId, updatedAt",
+    });
+    this.version(8).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
+      activeRehabSessions: "id, userId, sessionId, updatedAt",
+      rehabSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      rehabObservationDrafts: "id, userId, sessionId, observationId, updatedAt",
+      rehabAlertDrafts: "id, userId, sessionId, alertId, updatedAt",
+      weightDrafts: "id, userId, entryId, updatedAt",
+      measurementDrafts: "id, userId, entryId, updatedAt",
+      progressPhotoDrafts: "id, userId, setId, photoId, updatedAt",
+      progressPhotoBlobs: "id, userId, setId, photoId, createdAt",
+      progressNoteDrafts: "id, userId, noteId, updatedAt",
     });
   }
 }

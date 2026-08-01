@@ -7,19 +7,18 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 7 — Rehab engine** (implemented locally; commit when ready)
+**Increment 8 — Progress tracking** (implemented locally; commit when ready)
 
-- Curated rehab catalog + clinician-guided plans/phases/days/prescriptions
-- Restrictions with original wording + optional structured fields
-- Performed sessions with pain/swelling/instability/confidence + alerts
-- Dexie v6 offline rehab drafts + ordered outbox replay
-- Real Rehab board card + focus runner; workout restriction notice only
-- ADRs 0009–0010; RLS test `increment7_rehab_rls.sql`
+- Weight + body measurements (catalog, left/right sides, custom defs)
+- Private progress photos (preprocessed JPEG, signed URLs, offline blob queue)
+- Side-by-side photo comparison on `/progress`
+- Dexie v8 offline drafts + `progressPhotoBlobs`; RLS test `increment8_progress_rls.sql`
+- ADRs 0011–0012; docs in `docs/development/INCREMENT_8_PROGRESS_TRACKING.md`
 
-Still deferred: diagnosis/AI rehab, pose/wearables, measurements/photos, clinician portal.
+Still deferred: Increment 9 (hydration/meditation/calendar), AI body analysis, clinician portal.
 
 Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.
-Increment notes: `docs/development/INCREMENT_7_REHAB_ENGINE.md`.
+Increment notes: `docs/development/INCREMENT_8_PROGRESS_TRACKING.md`.
 Data model: `docs/architecture/DATA_MODEL.md`.
 
 ## Stack

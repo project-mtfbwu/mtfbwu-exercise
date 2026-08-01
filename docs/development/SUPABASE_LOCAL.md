@@ -21,27 +21,29 @@ Stop with `npx supabase stop`.
 
 ## Migrations
 
-| File                                                  | Contents                                                                   |
-| ----------------------------------------------------- | -------------------------------------------------------------------------- |
-| `20260726120000_increment3_auth_board_daily.sql`      | profiles, modules, layouts, daily status, RLS, onboarding trigger          |
-| `20260727120000_increment4_nutrition.sql`             | nutrition catalog, custom foods, recipes, templates, meal logs/goals, RLS  |
-| `20260727120100_increment4_curated_foods_seed.sql`    | provisional curated starter foods, portions, aliases, and core nutrients   |
-| `20260727130000_increment4_barcode_provenance.sql`    | barcode → branded_product ownership, multi-brand foods, curated provenance |
-| `20260730120000_increment6_workout_engine.sql`        | exercise catalog, plans, sessions, scheduling, RLS                         |
-| `20260730120100_increment6_exercise_catalog_seed.sql` | curated taxonomy + starter exercises (original descriptions)               |
-| `20260730120200_increment6_workout_align.sql`         | session title/duration, load_unit, enum expansions, PR uniqueness          |
-| `20260730120300_increment6_catalog_expansion.sql`     | additional curated exercises (conditioning/mobility/core gaps)             |
-| `20260730120400_increment6_plan_editor_align.sql`     | block transition, prescription tempo/RIR, PR status sync                   |
-| `20260731120000_increment7_rehab_engine.sql`          | rehab catalog, plans, restrictions, sessions, alerts, RLS, archive RPC     |
-| `20260731120100_increment7_rehab_catalog_seed.sql`    | body areas, movements, curated rehab exercises (neutral descriptions)      |
-| `20260731120200_increment7_rehab_align.sql`           | restriction display_order; hardened archive_rehab_plan                     |
+| File                                                     | Contents                                                                   |
+| -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `20260726120000_increment3_auth_board_daily.sql`         | profiles, modules, layouts, daily status, RLS, onboarding trigger          |
+| `20260727120000_increment4_nutrition.sql`                | nutrition catalog, custom foods, recipes, templates, meal logs/goals, RLS  |
+| `20260727120100_increment4_curated_foods_seed.sql`       | provisional curated starter foods, portions, aliases, and core nutrients   |
+| `20260727130000_increment4_barcode_provenance.sql`       | barcode → branded_product ownership, multi-brand foods, curated provenance |
+| `20260730120000_increment6_workout_engine.sql`           | exercise catalog, plans, sessions, scheduling, RLS                         |
+| `20260730120100_increment6_exercise_catalog_seed.sql`    | curated taxonomy + starter exercises (original descriptions)               |
+| `20260730120200_increment6_workout_align.sql`            | session title/duration, load_unit, enum expansions, PR uniqueness          |
+| `20260730120300_increment6_catalog_expansion.sql`        | additional curated exercises (conditioning/mobility/core gaps)             |
+| `20260730120400_increment6_plan_editor_align.sql`        | block transition, prescription tempo/RIR, PR status sync                   |
+| `20260731120000_increment7_rehab_engine.sql`             | rehab catalog, plans, restrictions, sessions, alerts, RLS, archive RPC     |
+| `20260731120100_increment7_rehab_catalog_seed.sql`       | body areas, movements, curated rehab exercises (neutral descriptions)      |
+| `20260731120200_increment7_rehab_align.sql`              | restriction display_order; hardened archive_rehab_plan                     |
+| `20260801120000_increment8_progress_tracking.sql`        | weight, measurements, photo sets, comparisons, notes, prefs, Storage RLS   |
+| `20260801120100_increment8_measurement_catalog_seed.sql` | curated measurement definitions (neutral names)                            |
 
 Without Docker, the migration remains in-repo; unit-test CI (`pnpm test`) uses
 placeholder env and does not require a live stack. The GitHub Actions `CI`
 workflow (`.github/workflows/ci.yml`) does run a live local Supabase stack —
 see below.
 
-After a reset, run the Increment 3–7 SQL test files against the local database
+After a reset, run the Increment 3–8 SQL test files against the local database
 container (`mtfbwu-local` is the `project_id` in
 `supabase/config.toml`, so the container is `supabase_db_mtfbwu-local`):
 
@@ -58,6 +60,9 @@ Get-Content supabase/tests/increment6_workout_rls.sql -Raw |
 
 Get-Content supabase/tests/increment7_rehab_rls.sql -Raw |
   docker exec -i supabase_db_mtfbwu-local psql -U postgres -d postgres
+
+Get-Content supabase/tests/increment8_progress_rls.sql -Raw |
+  docker exec -i supabase_db_mtfbwu-local psql -U postgres -d postgres
 ```
 
 ```bash
@@ -67,6 +72,7 @@ docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/inc
 docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment4_nutrition_rls.sql
 docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment6_workout_rls.sql
 docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment7_rehab_rls.sql
+docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment8_progress_rls.sql
 ```
 
 Each file `begin;` a transaction, insert fixed-UUID fixtures, assert RLS

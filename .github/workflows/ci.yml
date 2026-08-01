@@ -53,10 +53,10 @@ jobs:
       - name: Start local Supabase
         run: supabase start
 
-      - name: Reset local database (apply Increment 3–6 migrations and seed)
+      - name: Reset local database (apply Increment 3–8 migrations and seed)
         run: supabase db reset
 
-      - name: Run Increment 3–6 DB tests
+      - name: Run Increment 3–8 DB tests
         run: |
           set -euo pipefail
           DB_CONTAINER=$(docker ps --format '{{.Names}}' | grep '^supabase_db_' | head -n1)
@@ -76,12 +76,14 @@ jobs:
             < supabase/tests/increment6_workout_rls.sql
           docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
             < supabase/tests/increment7_rehab_rls.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            < supabase/tests/increment8_progress_rls.sql
 
       - name: Generate + validate Supabase TypeScript types
         run: |
           set -euo pipefail
           supabase gen types typescript --local > /tmp/types.generated.ts
-          for table in foods barcodes branded_products meal_logs nutrition_label_captures workout_sessions exercise_definitions rehab_sessions rehab_plans rehab_exercise_definitions rehab_alert_events; do
+          for table in foods barcodes branded_products meal_logs nutrition_label_captures workout_sessions exercise_definitions rehab_sessions rehab_plans rehab_exercise_definitions rehab_alert_events body_weight_entries progress_photo_sets measurement_definitions; do
             if ! grep -qE "^ *${table}: \{" /tmp/types.generated.ts; then
               echo "::error::generated local schema is missing table '${table}' -- migrations did not apply as expected"
               exit 1
@@ -118,6 +120,18 @@ jobs:
           fi
           if ! grep -q "rehab_sessions" src/shared/database/database.types.ts; then
             echo "::error::src/shared/database/database.types.ts is missing rehab_sessions -- regenerate after Increment 7"
+            exit 1
+          fi
+          if ! grep -q "body_weight_entries" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing body_weight_entries -- add Increment 8 aliases"
+            exit 1
+          fi
+          if ! grep -q "progress_photo_sets" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing progress_photo_sets -- add Increment 8 aliases"
+            exit 1
+          fi
+          if ! grep -q "measurement_definitions" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing measurement_definitions -- add Increment 8 aliases"
             exit 1
           fi
 

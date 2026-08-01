@@ -61,6 +61,17 @@ export type RehabExerciseCategory =
 export type RehabExerciseSource = Database["public"]["Enums"]["rehab_exercise_source"];
 export type ScheduledRehabStatus = Database["public"]["Enums"]["scheduled_rehab_status"];
 
+/** Increment 8 — progress tracking enums (from generated schema). */
+export type MeasurementCategory = Database["public"]["Enums"]["measurement_category"];
+export type MeasurementSideMode = Database["public"]["Enums"]["measurement_side_mode"];
+export type MeasurementValueSide = Database["public"]["Enums"]["measurement_value_side"];
+export type ProgressRecordSource = Database["public"]["Enums"]["progress_record_source"];
+export type ProgressPhotoSlot = Database["public"]["Enums"]["progress_photo_slot"];
+export type ProgressComparisonType =
+  Database["public"]["Enums"]["progress_comparison_type"];
+export type ProgressNoteType = Database["public"]["Enums"]["progress_note_type"];
+export type ProgressDateRange = Database["public"]["Enums"]["progress_date_range"];
+
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ModuleDefinition = Database["public"]["Tables"]["module_definitions"]["Row"];
 export type UserModule = Database["public"]["Tables"]["user_modules"]["Row"];
@@ -132,3 +143,20 @@ export type RehabSessionObservation =
 export type RehabAlertEvent = Database["public"]["Tables"]["rehab_alert_events"]["Row"];
 export type ScheduledRehabSession =
   Database["public"]["Tables"]["scheduled_rehab_sessions"]["Row"];
+
+export type MeasurementDefinition =
+  Database["public"]["Tables"]["measurement_definitions"]["Row"];
+export type UserMeasurementDefinition =
+  Database["public"]["Tables"]["user_measurement_definitions"]["Row"];
+export type BodyWeightEntry = Database["public"]["Tables"]["body_weight_entries"]["Row"];
+export type BodyMeasurementEntry =
+  Database["public"]["Tables"]["body_measurement_entries"]["Row"];
+export type BodyMeasurementValue =
+  Database["public"]["Tables"]["body_measurement_values"]["Row"];
+export type ProgressPhotoSet = Database["public"]["Tables"]["progress_photo_sets"]["Row"];
+export type ProgressPhoto = Database["public"]["Tables"]["progress_photos"]["Row"];
+export type ProgressComparison =
+  Database["public"]["Tables"]["progress_comparisons"]["Row"];
+export type ProgressNote = Database["public"]["Tables"]["progress_notes"]["Row"];
+export type ProgressSummaryPreferences =
+  Database["public"]["Tables"]["progress_summary_preferences"]["Row"];

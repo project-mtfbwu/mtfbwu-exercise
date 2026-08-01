@@ -30,37 +30,36 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 7 — Rehab engine** is implemented locally (uncommitted until you ask).
+**Increment 8 — Progress tracking** is implemented locally (uncommitted until you ask).
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 8
-(measurements/photos) without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 9
+(hydration/meditation/calendar) without authorization.
 
-### Still deferred (Increment 8+)
+### Still deferred (Increment 9+)
 
-- Measurements engine and private progress photos
 - Hydration/meditation/calendar engines
 - AI meal-photo estimation / natural-language food logging / AI workout or rehab generation
 - Wearables, pose detection, social/trainer features, clinician portal
 
 ## Source of truth (read these first)
 
-| Document                                           | Purpose                              |
-| -------------------------------------------------- | ------------------------------------ |
-| `docs/architecture/PRODUCT.md`                     | Product boundaries and principles    |
-| `docs/architecture/SYSTEM_ARCHITECTURE.md`         | System shape                         |
-| `docs/architecture/DOMAIN_MODEL.md`                | Domain language                      |
-| `docs/architecture/DATA_MODEL.md`                  | Persistence sketch                   |
-| `docs/architecture/UI_ARCHITECTURE.md`             | Flat-lay + focus UI                  |
-| `docs/architecture/OFFLINE_SYNC.md`                | Dexie / sync                         |
-| `docs/architecture/AI_IMPORT_PIPELINE.md`          | AI import + provenance               |
-| `docs/architecture/SECURITY_AND_PRIVACY.md`        | Auth, RLS, private media             |
-| `docs/architecture/REFERENCE_PROJECTS_RESEARCH.md` | External research                    |
-| `docs/architecture/BUILD_INCREMENTS.md`            | Delivery sequence                    |
-| `docs/architecture/ADR/`                           | Architecture decisions               |
-| `docs/design-references/README.md`                 | Approved visual references           |
-| `docs/design-system/`                              | Extracted design system + compliance |
-| `docs/development/`                                | Local setup, env, testing            |
-| `.cursor/rules/`                                   | Always-on agent constraints          |
+| Document                                           | Purpose                                     |
+| -------------------------------------------------- | ------------------------------------------- |
+| `docs/architecture/PRODUCT.md`                     | Product boundaries and principles           |
+| `docs/architecture/SYSTEM_ARCHITECTURE.md`         | System shape                                |
+| `docs/architecture/DOMAIN_MODEL.md`                | Domain language                             |
+| `docs/architecture/DATA_MODEL.md`                  | Persistence sketch                          |
+| `docs/architecture/UI_ARCHITECTURE.md`             | Flat-lay + focus UI                         |
+| `docs/architecture/OFFLINE_SYNC.md`                | Dexie / sync                                |
+| `docs/architecture/AI_IMPORT_PIPELINE.md`          | AI import + provenance                      |
+| `docs/architecture/SECURITY_AND_PRIVACY.md`        | Auth, RLS, private media                    |
+| `docs/architecture/REFERENCE_PROJECTS_RESEARCH.md` | External research                           |
+| `docs/architecture/BUILD_INCREMENTS.md`            | Delivery sequence                           |
+| `docs/architecture/ADR/`                           | Architecture decisions                      |
+| `docs/design-references/README.md`                 | Approved visual references                  |
+| `docs/design-system/`                              | Extracted design system + compliance        |
+| `docs/development/`                                | Local setup, env, testing, increment guides |
+| `.cursor/rules/`                                   | Always-on agent constraints                 |
 
 ## Stack decisions (locked by ADR)
 

@@ -102,7 +102,7 @@ export function createTestBoardSnapshot(
     moduleDef({
       id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa6",
       key: "progress_photos",
-      display_name: "Profile",
+      display_name: "Progress photos",
       category: "body",
       default_order: 5,
       visual_variant: "window_pink",

@@ -45,8 +45,8 @@ outbox
 | Label-capture drafts (uncached barcode / OCR) | Increment 5 | Dexie `labelCaptureDrafts`; OCR assets local after cache |
 | Workout sessions / sets | Increment 6 | Dexie v4 `activeWorkoutSessions`, `workoutSetDrafts`, `workoutNoteDrafts`; outbox `kind: workout`; coordinator apply wired |
 | Rehab sessions / sets / alerts | Increment 7 | Dexie v6 `activeRehabSessions`, `rehabSetDrafts`, `rehabObservationDrafts`, `rehabAlertDrafts`; outbox `kind: rehab`; ordered finish fold |
+| Weight / measurements / progress photos | Increment 8 | Dexie v8 drafts + `progressPhotoBlobs`; outbox `kind: progress`; see `docs/development/PROGRESS_OFFLINE_SYNC.md` |
 | Hydration / meditation domain rows | Later | Status summary already exists |
-| Measurements / photos | Later | |
 
 ## Conflict rules (Increment 3 board)
 
@@ -119,6 +119,15 @@ Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
   completed from stale mutation; alert acknowledgment cannot be silently
   removed; plan version and restriction freshness checks apply.
 - See `docs/development/REHAB_OFFLINE_SYNC.md`.
+
+## Progress writes (Increment 8)
+
+- Dexie v8 adds `weightDrafts`, `measurementDrafts`, `progressPhotoDrafts`, `progressPhotoBlobs`, `progressNoteDrafts`.
+- Photo replay: set row → **Storage upload** from `progressPhotoBlobs` → metadata upsert → notes → complete.
+- `storeProgressPhotoBlobSafe` catches `QuotaExceededError`, cleans partial blob rows, and skips outbox enqueue when storage fails.
+- Only **crop+preprocessed** JPEGs are stored offline (never raw camera originals); adaptive smaller preprocess on quota retry.
+- Slot replacement online: upload new Storage object before soft-deleting prior metadata; see `docs/development/PROGRESS_PHOTOS.md`.
+- See `docs/development/PROGRESS_OFFLINE_SYNC.md`.
 
 ## Catalogs offline
 

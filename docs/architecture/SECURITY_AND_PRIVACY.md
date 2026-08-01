@@ -27,7 +27,10 @@ From Supabase Storage docs:
 
 - Policies on `storage.objects`; no uploads without policies.
 - Private buckets only for progress photos.
-- Path layout: `{user_id}/...` and policies comparing `(storage.foldername(name))[1] = auth.uid()::text` (exact helper usage per current Supabase docs).
+- Path layout: `{user_id}/progress/{set_id}/{slot}-{photo_id}.jpg` (Increment 8) and policies comparing `(storage.foldername(name))[1] = auth.uid()::text`
+- Client uploads only **processed** JPEG bytes after crop/rotate/preprocess; raw camera files and live video are never stored server-side.
+- `replacePhotoSlotAction` upserts new metadata before soft-deleting the prior row; optional `previousPhotoId` rejects stale replacements.
+- Signed URL actions require non-deleted photo rows and non-deleted parent sets.
 - Treat `storage` schema as read-only metadata; mutate via Storage API.
 - Service role bypasses RLS — restrict server use.
 

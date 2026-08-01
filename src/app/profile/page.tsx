@@ -6,12 +6,15 @@ import { PaperCard } from "@/shared/ui/flat-lay/paper-card";
 import { AppLink } from "@/shared/ui/app-link";
 import { ROUTES } from "@/shared/config/constants";
 import { SyncStatusBanner } from "@/widgets/sync/sync-status-banner";
+import { getProgressSummaryCountsAction } from "@/modules/measurements/actions";
+import { PROGRESS_DATA_DISCLAIMER } from "@/modules/progress-photos/safety";
 
 export const metadata: Metadata = { title: "Profile" };
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const { profile, user } = await loadProfileOrRedirect();
+  const progressCounts = await getProgressSummaryCountsAction();
 
   return (
     <article className="mx-auto max-w-2xl space-y-4 py-4">
@@ -39,13 +42,24 @@ export default async function ProfilePage() {
               <dt className="font-bold">Motion</dt>
               <dd>{profile.animation_mode}</dd>
             </div>
+            <div>
+              <dt className="font-bold">Progress summary — user-recorded data</dt>
+              <dd>
+                {progressCounts.weightCount} weight · {progressCounts.measurementCount}{" "}
+                measurement sets · {progressCounts.photoSetCount} photo sets
+              </dd>
+            </div>
           </dl>
           <p className="mt-3 text-xs text-[var(--mt-ink-muted)]">
+            {PROGRESS_DATA_DISCLAIMER}
+          </p>
+          <p className="mt-1 text-xs text-[var(--mt-ink-muted)]">
             Medical details and deep privacy controls arrive later. Customize modules on
             the board screen.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <AppLink href={ROUTES.customize}>Customize board</AppLink>
+            <AppLink href={ROUTES.progress}>Progress</AppLink>
             <AppLink href={ROUTES.settings}>Settings</AppLink>
             <SignOutButton />
           </div>
