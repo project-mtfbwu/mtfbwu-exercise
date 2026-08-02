@@ -82,6 +82,17 @@ vi.mock("@/modules/progress-photos/actions", () => ({
   })),
 }));
 
+vi.mock("@/modules/hydration/actions", () => ({
+  listHydrationEntriesAction: vi.fn(async () => []),
+  addHydrationEntryAction: vi.fn(async () => ({ ok: true, message: "saved", id: "h1" })),
+  deleteHydrationEntryAction: vi.fn(async () => ({ ok: true, message: "removed" })),
+}));
+
+vi.mock("@/shared/offline/online-store", () => ({
+  useOnlineStore: (selector: (s: { status: string }) => unknown) =>
+    selector({ status: "online" }),
+}));
+
 function renderBoard() {
   return render(
     <MotionPreferenceProvider>
@@ -153,18 +164,15 @@ describe("Today flat-lay board (Increment 3)", () => {
 
     await user.click(screen.getByRole("button", { name: /Open Water/i }));
     await user.click(screen.getByRole("button", { name: /\+500 ml/i }));
-    await user.click(screen.getByRole("button", { name: /^Save$/i }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(updateDailyStatusAction).toHaveBeenCalled();
-    expect(
-      screen.getByRole("button", { name: /Hydration demo status saved/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /0\.5 L logged/i })).toBeInTheDocument();
 
     const before = screen
       .getByRole("button", { name: /Open Meditation/i })
       .getAttribute("aria-label");
     await user.click(screen.getByRole("button", { name: /Open Meditation/i }));
-    await user.click(screen.getByRole("button", { name: /^Cancel$/i }));
+    await user.keyboard("{Escape}");
     expect(screen.getByRole("button", { name: /Open Meditation/i })).toHaveAttribute(
       "aria-label",
       before,

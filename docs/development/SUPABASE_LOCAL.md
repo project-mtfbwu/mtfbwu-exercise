@@ -6,7 +6,7 @@ See also `supabase/README.md` and `docs/development/AUTHENTICATION.md`.
 # Docker Desktop must be running
 npx supabase start
 npx supabase status
-npx supabase db reset   # applies Increment 3–6 migrations
+npx supabase db reset   # applies Increment 3–9 migrations
 ```
 
 Map keys into `.env.local` from `supabase status` (`API URL`, `anon key`, `service_role` for server-only tools only).
@@ -37,13 +37,15 @@ Stop with `npx supabase stop`.
 | `20260731120200_increment7_rehab_align.sql`              | restriction display_order; hardened archive_rehab_plan                     |
 | `20260801120000_increment8_progress_tracking.sql`        | weight, measurements, photo sets, comparisons, notes, prefs, Storage RLS   |
 | `20260801120100_increment8_measurement_catalog_seed.sql` | curated measurement definitions (neutral names)                            |
+| `20260801130000_increment9_daily_system.sql`             | hydration, meditation, sleep, supplements, trackers, reminders, RLS        |
+| `20260801130100_increment9_tracker_catalog_seed.sql`     | curated tracker + supplement catalog seed                                  |
 
 Without Docker, the migration remains in-repo; unit-test CI (`pnpm test`) uses
 placeholder env and does not require a live stack. The GitHub Actions `CI`
 workflow (`.github/workflows/ci.yml`) does run a live local Supabase stack —
 see below.
 
-After a reset, run the Increment 3–8 SQL test files against the local database
+After a reset, run the Increment 3–9 SQL test files against the local database
 container (`mtfbwu-local` is the `project_id` in
 `supabase/config.toml`, so the container is `supabase_db_mtfbwu-local`):
 
@@ -63,6 +65,9 @@ Get-Content supabase/tests/increment7_rehab_rls.sql -Raw |
 
 Get-Content supabase/tests/increment8_progress_rls.sql -Raw |
   docker exec -i supabase_db_mtfbwu-local psql -U postgres -d postgres
+
+Get-Content supabase/tests/increment9_daily_rls.sql -Raw |
+  docker exec -i supabase_db_mtfbwu-local psql -U postgres -d postgres
 ```
 
 ```bash
@@ -73,6 +78,7 @@ docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/inc
 docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment6_workout_rls.sql
 docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment7_rehab_rls.sql
 docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment8_progress_rls.sql
+docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres < supabase/tests/increment9_daily_rls.sql
 ```
 
 Each file `begin;` a transaction, insert fixed-UUID fixtures, assert RLS
@@ -87,7 +93,7 @@ stability). `increment6_workout_rls.sql` covers exercise catalog read-only
 access, user plan/session ownership isolation, soft-deleted plan visibility,
 and cross-user deny paths for sessions, sets, and personal records.
 
-CI (`.github/workflows/ci.yml`) runs all three SQL test files automatically on every push
+CI (`.github/workflows/ci.yml`) runs Increment 3–9 SQL test files automatically on every push
 and PR: it installs a pinned Supabase CLI (`supabase/setup-cli@v3`), runs
 `supabase start` + `supabase db reset`, executes the SQL test files inside
 the `supabase_db_*` container, and generates + sanity-checks TypeScript types

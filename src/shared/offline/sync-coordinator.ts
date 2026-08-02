@@ -31,8 +31,19 @@ import {
   isProgressOutboxPayload,
   type ProgressOutboxPayload,
 } from "@/shared/offline/progress-outbox";
+import {
+  isTrackerOutboxPayload,
+  isTrackerConflict,
+  sortTrackerRecordsForReplay,
+  trackerDependenciesMet,
+  type TrackerOutboxPayload,
+} from "@/shared/offline/tracker-outbox";
 import { useSyncStatusStore } from "@/shared/offline/sync-status-store";
 import { isLayoutConflictError, isStatusConflictError } from "@/shared/board/board-model";
+import {
+  cleanupDraftsForOutboxRecord,
+  reconcileStaleDrafts,
+} from "@/shared/offline/draft-cleanup";
 
 type BrowserClient = ReturnType<typeof createSupabaseBrowserClient>;
 
@@ -58,6 +69,7 @@ export function createBoardSyncCoordinator(
   getClient: () => BrowserClient,
 ): SyncCoordinator {
   let lastError: string | null = null;
+  let reconcileStarted = false;
   const outbox = createDexieOutboxRepository(getDatabase());
 
   return {
@@ -65,40 +77,79 @@ export function createBoardSyncCoordinator(
       return lastError;
     },
     async flush() {
+      const db = getDatabase();
+      if (!reconcileStarted) {
+        reconcileStarted = true;
+        void reconcileStaleDrafts(db)
+          .then(({ warnings }) => {
+            const store = useSyncStatusStore.getState();
+            for (const warning of warnings) {
+              store.addCleanupWarning(warning);
+            }
+          })
+          .catch(() => {
+            /* IndexedDB unavailable — skip startup reconcile */
+          });
+      }
+
       const store = useSyncStatusStore.getState();
       store.setStatus("syncing");
       let processed = 0;
       let failed = 0;
       lastError = null;
 
-      const pending = await outbox.listPending();
+      const pending = sortTrackerRecordsForReplay(await outbox.listPending());
       store.setPendingCount(pending.length);
 
-      for (const record of pending) {
-        if (!record.id) continue;
-        try {
-          await outbox.markInProgress(record.id);
-          await applyRecord(getClient(), record);
-          await outbox.markSynced(record.id);
-          processed += 1;
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "Sync failed";
-          lastError = message;
-          await outbox.markFailed(record.id, message);
-          failed += 1;
-          // Conflicts stay visible; do not continue silently overwriting.
-          if (isLayoutConflictError(message) || isStatusConflictError(message)) {
-            break;
+      const syncedEntityIds = new Set<string>();
+      const syncedIdempotencyKeys = new Set<string>();
+      let pass = 0;
+      const maxPasses = Math.max(3, pending.length + 1);
+
+      while (pass < maxPasses) {
+        pass += 1;
+        let progressed = false;
+        const stillPending = sortTrackerRecordsForReplay(await outbox.listPending());
+        store.setPendingCount(stillPending.length);
+
+        for (const record of stillPending) {
+          if (!record.id) continue;
+          if (
+            isTrackerOutboxPayload(record.payload) &&
+            !trackerDependenciesMet(record, syncedEntityIds, syncedIdempotencyKeys)
+          ) {
+            continue;
+          }
+          try {
+            await outbox.markInProgress(record.id);
+            await applyRecord(getClient(), record);
+            await outbox.markSynced(record.id);
+            const syncedRecord = { ...record, status: "synced" as const };
+            const cleanup = await cleanupDraftsForOutboxRecord(db, syncedRecord);
+            if (cleanup.warning) {
+              store.addCleanupWarning(cleanup.warning);
+            }
+            syncedEntityIds.add(record.entityId);
+            syncedIdempotencyKeys.add(record.idempotencyKey);
+            processed += 1;
+            progressed = true;
+          } catch (error) {
+            const message = error instanceof Error ? error.message : "Sync failed";
+            lastError = message;
+            await outbox.markFailed(record.id, message);
+            failed += 1;
+            if (isLayoutConflictError(message) || isStatusConflictError(message)) {
+              break;
+            }
           }
         }
+        if (!progressed) break;
       }
 
       const remaining = await outbox.listPending();
-      const failedRows = await getDatabase()
-        .outbox.where("status")
-        .equals("failed")
-        .count();
-      store.setPendingCount(remaining.length + failedRows);
+      const failedRows = await db.outbox.where("status").equals("failed").count();
+      store.setPendingCount(remaining.length);
+      store.setFailedCount(failedRows);
       store.setStatus(failed > 0 || lastError ? "error" : "idle");
       return { processed, failed };
     },
@@ -124,6 +175,10 @@ async function applyRecord(client: BrowserClient, record: OutboxRecord) {
   }
   if (isProgressOutboxPayload(record.payload)) {
     await applyProgressPayload(client, record.payload);
+    return;
+  }
+  if (isTrackerOutboxPayload(record.payload)) {
+    await applyTrackerPayload(client, record.payload);
     return;
   }
   throw new Error(`Unsupported outbox payload for ${record.entityType}`);
@@ -582,5 +637,89 @@ async function applyProgressPayload(
 
     const { error } = await progressClient.from(write.table).upsert(write.values);
     if (error) throw new Error(error.message);
+  }
+}
+
+async function applyTrackerPayload(client: BrowserClient, payload: TrackerOutboxPayload) {
+  const trackerClient = client as unknown as {
+    from: (table: string) => {
+      upsert: (values: Record<string, unknown> | Record<string, unknown>[]) => Promise<{
+        error: { message: string } | null;
+      }>;
+      select: (cols: string) => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => {
+          maybeSingle: () => Promise<{
+            data: Record<string, unknown> | null;
+            error: { message: string } | null;
+          }>;
+        };
+      };
+      delete: () => {
+        eq: (
+          column: string,
+          value: unknown,
+        ) => Promise<{ error: { message: string } | null }>;
+      };
+    };
+    rpc: (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ error: { message: string } | null }>;
+  };
+
+  for (const write of payload.writes) {
+    const rows = Array.isArray(write.values) ? write.values : [write.values];
+
+    if (write.operation === "delete") {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id !== "string") continue;
+        const { error } = await trackerClient.from(write.table).delete().eq("id", id);
+        if (error) throw new Error(error.message);
+      }
+      continue;
+    }
+
+    if (write.conflictIfServerUpdatedAfter) {
+      for (const row of rows) {
+        const id = row.id;
+        if (typeof id !== "string") continue;
+        const { data: existing, error: readError } = await trackerClient
+          .from(write.table)
+          .select("id, updated_at")
+          .eq("id", id)
+          .maybeSingle();
+        if (readError) throw new Error(readError.message);
+        if (
+          isTrackerConflict(
+            existing?.updated_at as string | undefined,
+            write.conflictIfServerUpdatedAfter,
+          )
+        ) {
+          throw new Error(
+            "Tracker entry changed elsewhere — refresh before overwriting.",
+          );
+        }
+      }
+    }
+
+    const { error } = await trackerClient.from(write.table).upsert(write.values);
+    if (error) throw new Error(error.message);
+
+    if (write.table === "tracker_events") {
+      for (const row of rows) {
+        const userTrackerId = row.user_tracker_id;
+        const localDate = row.local_date;
+        if (typeof userTrackerId === "string" && typeof localDate === "string") {
+          await trackerClient.rpc("recalculate_tracker_daily_summary", {
+            p_user_tracker_id: userTrackerId,
+            p_local_date: localDate,
+          });
+        }
+      }
+    }
   }
 }

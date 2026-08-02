@@ -25,13 +25,17 @@ import { cn } from "@/shared/utils/cn";
 import { MealFocus } from "@/widgets/today-board/focus/meal-focus";
 import { WorkoutFocus } from "@/widgets/today-board/focus/workout-focus";
 import { RehabFocus } from "@/widgets/today-board/focus/rehab-focus";
-import { WaterFocus } from "@/widgets/today-board/focus/water-focus";
+import { HydrationFocus } from "@/widgets/today-board/focus/hydration-focus";
 import { MeditationFocus } from "@/widgets/today-board/focus/meditation-focus";
+import { SleepFocus } from "@/widgets/today-board/focus/sleep-focus";
+import { SupplementsFocus } from "@/widgets/today-board/focus/supplements-focus";
+import { CustomTrackerFocus } from "@/widgets/today-board/focus/custom-tracker-focus";
 import { MeasurementsFocus } from "@/widgets/today-board/focus/measurements-focus";
 import { ProgressPhotosFocus } from "@/widgets/today-board/focus/progress-photos-focus";
 import { ProfileFocus } from "@/widgets/today-board/focus/profile-focus";
 import { createInitialDemoState } from "@/widgets/today-board/demo-state";
 import { SyncStatusBanner } from "@/widgets/sync/sync-status-banner";
+import { DailyOverviewSyncHealth } from "@/widgets/today-board/daily-overview-sync-health";
 import { BOARD_ENTITY, queueBoardMutation } from "@/shared/offline/board-outbox";
 import { useOnlineStore } from "@/shared/offline/online-store";
 import { useSyncStatusStore } from "@/shared/offline/sync-status-store";
@@ -220,6 +224,7 @@ export function TodayBoard({ snapshot }: Props) {
     <div className="space-y-4">
       <ScreenReaderStatus message={statusMessage} />
       <SyncStatusBanner />
+      <DailyOverviewSyncHealth />
       <div className="flex flex-wrap items-center gap-2">
         <PixelButton tone="neutral" onClick={() => goDate(-1)} aria-label="Previous day">
           ← Prev
@@ -343,6 +348,11 @@ export function TodayBoard({ snapshot }: Props) {
             workoutDaySummary={snapshot.workoutDaySummary}
             rehabDaySummary={snapshot.rehabDaySummary}
             progressDaySummary={snapshot.progressDaySummary}
+            hydrationDaySummary={snapshot.hydrationDaySummary}
+            meditationDaySummary={snapshot.meditationDaySummary}
+            sleepDaySummary={snapshot.sleepDaySummary}
+            supplementsDaySummary={snapshot.supplementsDaySummary}
+            customTrackerSummaries={snapshot.customTrackerSummaries}
             unitsSystem={snapshot.profile.units_system}
             onCancel={() => setOpenCardId(null)}
             onSaveStatus={saveStatus}
@@ -367,6 +377,11 @@ function ModuleFocusRouter({
   workoutDaySummary,
   rehabDaySummary,
   progressDaySummary,
+  hydrationDaySummary,
+  meditationDaySummary,
+  sleepDaySummary,
+  supplementsDaySummary,
+  customTrackerSummaries,
   unitsSystem,
   onCancel,
   onSaveStatus,
@@ -384,6 +399,11 @@ function ModuleFocusRouter({
   workoutDaySummary?: BoardSnapshot["workoutDaySummary"];
   rehabDaySummary?: BoardSnapshot["rehabDaySummary"];
   progressDaySummary?: BoardSnapshot["progressDaySummary"];
+  hydrationDaySummary?: BoardSnapshot["hydrationDaySummary"];
+  meditationDaySummary?: BoardSnapshot["meditationDaySummary"];
+  sleepDaySummary?: BoardSnapshot["sleepDaySummary"];
+  supplementsDaySummary?: BoardSnapshot["supplementsDaySummary"];
+  customTrackerSummaries?: BoardSnapshot["customTrackerSummaries"];
   unitsSystem: "metric" | "imperial";
   onCancel: () => void;
   onSaveStatus: (summary: string) => void;
@@ -432,10 +452,13 @@ function ModuleFocusRouter({
   }
   if (moduleKey === "hydration") {
     return (
-      <WaterFocus
+      <HydrationFocus
         titleId={titleId}
-        initial={demo.water}
-        onSave={() => onSaveStatus("Hydration demo status saved")}
+        userId={userId}
+        localDate={localDate}
+        dailyRecordId={dailyRecordId}
+        hydrationDaySummary={hydrationDaySummary}
+        onSaved={onSaveStatus}
         onCancel={onCancel}
       />
     );
@@ -444,8 +467,51 @@ function ModuleFocusRouter({
     return (
       <MeditationFocus
         titleId={titleId}
-        initial={demo.meditation}
-        onSave={() => onSaveStatus("Meditation demo completed")}
+        userId={userId}
+        localDate={localDate}
+        timezone={timezone}
+        dailyRecordId={dailyRecordId}
+        meditationDaySummary={meditationDaySummary}
+        onSaved={onSaveStatus}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "sleep") {
+    return (
+      <SleepFocus
+        titleId={titleId}
+        userId={userId}
+        localDate={localDate}
+        timezone={timezone}
+        sleepDaySummary={sleepDaySummary}
+        onSaved={onSaveStatus}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "supplements") {
+    return (
+      <SupplementsFocus
+        titleId={titleId}
+        userId={userId}
+        localDate={localDate}
+        dailyRecordId={dailyRecordId}
+        supplementsDaySummary={supplementsDaySummary}
+        onSaved={onSaveStatus}
+        onCancel={onCancel}
+      />
+    );
+  }
+  if (moduleKey === "custom_tracker") {
+    return (
+      <CustomTrackerFocus
+        titleId={titleId}
+        userId={userId}
+        localDate={localDate}
+        timezone={timezone}
+        customTrackerSummaries={customTrackerSummaries}
+        onSaved={onSaveStatus}
         onCancel={onCancel}
       />
     );

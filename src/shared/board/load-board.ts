@@ -6,10 +6,19 @@ import {
   progressStatusLabel,
   rehabStatusLabel,
   workoutStatusLabel,
+  hydrationStatusLabel,
+  meditationStatusLabelForBoard,
+  sleepStatusLabelForBoard,
+  supplementsStatusLabelForBoard,
+  customTrackerStatusLabel,
 } from "@/shared/board/board-model";
 import { loadWorkoutDaySummary } from "@/modules/workout/sessions/load-workout-day";
 import { loadRehabDaySummary } from "@/modules/rehab/sessions/load-rehab-day";
 import { loadProgressDaySummary } from "@/modules/progress/load-progress-day";
+import { loadHydrationDaySummary } from "@/modules/hydration/load-hydration-day";
+import { loadMeditationDaySummary } from "@/modules/meditation/load-meditation-day";
+import { loadSleepDaySummary } from "@/modules/sleep/load-sleep-day";
+import { loadSupplementsDaySummary } from "@/modules/supplements/load-supplements-day";
 import { clampToLoggableLocalDate, todayLocalDate } from "@/shared/utils/local-date";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/shared/config/constants";
@@ -147,6 +156,33 @@ export async function loadBoardSnapshot(
   const workoutDaySummary = await loadWorkoutDaySummary(localDate);
   const rehabDaySummary = await loadRehabDaySummary(localDate);
   const progressDaySummary = await loadProgressDaySummary(localDate);
+  const hydrationDaySummary = await loadHydrationDaySummary(localDate);
+  const meditationDaySummary = await loadMeditationDaySummary(localDate);
+  const sleepDaySummary = await loadSleepDaySummary(localDate);
+  const supplementsDaySummary = await loadSupplementsDaySummary(localDate);
+
+  const { data: customTrackers } = await supabase
+    .from("user_trackers")
+    .select("id, custom_name")
+    .eq("user_id", user.id)
+    .is("archived_at", null)
+    .is("tracker_definition_id", null)
+    .eq("enabled", true);
+
+  const customTrackerSummaries = [];
+  for (const t of customTrackers ?? []) {
+    const { count } = await supabase
+      .from("tracker_events")
+      .select("id", { count: "exact", head: true })
+      .eq("user_tracker_id", t.id)
+      .eq("local_date", localDate)
+      .is("deleted_at", null);
+    customTrackerSummaries.push({
+      id: String(t.id),
+      displayName: (t.custom_name as string | null)?.trim() || "Custom tracker",
+      eventCount: count ?? 0,
+    });
+  }
 
   const defById = new Map((definitions ?? []).map((d) => [d.id, d]));
   const moduleById = new Map((userModules ?? []).map((m) => [m.id, m]));
@@ -196,7 +232,42 @@ export async function loadBoardSnapshot(
                     userModule.custom_label,
                     definition.key,
                   )
-                : labelForStatus(definition, status, userModule.custom_label),
+                : definition.key === "hydration"
+                  ? hydrationStatusLabel(
+                      hydrationDaySummary,
+                      definition,
+                      status,
+                      userModule.custom_label,
+                    )
+                  : definition.key === "meditation"
+                    ? meditationStatusLabelForBoard(
+                        meditationDaySummary,
+                        definition,
+                        status,
+                        userModule.custom_label,
+                      )
+                    : definition.key === "sleep"
+                      ? sleepStatusLabelForBoard(
+                          sleepDaySummary,
+                          definition,
+                          status,
+                          userModule.custom_label,
+                        )
+                      : definition.key === "supplements"
+                        ? supplementsStatusLabelForBoard(
+                            supplementsDaySummary,
+                            definition,
+                            status,
+                            userModule.custom_label,
+                          )
+                        : definition.key === "custom_tracker"
+                          ? customTrackerStatusLabel(
+                              customTrackerSummaries,
+                              definition,
+                              status,
+                              userModule.custom_label,
+                            )
+                          : labelForStatus(definition, status, userModule.custom_label),
     });
   }
 
@@ -211,6 +282,11 @@ export async function loadBoardSnapshot(
     workoutDaySummary,
     rehabDaySummary,
     progressDaySummary,
+    hydrationDaySummary,
+    meditationDaySummary,
+    sleepDaySummary,
+    supplementsDaySummary,
+    customTrackerSummaries,
     syncBanner: null,
   };
 }

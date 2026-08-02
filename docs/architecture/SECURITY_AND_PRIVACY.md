@@ -126,6 +126,15 @@ Open Food Facts:
   verification. Restriction `value_text` is the primary instruction record.
 - No cross-user read of rehab plans, sessions, symptoms, or alerts.
 
+## Daily trackers (Increment 9)
+
+- **Catalog RLS:** `tracker_definitions`, `supplement_definitions` select-only for authenticated clients.
+- **User data:** `user_trackers`, `tracker_targets`, `tracker_events`, `tracker_daily_summaries`, `tracker_streaks`, `hydration_entries`, `meditation_sessions`, `sleep_sessions`, `user_supplements`, `supplement_intakes`, `tracker_reminders`, `profile_preferences` owner-scoped via `user_id`.
+- **Sleep / local dates:** `sleep_date` derived from bedtime local date; other logs use `local_date` — no cross-user calendar aggregation.
+- **Supplements:** UI must show neutral tracking-only disclaimer (`src/modules/supplements/safety.ts`); no medical advice or dosage recommendations.
+- **Reminders:** rows persist user schedules; delivery mechanism deferred — do not imply push/email is live.
+- Offline drafts may contain tracker logs; logout clears Dexie. No passwords or API keys in drafts.
+
 ## Checklist before any production data
 
 - [ ] RLS enabled + policies tested with anon key

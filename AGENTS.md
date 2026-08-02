@@ -30,15 +30,17 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 8 — Progress tracking** is implemented locally (uncommitted until you ask).
+**Increment 9 — Daily trackers** is implemented locally (uncommitted until you ask).
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 9
-(hydration/meditation/calendar) without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 10
+(AI import review) without authorization.
 
-### Still deferred (Increment 9+)
+Increment 9 master doc: `docs/development/INCREMENT_9_DAILY_SYSTEM.md`.
 
-- Hydration/meditation/calendar engines
+### Still deferred (Increment 10+)
+
 - AI meal-photo estimation / natural-language food logging / AI workout or rehab generation
+- Reminder push/email delivery (preferences persist; delivery later)
 - Wearables, pose detection, social/trainer features, clinician portal
 
 ## Source of truth (read these first)

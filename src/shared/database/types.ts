@@ -72,6 +72,19 @@ export type ProgressComparisonType =
 export type ProgressNoteType = Database["public"]["Enums"]["progress_note_type"];
 export type ProgressDateRange = Database["public"]["Enums"]["progress_date_range"];
 
+/** Increment 9 — daily trackers enums. */
+export type TrackerType = Database["public"]["Enums"]["tracker_type"];
+export type TrackerValueType = Database["public"]["Enums"]["tracker_value_type"];
+export type TrackerTargetFrequency =
+  Database["public"]["Enums"]["tracker_target_frequency"];
+export type TrackerEventSource = Database["public"]["Enums"]["tracker_event_source"];
+export type MeditationType = Database["public"]["Enums"]["meditation_type"];
+export type SleepQuality = Database["public"]["Enums"]["sleep_quality"];
+export type SupplementForm = Database["public"]["Enums"]["supplement_form"];
+export type SupplementIntakeStatus =
+  Database["public"]["Enums"]["supplement_intake_status"];
+export type TrackerReminderType = Database["public"]["Enums"]["tracker_reminder_type"];
+
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ModuleDefinition = Database["public"]["Tables"]["module_definitions"]["Row"];
 export type UserModule = Database["public"]["Tables"]["user_modules"]["Row"];
@@ -160,3 +173,25 @@ export type ProgressComparison =
 export type ProgressNote = Database["public"]["Tables"]["progress_notes"]["Row"];
 export type ProgressSummaryPreferences =
   Database["public"]["Tables"]["progress_summary_preferences"]["Row"];
+
+export type TrackerDefinition =
+  Database["public"]["Tables"]["tracker_definitions"]["Row"];
+export type UserTracker = Database["public"]["Tables"]["user_trackers"]["Row"];
+export type TrackerTarget = Database["public"]["Tables"]["tracker_targets"]["Row"];
+export type TrackerEvent = Database["public"]["Tables"]["tracker_events"]["Row"];
+export type TrackerDailySummary =
+  Database["public"]["Tables"]["tracker_daily_summaries"]["Row"];
+export type HydrationEntry = Database["public"]["Tables"]["hydration_entries"]["Row"];
+export type MeditationSession =
+  Database["public"]["Tables"]["meditation_sessions"]["Row"];
+export type SleepSession = Database["public"]["Tables"]["sleep_sessions"]["Row"];
+export type SupplementDefinition =
+  Database["public"]["Tables"]["supplement_definitions"]["Row"];
+export type UserSupplement = Database["public"]["Tables"]["user_supplements"]["Row"];
+export type SupplementIntake = Database["public"]["Tables"]["supplement_intakes"]["Row"];
+export type TrackerReminder = Database["public"]["Tables"]["tracker_reminders"]["Row"];
+export type TrackerStreak = Database["public"]["Tables"]["tracker_streaks"]["Row"];
+export type ProfilePreferences =
+  Database["public"]["Tables"]["profile_preferences"]["Row"];
+export type DailyOverviewPreferences =
+  Database["public"]["Tables"]["daily_overview_preferences"]["Row"];

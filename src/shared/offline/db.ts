@@ -209,6 +209,116 @@ export type ProgressNoteDraft = {
   updatedAt: string;
 };
 
+/** Device-local hydration entry waiting to sync (Increment 9). */
+export type HydrationDraft = {
+  id: string;
+  userId: string;
+  entryId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local meditation session waiting to sync (Increment 9). */
+export type MeditationDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** In-progress meditation timer state (Increment 9). */
+export type MeditationTimerState = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  payload: unknown;
+  updatedAt: string;
+};
+
+/** Device-local sleep session waiting to sync (Increment 9). */
+export type SleepDraft = {
+  id: string;
+  userId: string;
+  sessionId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local supplement intake waiting to sync (Increment 9). */
+export type SupplementIntakeDraft = {
+  id: string;
+  userId: string;
+  intakeId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local generic tracker event waiting to sync (Increment 9). */
+export type TrackerEventDraft = {
+  id: string;
+  userId: string;
+  eventId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local tracker target waiting to sync (Increment 9). */
+export type TrackerTargetDraft = {
+  id: string;
+  userId: string;
+  targetId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local profile preferences waiting to sync (Increment 9). */
+export type ProfilePreferenceDraft = {
+  id: string;
+  userId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local user supplement waiting to sync (Increment 9). */
+export type UserSupplementDraft = {
+  id: string;
+  userId: string;
+  supplementId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Device-local tracker reminder preference waiting to sync (Increment 9). */
+export type TrackerReminderDraft = {
+  id: string;
+  userId: string;
+  reminderId: string;
+  payload: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/**
+ * Optional client cache of daily overview snapshots.
+ * Invalidated after confirmed tracker sync for matching local dates.
+ */
+export type DailyOverviewCacheEntry = {
+  id: string;
+  userId: string;
+  localDate: string;
+  payload: unknown;
+  updatedAt: string;
+};
+
 export class MtfbwuDatabase extends Dexie {
   outbox!: EntityTable<OutboxRecord, "id">;
   mealLogDrafts!: EntityTable<MealLogDraft, "id">;
@@ -225,6 +335,17 @@ export class MtfbwuDatabase extends Dexie {
   progressPhotoDrafts!: EntityTable<ProgressPhotoDraft, "id">;
   progressPhotoBlobs!: EntityTable<ProgressPhotoBlob, "id">;
   progressNoteDrafts!: EntityTable<ProgressNoteDraft, "id">;
+  hydrationDrafts!: EntityTable<HydrationDraft, "id">;
+  meditationDrafts!: EntityTable<MeditationDraft, "id">;
+  meditationTimerState!: EntityTable<MeditationTimerState, "id">;
+  sleepDrafts!: EntityTable<SleepDraft, "id">;
+  supplementIntakeDrafts!: EntityTable<SupplementIntakeDraft, "id">;
+  trackerEventDrafts!: EntityTable<TrackerEventDraft, "id">;
+  trackerTargetDrafts!: EntityTable<TrackerTargetDraft, "id">;
+  profilePreferenceDrafts!: EntityTable<ProfilePreferenceDraft, "id">;
+  userSupplementDrafts!: EntityTable<UserSupplementDraft, "id">;
+  trackerReminderDrafts!: EntityTable<TrackerReminderDraft, "id">;
+  dailyOverviewCache!: EntityTable<DailyOverviewCacheEntry, "id">;
 
   constructor(name = "mtfbwu") {
     super(name);
@@ -299,6 +420,86 @@ export class MtfbwuDatabase extends Dexie {
       progressPhotoDrafts: "id, userId, setId, photoId, updatedAt",
       progressPhotoBlobs: "id, userId, setId, photoId, createdAt",
       progressNoteDrafts: "id, userId, noteId, updatedAt",
+    });
+    this.version(9).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
+      activeRehabSessions: "id, userId, sessionId, updatedAt",
+      rehabSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      rehabObservationDrafts: "id, userId, sessionId, observationId, updatedAt",
+      rehabAlertDrafts: "id, userId, sessionId, alertId, updatedAt",
+      weightDrafts: "id, userId, entryId, updatedAt",
+      measurementDrafts: "id, userId, entryId, updatedAt",
+      progressPhotoDrafts: "id, userId, setId, photoId, updatedAt",
+      progressPhotoBlobs: "id, userId, setId, photoId, createdAt",
+      progressNoteDrafts: "id, userId, noteId, updatedAt",
+      hydrationDrafts: "id, userId, entryId, updatedAt",
+      meditationDrafts: "id, userId, sessionId, updatedAt",
+      meditationTimerState: "id, userId, sessionId, updatedAt",
+      sleepDrafts: "id, userId, sessionId, updatedAt",
+      supplementIntakeDrafts: "id, userId, intakeId, updatedAt",
+      trackerEventDrafts: "id, userId, eventId, updatedAt",
+      trackerTargetDrafts: "id, userId, targetId, updatedAt",
+      profilePreferenceDrafts: "id, userId, updatedAt",
+    });
+    this.version(10).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
+      activeRehabSessions: "id, userId, sessionId, updatedAt",
+      rehabSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      rehabObservationDrafts: "id, userId, sessionId, observationId, updatedAt",
+      rehabAlertDrafts: "id, userId, sessionId, alertId, updatedAt",
+      weightDrafts: "id, userId, entryId, updatedAt",
+      measurementDrafts: "id, userId, entryId, updatedAt",
+      progressPhotoDrafts: "id, userId, setId, photoId, updatedAt",
+      progressPhotoBlobs: "id, userId, setId, photoId, createdAt",
+      progressNoteDrafts: "id, userId, noteId, updatedAt",
+      hydrationDrafts: "id, userId, entryId, updatedAt",
+      meditationDrafts: "id, userId, sessionId, updatedAt",
+      meditationTimerState: "id, userId, sessionId, updatedAt",
+      sleepDrafts: "id, userId, sessionId, updatedAt",
+      supplementIntakeDrafts: "id, userId, intakeId, updatedAt",
+      trackerEventDrafts: "id, userId, eventId, updatedAt",
+      trackerTargetDrafts: "id, userId, targetId, updatedAt",
+      profilePreferenceDrafts: "id, userId, updatedAt",
+      userSupplementDrafts: "id, userId, supplementId, updatedAt",
+      trackerReminderDrafts: "id, userId, reminderId, updatedAt",
+    });
+    this.version(11).stores({
+      outbox: "++id, idempotencyKey, userId, status, entityType, entityId, createdAt",
+      mealLogDrafts: "id, userId, mealLogId, updatedAt",
+      labelCaptureDrafts: "id, userId, barcode, updatedAt",
+      activeWorkoutSessions: "id, userId, sessionId, updatedAt",
+      workoutSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      workoutNoteDrafts: "id, userId, sessionId, noteId, updatedAt",
+      activeRehabSessions: "id, userId, sessionId, updatedAt",
+      rehabSetDrafts: "id, userId, sessionId, setId, updatedAt",
+      rehabObservationDrafts: "id, userId, sessionId, observationId, updatedAt",
+      rehabAlertDrafts: "id, userId, sessionId, alertId, updatedAt",
+      weightDrafts: "id, userId, entryId, updatedAt",
+      measurementDrafts: "id, userId, entryId, updatedAt",
+      progressPhotoDrafts: "id, userId, setId, photoId, updatedAt",
+      progressPhotoBlobs: "id, userId, setId, photoId, createdAt",
+      progressNoteDrafts: "id, userId, noteId, updatedAt",
+      hydrationDrafts: "id, userId, entryId, updatedAt",
+      meditationDrafts: "id, userId, sessionId, updatedAt",
+      meditationTimerState: "id, userId, sessionId, updatedAt",
+      sleepDrafts: "id, userId, sessionId, updatedAt",
+      supplementIntakeDrafts: "id, userId, intakeId, updatedAt",
+      trackerEventDrafts: "id, userId, eventId, updatedAt",
+      trackerTargetDrafts: "id, userId, targetId, updatedAt",
+      profilePreferenceDrafts: "id, userId, updatedAt",
+      userSupplementDrafts: "id, userId, supplementId, updatedAt",
+      trackerReminderDrafts: "id, userId, reminderId, updatedAt",
+      dailyOverviewCache: "id, userId, localDate, updatedAt",
     });
   }
 }

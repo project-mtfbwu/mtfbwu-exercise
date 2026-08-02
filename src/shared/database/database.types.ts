@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
@@ -351,6 +351,47 @@ export type Database = {
             columns: ["user_module_id"];
             isOneToOne: false;
             referencedRelation: "user_modules";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      daily_overview_preferences: {
+        Row: {
+          created_at: string;
+          id: string;
+          show_completion_percentage: boolean;
+          show_module_counts: boolean;
+          summary_order: Json;
+          updated_at: string;
+          user_id: string;
+          visible_sections: Json;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          show_completion_percentage?: boolean;
+          show_module_counts?: boolean;
+          summary_order?: Json;
+          updated_at?: string;
+          user_id: string;
+          visible_sections?: Json;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          show_completion_percentage?: boolean;
+          show_module_counts?: boolean;
+          summary_order?: Json;
+          updated_at?: string;
+          user_id?: string;
+          visible_sections?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "daily_overview_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -860,6 +901,66 @@ export type Database = {
         };
         Relationships: [];
       };
+      hydration_entries: {
+        Row: {
+          amount_ml: number;
+          created_at: string;
+          daily_record_id: string | null;
+          deleted_at: string | null;
+          id: string;
+          local_date: string;
+          note: string | null;
+          occurred_at: string;
+          source: Database["public"]["Enums"]["tracker_event_source"];
+          updated_at: string;
+          user_id: string;
+          vessel_label: string | null;
+        };
+        Insert: {
+          amount_ml: number;
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          id?: string;
+          local_date: string;
+          note?: string | null;
+          occurred_at?: string;
+          source?: Database["public"]["Enums"]["tracker_event_source"];
+          updated_at?: string;
+          user_id: string;
+          vessel_label?: string | null;
+        };
+        Update: {
+          amount_ml?: number;
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          id?: string;
+          local_date?: string;
+          note?: string | null;
+          occurred_at?: string;
+          source?: Database["public"]["Enums"]["tracker_event_source"];
+          updated_at?: string;
+          user_id?: string;
+          vessel_label?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "hydration_entries_daily_record_id_fkey";
+            columns: ["daily_record_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_records";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "hydration_entries_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       meal_log_items: {
         Row: {
           carbohydrate_g: number;
@@ -1167,6 +1268,69 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      meditation_sessions: {
+        Row: {
+          completed: boolean;
+          completed_at: string | null;
+          created_at: string;
+          daily_record_id: string | null;
+          deleted_at: string | null;
+          duration_seconds: number;
+          id: string;
+          local_date: string;
+          meditation_type: Database["public"]["Enums"]["meditation_type"];
+          note: string | null;
+          started_at: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          completed?: boolean;
+          completed_at?: string | null;
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          duration_seconds: number;
+          id?: string;
+          local_date: string;
+          meditation_type?: Database["public"]["Enums"]["meditation_type"];
+          note?: string | null;
+          started_at?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          completed?: boolean;
+          completed_at?: string | null;
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          duration_seconds?: number;
+          id?: string;
+          local_date?: string;
+          meditation_type?: Database["public"]["Enums"]["meditation_type"];
+          note?: string | null;
+          started_at?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "meditation_sessions_daily_record_id_fkey";
+            columns: ["daily_record_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_records";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "meditation_sessions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       module_definitions: {
         Row: {
@@ -1539,6 +1703,62 @@ export type Database = {
             foreignKeyName: "product_review_events_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      profile_preferences: {
+        Row: {
+          created_at: string;
+          default_dashboard_date_mode: string;
+          id: string;
+          length_unit: string;
+          preferred_name: string | null;
+          show_streaks: boolean;
+          show_weekly_summary: boolean;
+          time_format: string;
+          updated_at: string;
+          user_id: string;
+          volume_unit: string;
+          week_starts_on: number;
+          weight_unit: string;
+        };
+        Insert: {
+          created_at?: string;
+          default_dashboard_date_mode?: string;
+          id?: string;
+          length_unit?: string;
+          preferred_name?: string | null;
+          show_streaks?: boolean;
+          show_weekly_summary?: boolean;
+          time_format?: string;
+          updated_at?: string;
+          user_id: string;
+          volume_unit?: string;
+          week_starts_on?: number;
+          weight_unit?: string;
+        };
+        Update: {
+          created_at?: string;
+          default_dashboard_date_mode?: string;
+          id?: string;
+          length_unit?: string;
+          preferred_name?: string | null;
+          show_streaks?: boolean;
+          show_weekly_summary?: boolean;
+          time_format?: string;
+          updated_at?: string;
+          user_id?: string;
+          volume_unit?: string;
+          week_starts_on?: number;
+          weight_unit?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
@@ -3037,6 +3257,544 @@ export type Database = {
           },
         ];
       };
+      sleep_sessions: {
+        Row: {
+          bedtime_at: string;
+          created_at: string;
+          deleted_at: string | null;
+          duration_seconds: number;
+          id: string;
+          interruptions: number | null;
+          nap: boolean;
+          note: string | null;
+          quality: Database["public"]["Enums"]["sleep_quality"] | null;
+          sleep_date: string;
+          source: Database["public"]["Enums"]["tracker_event_source"];
+          timezone: string;
+          updated_at: string;
+          user_id: string;
+          wake_at: string;
+        };
+        Insert: {
+          bedtime_at: string;
+          created_at?: string;
+          deleted_at?: string | null;
+          duration_seconds: number;
+          id?: string;
+          interruptions?: number | null;
+          nap?: boolean;
+          note?: string | null;
+          quality?: Database["public"]["Enums"]["sleep_quality"] | null;
+          sleep_date: string;
+          source?: Database["public"]["Enums"]["tracker_event_source"];
+          timezone?: string;
+          updated_at?: string;
+          user_id: string;
+          wake_at: string;
+        };
+        Update: {
+          bedtime_at?: string;
+          created_at?: string;
+          deleted_at?: string | null;
+          duration_seconds?: number;
+          id?: string;
+          interruptions?: number | null;
+          nap?: boolean;
+          note?: string | null;
+          quality?: Database["public"]["Enums"]["sleep_quality"] | null;
+          sleep_date?: string;
+          source?: Database["public"]["Enums"]["tracker_event_source"];
+          timezone?: string;
+          updated_at?: string;
+          user_id?: string;
+          wake_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "sleep_sessions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      supplement_definitions: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          default_unit: string | null;
+          display_name: string;
+          form: Database["public"]["Enums"]["supplement_form"];
+          id: string;
+          stable_key: string | null;
+          system_owned: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          default_unit?: string | null;
+          display_name: string;
+          form?: Database["public"]["Enums"]["supplement_form"];
+          id?: string;
+          stable_key?: string | null;
+          system_owned?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          default_unit?: string | null;
+          display_name?: string;
+          form?: Database["public"]["Enums"]["supplement_form"];
+          id?: string;
+          stable_key?: string | null;
+          system_owned?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      supplement_intakes: {
+        Row: {
+          amount: number | null;
+          created_at: string;
+          daily_record_id: string | null;
+          deleted_at: string | null;
+          id: string;
+          local_date: string;
+          note: string | null;
+          status: Database["public"]["Enums"]["supplement_intake_status"];
+          taken_at: string;
+          unit: string | null;
+          updated_at: string;
+          user_id: string;
+          user_supplement_id: string;
+        };
+        Insert: {
+          amount?: number | null;
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          id?: string;
+          local_date: string;
+          note?: string | null;
+          status?: Database["public"]["Enums"]["supplement_intake_status"];
+          taken_at?: string;
+          unit?: string | null;
+          updated_at?: string;
+          user_id: string;
+          user_supplement_id: string;
+        };
+        Update: {
+          amount?: number | null;
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          id?: string;
+          local_date?: string;
+          note?: string | null;
+          status?: Database["public"]["Enums"]["supplement_intake_status"];
+          taken_at?: string;
+          unit?: string | null;
+          updated_at?: string;
+          user_id?: string;
+          user_supplement_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "supplement_intakes_daily_record_id_fkey";
+            columns: ["daily_record_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_records";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "supplement_intakes_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "supplement_intakes_user_supplement_id_fkey";
+            columns: ["user_supplement_id"];
+            isOneToOne: false;
+            referencedRelation: "user_supplements";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tracker_daily_summaries: {
+        Row: {
+          calculated_at: string;
+          completed: boolean;
+          created_at: string;
+          event_count: number;
+          id: string;
+          local_date: string;
+          target_snapshot_json: Json;
+          total_duration_seconds: number | null;
+          total_numeric: number | null;
+          updated_at: string;
+          user_id: string;
+          user_tracker_id: string;
+        };
+        Insert: {
+          calculated_at?: string;
+          completed?: boolean;
+          created_at?: string;
+          event_count?: number;
+          id?: string;
+          local_date: string;
+          target_snapshot_json?: Json;
+          total_duration_seconds?: number | null;
+          total_numeric?: number | null;
+          updated_at?: string;
+          user_id: string;
+          user_tracker_id: string;
+        };
+        Update: {
+          calculated_at?: string;
+          completed?: boolean;
+          created_at?: string;
+          event_count?: number;
+          id?: string;
+          local_date?: string;
+          target_snapshot_json?: Json;
+          total_duration_seconds?: number | null;
+          total_numeric?: number | null;
+          updated_at?: string;
+          user_id?: string;
+          user_tracker_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tracker_daily_summaries_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tracker_daily_summaries_user_tracker_id_fkey";
+            columns: ["user_tracker_id"];
+            isOneToOne: false;
+            referencedRelation: "user_trackers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tracker_definitions: {
+        Row: {
+          active: boolean;
+          created_at: string;
+          default_unit: string | null;
+          description: string | null;
+          display_name: string;
+          display_order: number;
+          id: string;
+          stable_key: string;
+          supports_duration: boolean;
+          supports_multiple_events: boolean;
+          supports_streak: boolean;
+          supports_target: boolean;
+          tracker_type: Database["public"]["Enums"]["tracker_type"];
+          updated_at: string;
+          value_type: Database["public"]["Enums"]["tracker_value_type"];
+          visual_variant: string;
+        };
+        Insert: {
+          active?: boolean;
+          created_at?: string;
+          default_unit?: string | null;
+          description?: string | null;
+          display_name: string;
+          display_order?: number;
+          id?: string;
+          stable_key: string;
+          supports_duration?: boolean;
+          supports_multiple_events?: boolean;
+          supports_streak?: boolean;
+          supports_target?: boolean;
+          tracker_type: Database["public"]["Enums"]["tracker_type"];
+          updated_at?: string;
+          value_type: Database["public"]["Enums"]["tracker_value_type"];
+          visual_variant?: string;
+        };
+        Update: {
+          active?: boolean;
+          created_at?: string;
+          default_unit?: string | null;
+          description?: string | null;
+          display_name?: string;
+          display_order?: number;
+          id?: string;
+          stable_key?: string;
+          supports_duration?: boolean;
+          supports_multiple_events?: boolean;
+          supports_streak?: boolean;
+          supports_target?: boolean;
+          tracker_type?: Database["public"]["Enums"]["tracker_type"];
+          updated_at?: string;
+          value_type?: Database["public"]["Enums"]["tracker_value_type"];
+          visual_variant?: string;
+        };
+        Relationships: [];
+      };
+      tracker_events: {
+        Row: {
+          created_at: string;
+          daily_record_id: string | null;
+          deleted_at: string | null;
+          duration_seconds: number | null;
+          id: string;
+          local_date: string;
+          note: string | null;
+          occurred_at: string;
+          source: Database["public"]["Enums"]["tracker_event_source"];
+          timezone: string;
+          unit: string | null;
+          updated_at: string;
+          user_id: string;
+          user_tracker_id: string;
+          value_boolean: boolean | null;
+          value_numeric: number | null;
+          value_text: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          duration_seconds?: number | null;
+          id?: string;
+          local_date: string;
+          note?: string | null;
+          occurred_at?: string;
+          source?: Database["public"]["Enums"]["tracker_event_source"];
+          timezone?: string;
+          unit?: string | null;
+          updated_at?: string;
+          user_id: string;
+          user_tracker_id: string;
+          value_boolean?: boolean | null;
+          value_numeric?: number | null;
+          value_text?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          daily_record_id?: string | null;
+          deleted_at?: string | null;
+          duration_seconds?: number | null;
+          id?: string;
+          local_date?: string;
+          note?: string | null;
+          occurred_at?: string;
+          source?: Database["public"]["Enums"]["tracker_event_source"];
+          timezone?: string;
+          unit?: string | null;
+          updated_at?: string;
+          user_id?: string;
+          user_tracker_id?: string;
+          value_boolean?: boolean | null;
+          value_numeric?: number | null;
+          value_text?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tracker_events_daily_record_id_fkey";
+            columns: ["daily_record_id"];
+            isOneToOne: false;
+            referencedRelation: "daily_records";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tracker_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tracker_events_user_tracker_id_fkey";
+            columns: ["user_tracker_id"];
+            isOneToOne: false;
+            referencedRelation: "user_trackers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tracker_reminders: {
+        Row: {
+          created_at: string;
+          days_of_week: number[];
+          enabled: boolean;
+          id: string;
+          local_time: string;
+          reminder_type: Database["public"]["Enums"]["tracker_reminder_type"];
+          timezone: string;
+          updated_at: string;
+          user_id: string;
+          user_supplement_id: string | null;
+          user_tracker_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          days_of_week?: number[];
+          enabled?: boolean;
+          id?: string;
+          local_time: string;
+          reminder_type?: Database["public"]["Enums"]["tracker_reminder_type"];
+          timezone?: string;
+          updated_at?: string;
+          user_id: string;
+          user_supplement_id?: string | null;
+          user_tracker_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          days_of_week?: number[];
+          enabled?: boolean;
+          id?: string;
+          local_time?: string;
+          reminder_type?: Database["public"]["Enums"]["tracker_reminder_type"];
+          timezone?: string;
+          updated_at?: string;
+          user_id?: string;
+          user_supplement_id?: string | null;
+          user_tracker_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tracker_reminders_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tracker_reminders_user_supplement_id_fkey";
+            columns: ["user_supplement_id"];
+            isOneToOne: false;
+            referencedRelation: "user_supplements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tracker_reminders_user_tracker_id_fkey";
+            columns: ["user_tracker_id"];
+            isOneToOne: false;
+            referencedRelation: "user_trackers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tracker_streaks: {
+        Row: {
+          calculated_at: string;
+          created_at: string;
+          current_streak: number;
+          id: string;
+          last_completed_date: string | null;
+          longest_streak: number;
+          updated_at: string;
+          user_id: string;
+          user_tracker_id: string;
+        };
+        Insert: {
+          calculated_at?: string;
+          created_at?: string;
+          current_streak?: number;
+          id?: string;
+          last_completed_date?: string | null;
+          longest_streak?: number;
+          updated_at?: string;
+          user_id: string;
+          user_tracker_id: string;
+        };
+        Update: {
+          calculated_at?: string;
+          created_at?: string;
+          current_streak?: number;
+          id?: string;
+          last_completed_date?: string | null;
+          longest_streak?: number;
+          updated_at?: string;
+          user_id?: string;
+          user_tracker_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tracker_streaks_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tracker_streaks_user_tracker_id_fkey";
+            columns: ["user_tracker_id"];
+            isOneToOne: true;
+            referencedRelation: "user_trackers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tracker_targets: {
+        Row: {
+          confirmed_by_user: boolean;
+          created_at: string;
+          days_of_week: number[] | null;
+          effective_from: string;
+          effective_until: string | null;
+          id: string;
+          target_frequency: Database["public"]["Enums"]["tracker_target_frequency"];
+          target_max: number | null;
+          target_min: number | null;
+          target_unit: string | null;
+          target_value: number | null;
+          updated_at: string;
+          user_tracker_id: string;
+        };
+        Insert: {
+          confirmed_by_user?: boolean;
+          created_at?: string;
+          days_of_week?: number[] | null;
+          effective_from: string;
+          effective_until?: string | null;
+          id?: string;
+          target_frequency?: Database["public"]["Enums"]["tracker_target_frequency"];
+          target_max?: number | null;
+          target_min?: number | null;
+          target_unit?: string | null;
+          target_value?: number | null;
+          updated_at?: string;
+          user_tracker_id: string;
+        };
+        Update: {
+          confirmed_by_user?: boolean;
+          created_at?: string;
+          days_of_week?: number[] | null;
+          effective_from?: string;
+          effective_until?: string | null;
+          id?: string;
+          target_frequency?: Database["public"]["Enums"]["tracker_target_frequency"];
+          target_max?: number | null;
+          target_min?: number | null;
+          target_unit?: string | null;
+          target_value?: number | null;
+          updated_at?: string;
+          user_tracker_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tracker_targets_user_tracker_id_fkey";
+            columns: ["user_tracker_id"];
+            isOneToOne: false;
+            referencedRelation: "user_trackers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       user_custom_foods: {
         Row: {
           created_at: string;
@@ -3276,6 +4034,126 @@ export type Database = {
           },
           {
             foreignKeyName: "user_rehab_exercises_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_supplements: {
+        Row: {
+          active: boolean;
+          brand: string | null;
+          created_at: string;
+          custom_name: string | null;
+          id: string;
+          instructions_text: string | null;
+          serving_amount: number | null;
+          serving_unit: string | null;
+          supplement_definition_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          active?: boolean;
+          brand?: string | null;
+          created_at?: string;
+          custom_name?: string | null;
+          id?: string;
+          instructions_text?: string | null;
+          serving_amount?: number | null;
+          serving_unit?: string | null;
+          supplement_definition_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          active?: boolean;
+          brand?: string | null;
+          created_at?: string;
+          custom_name?: string | null;
+          id?: string;
+          instructions_text?: string | null;
+          serving_amount?: number | null;
+          serving_unit?: string | null;
+          supplement_definition_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_supplements_supplement_definition_id_fkey";
+            columns: ["supplement_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "supplement_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_supplements_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      user_trackers: {
+        Row: {
+          archived_at: string | null;
+          color_token: string | null;
+          created_at: string;
+          custom_description: string | null;
+          custom_name: string | null;
+          display_order: number;
+          enabled: boolean;
+          icon_key: string | null;
+          id: string;
+          tracker_definition_id: string | null;
+          unit: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          archived_at?: string | null;
+          color_token?: string | null;
+          created_at?: string;
+          custom_description?: string | null;
+          custom_name?: string | null;
+          display_order?: number;
+          enabled?: boolean;
+          icon_key?: string | null;
+          id?: string;
+          tracker_definition_id?: string | null;
+          unit?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          archived_at?: string | null;
+          color_token?: string | null;
+          created_at?: string;
+          custom_description?: string | null;
+          custom_name?: string | null;
+          display_order?: number;
+          enabled?: boolean;
+          icon_key?: string | null;
+          id?: string;
+          tracker_definition_id?: string | null;
+          unit?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "user_trackers_tracker_definition_id_fkey";
+            columns: ["tracker_definition_id"];
+            isOneToOne: false;
+            referencedRelation: "tracker_definitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_trackers_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
@@ -3939,6 +4817,10 @@ export type Database = {
         Args: { p_user_id: string };
         Returns: undefined;
       };
+      recalculate_tracker_daily_summary: {
+        Args: { p_local_date: string; p_user_tracker_id: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       animation_mode: "full" | "reduced" | "off";
@@ -3993,6 +4875,15 @@ export type Database = {
         "weight" | "circumference" | "width" | "composition" | "custom";
       measurement_side_mode: "not_applicable" | "left_right" | "single_value";
       measurement_value_side: "left" | "right" | "not_applicable";
+      meditation_type:
+        | "breathing"
+        | "mindfulness"
+        | "body_scan"
+        | "guided"
+        | "mantra"
+        | "visualization"
+        | "walking"
+        | "custom";
       module_category:
         "nutrition" | "training" | "recovery" | "body" | "lifestyle" | "custom";
       nutrition_label_capture_status:
@@ -4080,6 +4971,26 @@ export type Database = {
         | "rescheduled"
         | "started"
         | "cancelled";
+      sleep_quality: "very_poor" | "poor" | "fair" | "good" | "very_good";
+      supplement_form:
+        "tablet" | "capsule" | "powder" | "liquid" | "sachet" | "gummy" | "other";
+      supplement_intake_status: "taken" | "skipped" | "partial";
+      tracker_event_source: "manual" | "imported_future" | "device_future";
+      tracker_reminder_type: "tracker" | "supplement" | "bedtime" | "wake" | "custom";
+      tracker_target_frequency: "daily" | "weekly" | "selected_days" | "as_needed";
+      tracker_type:
+        | "hydration"
+        | "meditation"
+        | "sleep"
+        | "supplement"
+        | "numeric"
+        | "duration"
+        | "boolean"
+        | "count"
+        | "text"
+        | "custom";
+      tracker_value_type:
+        "amount" | "duration" | "count" | "boolean" | "time_range" | "text";
       units_system: "metric" | "imperial";
       workout_block_type:
         | "warmup"
@@ -4306,6 +5217,16 @@ export const Constants = {
       measurement_category: ["weight", "circumference", "width", "composition", "custom"],
       measurement_side_mode: ["not_applicable", "left_right", "single_value"],
       measurement_value_side: ["left", "right", "not_applicable"],
+      meditation_type: [
+        "breathing",
+        "mindfulness",
+        "body_scan",
+        "guided",
+        "mantra",
+        "visualization",
+        "walking",
+        "custom",
+      ],
       module_category: [
         "nutrition",
         "training",
@@ -4405,6 +5326,40 @@ export const Constants = {
         "rescheduled",
         "started",
         "cancelled",
+      ],
+      sleep_quality: ["very_poor", "poor", "fair", "good", "very_good"],
+      supplement_form: [
+        "tablet",
+        "capsule",
+        "powder",
+        "liquid",
+        "sachet",
+        "gummy",
+        "other",
+      ],
+      supplement_intake_status: ["taken", "skipped", "partial"],
+      tracker_event_source: ["manual", "imported_future", "device_future"],
+      tracker_reminder_type: ["tracker", "supplement", "bedtime", "wake", "custom"],
+      tracker_target_frequency: ["daily", "weekly", "selected_days", "as_needed"],
+      tracker_type: [
+        "hydration",
+        "meditation",
+        "sleep",
+        "supplement",
+        "numeric",
+        "duration",
+        "boolean",
+        "count",
+        "text",
+        "custom",
+      ],
+      tracker_value_type: [
+        "amount",
+        "duration",
+        "count",
+        "boolean",
+        "time_range",
+        "text",
       ],
       units_system: ["metric", "imperial"],
       workout_block_type: [

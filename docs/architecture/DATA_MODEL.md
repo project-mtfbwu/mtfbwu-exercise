@@ -157,16 +157,36 @@ progress_summary_preferences
 
 Storage path: `{user_id}/progress/{set_id}/{slot}-{photo_id}.jpg` in bucket `progress-photos`. See `docs/development/PROGRESS_PHOTOS.md`, ADR 0011; comparisons ADR 0012.
 
-## Calendar & custom trackers
+## Calendar & custom trackers (Increment 9 — shipped)
+
+```
+tracker_definitions              -- system catalog (seeded)
+user_trackers                    -- catalog wrapper OR custom_name
+tracker_targets                  -- effective-dated; confirmed_by_user for board goals
+tracker_events                   -- generic performed logs (numeric/boolean/text/duration)
+tracker_daily_summaries          -- per-day cache; RPC recalculate_tracker_daily_summary
+tracker_streaks
+
+hydration_entries                -- local_date, amount_ml, vessel_label
+meditation_sessions              -- local_date, duration_seconds, meditation_type
+sleep_sessions                   -- sleep_date (= local date of bedtime_at), bedtime_at, wake_at
+supplement_definitions           -- system catalog (seeded)
+user_supplements, supplement_intakes
+
+tracker_reminders                -- persist schedule; delivery deferred
+profile_preferences              -- daily overview + reminder prefs
+```
+
+Sleep **`sleep_date`** rule: local date of **`bedtime_at`** in session timezone (ADR 0014).
+Detail: `docs/development/INCREMENT_9_DAILY_SYSTEM.md`.
+
+## Legacy sketch (superseded by Increment 9 generic model)
 
 ```
 calendar_pins (optional) -- user markers on days
 
-custom_trackers
-  id, user_id, name, value_type, unit, config jsonb
-
+custom_trackers            -- replaced by user_trackers + tracker_events
 custom_tracker_entries
-  id, tracker_id, value jsonb, recorded_at
 ```
 
 ## Sync / AI
@@ -191,10 +211,13 @@ Increment 4 adds `mealLogDrafts` alongside `outbox`. Increment 5 adds
 `activeRehabSessions`, `rehabSetDrafts`, `rehabObservationDrafts`, and
 `rehabAlertDrafts`. Increment 8 (Dexie v8) adds `weightDrafts`,
 `measurementDrafts`, `progressPhotoDrafts`, `progressPhotoBlobs`, and
-`progressNoteDrafts`. Sync
-coordinator applies `kind: "workout"`, `kind: "rehab"`, and `kind: "progress"`
-payloads (photo replay: set → blob upload → metadata → notes → complete).
-Full catalog mirror in IndexedDB remains a future optimization.
+`progressNoteDrafts`. Increment 9 (Dexie v9–v11) adds `hydrationDrafts`,
+`meditationDrafts`, `meditationTimerState`, `sleepDrafts`,
+`supplementIntakeDrafts`, `trackerEventDrafts`, `trackerTargetDrafts`,
+`profilePreferenceDrafts`, `userSupplementDrafts`, `trackerReminderDrafts`, and
+`dailyOverviewCache`. Sync
+coordinator applies `kind: "workout"`, `kind: "rehab"`, `kind: "progress"`, and
+`kind: "tracker"` payloads. See `docs/development/INCREMENT_9_OFFLINE_SYNC.md`.
 
 ## Indexes (early)
 

@@ -7,6 +7,7 @@ export const NODE_MAJOR = 24;
 export const ROUTES = {
   today: "/today",
   calendar: "/calendar",
+  history: "/history",
   plans: "/plans",
   rehabPlans: "/rehab/plans",
   progress: "/progress",
@@ -33,6 +34,7 @@ export function rehabSessionSummaryRoute(sessionId: string): string {
 export const PROTECTED_ROUTES = [
   ROUTES.today,
   ROUTES.calendar,
+  ROUTES.history,
   ROUTES.plans,
   ROUTES.rehabPlans,
   ROUTES.progress,

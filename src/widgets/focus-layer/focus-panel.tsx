@@ -16,6 +16,8 @@ export type FocusPanelProps = {
   children: ReactNode;
   className?: string;
   footer?: ReactNode;
+  /** Opt-in only — real Increment modules persist; do not imply data is discarded. */
+  showDemoBanner?: boolean;
 };
 
 export function FocusPanel({
@@ -27,12 +29,15 @@ export function FocusPanel({
   children,
   className,
   footer,
+  showDemoBanner = false,
 }: FocusPanelProps) {
   const content = (
     <>
-      <p className="mb-3 rounded border-2 border-dashed border-[var(--mt-ink)] bg-[var(--mt-paper-warm)] px-2 py-1 text-xs font-bold text-[var(--mt-ink)]">
-        Development-only demo data — not saved to Supabase.
-      </p>
+      {showDemoBanner ? (
+        <p className="mb-3 rounded border-2 border-dashed border-[var(--mt-ink)] bg-[var(--mt-paper-warm)] px-2 py-1 text-xs font-bold text-[var(--mt-ink)]">
+          Development-only demo data — not saved to Supabase.
+        </p>
+      ) : null}
       {children}
       {footer ? <div className="mt-4 flex flex-wrap gap-2">{footer}</div> : null}
     </>

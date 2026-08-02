@@ -15,6 +15,14 @@ import type {
 import type { WorkoutDaySummary } from "@/modules/workout/sessions/load-workout-day";
 import type { RehabDaySummary } from "@/modules/rehab/sessions/load-rehab-day";
 import type { ProgressDaySummary } from "@/modules/progress/load-progress-day";
+import type { HydrationDaySummary } from "@/modules/hydration/types";
+import type { MeditationDaySummary } from "@/modules/meditation/types";
+import type { SleepDaySummary } from "@/modules/sleep/types";
+import type { SupplementDaySummary } from "@/modules/supplements/types";
+import { hydrationProgressLabel } from "@/modules/hydration/calculations";
+import { meditationStatusLabel } from "@/modules/meditation/calculations";
+import { sleepStatusLabel } from "@/modules/sleep/calculations";
+import { supplementStatusLabel } from "@/modules/supplements/calculations/helpers";
 
 export type BoardCardView = {
   card: DashboardCard;
@@ -36,6 +44,11 @@ export type BoardSnapshot = {
   workoutDaySummary?: WorkoutDaySummary;
   rehabDaySummary?: RehabDaySummary;
   progressDaySummary?: ProgressDaySummary;
+  hydrationDaySummary?: HydrationDaySummary;
+  meditationDaySummary?: MeditationDaySummary;
+  sleepDaySummary?: SleepDaySummary;
+  supplementsDaySummary?: SupplementDaySummary;
+  customTrackerSummaries?: { id: string; displayName: string; eventCount: number }[];
   syncBanner: string | null;
 };
 
@@ -156,6 +169,61 @@ export function progressStatusLabel(
   }
   if (status?.summary_text) return status.summary_text;
   return labelForStatus(definition, status, customLabel);
+}
+
+export function hydrationStatusLabel(
+  summary: HydrationDaySummary,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  if (summary.entryCount === 0) return labelForStatus(definition, status, customLabel);
+  return hydrationProgressLabel(summary);
+}
+
+export function meditationStatusLabelForBoard(
+  summary: MeditationDaySummary,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  if (summary.sessionCount === 0) return labelForStatus(definition, status, customLabel);
+  return meditationStatusLabel(summary.totalDurationSeconds, summary.sessionCount);
+}
+
+export function sleepStatusLabelForBoard(
+  summary: SleepDaySummary,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  if (!summary.primarySession) return labelForStatus(definition, status, customLabel);
+  return sleepStatusLabel(summary);
+}
+
+export function supplementsStatusLabelForBoard(
+  summary: SupplementDaySummary,
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  if (summary.totalActive === 0 && summary.intakes.length === 0) {
+    return labelForStatus(definition, status, customLabel);
+  }
+  return supplementStatusLabel(summary);
+}
+
+export function customTrackerStatusLabel(
+  summaries: { displayName: string; eventCount: number }[],
+  definition: ModuleDefinition,
+  status: DailyModuleStatus | null,
+  customLabel: string | null,
+): string {
+  const active = summaries.filter((s) => s.eventCount > 0);
+  if (active.length === 0) return labelForStatus(definition, status, customLabel);
+  const first = active[0]!;
+  if (active.length === 1) return `${first.displayName} · ${first.eventCount} logged`;
+  return `${active.length} trackers · ${active.reduce((n, s) => n + s.eventCount, 0)} events`;
 }
 
 export function variantToFlatLay(variant: CardVisualVariant): {

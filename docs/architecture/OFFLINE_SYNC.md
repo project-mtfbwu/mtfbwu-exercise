@@ -46,7 +46,7 @@ outbox
 | Workout sessions / sets | Increment 6 | Dexie v4 `activeWorkoutSessions`, `workoutSetDrafts`, `workoutNoteDrafts`; outbox `kind: workout`; coordinator apply wired |
 | Rehab sessions / sets / alerts | Increment 7 | Dexie v6 `activeRehabSessions`, `rehabSetDrafts`, `rehabObservationDrafts`, `rehabAlertDrafts`; outbox `kind: rehab`; ordered finish fold |
 | Weight / measurements / progress photos | Increment 8 | Dexie v8 drafts + `progressPhotoBlobs`; outbox `kind: progress`; see `docs/development/PROGRESS_OFFLINE_SYNC.md` |
-| Hydration / meditation domain rows | Later | Status summary already exists |
+| Hydration / meditation / sleep / supplements / custom trackers | Increment 9 | Dexie v9 drafts + `kind: tracker`; see `docs/development/INCREMENT_9_OFFLINE_SYNC.md` |
 
 ## Conflict rules (Increment 3 board)
 
@@ -129,6 +129,21 @@ Auth actions are never queued. Logout clears Dexie (`clearLocalOfflineData`).
 - Slot replacement online: upload new Storage object before soft-deleting prior metadata; see `docs/development/PROGRESS_PHOTOS.md`.
 - See `docs/development/PROGRESS_OFFLINE_SYNC.md`.
 
+## Tracker writes (Increment 9)
+
+- Dexie **v9** adds hydration, meditation, sleep, supplement intake, tracker event/target, and profile preference drafts; **v10** adds `userSupplementDrafts` and `trackerReminderDrafts` (see `db.ts`).
+- Outbox `kind: "tracker"` in `tracker-outbox.ts`; replay order:
+  1. `user_trackers` / `user_supplements`
+  2. `tracker_targets` / `tracker_reminders` / `profile_preferences` / `profiles`
+  3. Domain rows: `hydration_entries`, `meditation_sessions`, `sleep_sessions`, `supplement_intakes`, `tracker_events`
+- `dependsOnEntityIds` multi-pass flush for parent-before-child replay.
+- Soft deletes use `deleted_at` upserts (hydration, sleep, supplement intakes) or `operation: "delete"` for reminder removal.
+- Reminder **preferences** sync; push/email **delivery** deferred to Increment 10+.
+- **Meditation timer recovery** — `meditationTimerState` single row per user; focus panel restores active/paused timers; expired timers require explicit confirm (never silent complete); one-active-timer + local-date guards.
+- **Post-sync draft cleanup** — `draft-cleanup.ts` runs after each `markSynced`; cleans matching drafts by entity id / idempotency key; preserves newer drafts and unresolved children; `reconcileStaleDrafts` on first flush; cleanup failures become recoverable `cleanupWarnings` (outbox stays synced).
+- **Dexie v11** — `dailyOverviewCache` invalidated after confirmed tracker sync.
+- **Offline status UX** — `OfflineRecordStatusBadge` on Increment 9 focus panels; `DailyOverviewSyncHealth` on Today board (failed/cleanup separate from completion counts).
+- See `docs/development/INCREMENT_9_OFFLINE_SYNC.md`.
 ## Catalogs offline
 
 - Ship or download a **subset** of exercise DB into Dexie.

@@ -200,7 +200,7 @@ performed sessions with symptom scales, alerts, board status, offline logging.
 
 ## Increment 8 — Measurements + private photos
 
-**Status:** Implemented locally (uncommitted until user asks).
+**Status:** Complete (local; uncommitted until user requests commit).
 
 - [x] Migrations: weight, measurements, photo sets, comparisons, notes, summary prefs, catalog seed
 - [x] RLS + `increment8_progress_rls.sql`
@@ -215,14 +215,27 @@ performed sessions with symptom scales, alerts, board status, offline logging.
 - Hydration, meditation, calendar (Increment 9)
 - Chart libraries, AI body analysis, body scoring
 
-## Increment 9 — Hydration, meditation, calendar polish
+## Increment 9 — Daily trackers + calendar
 
-- Thin modules on same patterns
-- Calendar read-model
+**Status:** Complete.
+
+- [x] Migrations: hydration, meditation, sleep, supplements, trackers, preferences, reminders, streaks
+- [x] RLS + `increment9_daily_rls.sql`
+- [x] Modules: hydration, meditation, sleep, supplements, trackers, daily, calendar, profile prefs
+- [x] Dexie v9 + v10 + `tracker-outbox.ts`; sync-coordinator `applyTrackerPayload`
+- [x] Meditation timer recovery + post-sync draft cleanup (`draft-cleanup.ts`)
+- [x] UI: Hydration/Meditation/Sleep/Supplements/CustomTracker focus (incl. sleep/supplement soft-delete); `/calendar`, `/history`; profile totals + reminder preference UI
+- [x] Docs + ADRs 0013/0014 + `INCREMENT_9_DAILY_SYSTEM.md` + visual review checklist
+
+### Explicitly out of scope for Increment 9
+
+- Reminder push/email delivery (preference rows + UI persist only)
+- Wearables, AI meal/workout generation, social
+- Chart libraries (optional inline SVG only)
 
 ## Increment 10 — Custom trackers + AI import review
 
-- Configurable trackers
+- Configurable trackers polish
 - AI proposal review UI + provenance
 
 ## Increment 11 — Hardening

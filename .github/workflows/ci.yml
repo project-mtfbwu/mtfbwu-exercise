@@ -53,10 +53,10 @@ jobs:
       - name: Start local Supabase
         run: supabase start
 
-      - name: Reset local database (apply Increment 3–8 migrations and seed)
+      - name: Reset local database (apply Increment 3–9 migrations and seed)
         run: supabase db reset
 
-      - name: Run Increment 3–8 DB tests
+      - name: Run Increment 3–9 DB tests
         run: |
           set -euo pipefail
           DB_CONTAINER=$(docker ps --format '{{.Names}}' | grep '^supabase_db_' | head -n1)
@@ -78,6 +78,8 @@ jobs:
             < supabase/tests/increment7_rehab_rls.sql
           docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
             < supabase/tests/increment8_progress_rls.sql
+          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            < supabase/tests/increment9_daily_rls.sql
 
       - name: Generate + validate Supabase TypeScript types
         run: |
@@ -134,6 +136,32 @@ jobs:
             echo "::error::src/shared/database/types.ts is missing measurement_definitions -- add Increment 8 aliases"
             exit 1
           fi
+          if ! grep -q "hydration_entries" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing hydration_entries -- add Increment 9 aliases"
+            exit 1
+          fi
+          if ! grep -q "meditation_sessions" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing meditation_sessions -- add Increment 9 aliases"
+            exit 1
+          fi
+          if ! grep -q "sleep_sessions" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing sleep_sessions -- add Increment 9 aliases"
+            exit 1
+          fi
+          if ! grep -q "tracker_definitions" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing tracker_definitions -- add Increment 9 aliases"
+            exit 1
+          fi
+          if ! grep -q "user_trackers" src/shared/database/types.ts; then
+            echo "::error::src/shared/database/types.ts is missing user_trackers -- add Increment 9 aliases"
+            exit 1
+          fi
+          for table in hydration_entries meditation_sessions sleep_sessions tracker_definitions user_trackers; do
+            if ! grep -q "${table}" src/shared/database/database.types.ts; then
+              echo "::error::src/shared/database/database.types.ts is missing ${table} -- regenerate after Increment 9"
+              exit 1
+            fi
+          done
 
       - name: Typecheck
         run: pnpm typecheck

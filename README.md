@@ -7,19 +7,17 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 8 — Progress tracking** (implemented locally; commit when ready)
+**Increment 9 — Daily trackers** (implemented locally; uncommitted until user requests commit)
 
-- Weight + body measurements (catalog, left/right sides, custom defs)
-- Private progress photos (preprocessed JPEG, signed URLs, offline blob queue)
-- Side-by-side photo comparison on `/progress`
-- Dexie v8 offline drafts + `progressPhotoBlobs`; RLS test `increment8_progress_rls.sql`
-- ADRs 0011–0012; docs in `docs/development/INCREMENT_8_PROGRESS_TRACKING.md`
+- Hydration, meditation, sleep, supplements, configurable custom trackers
+- Calendar month indicators + `/history` day list; `loadDailyOverview` aggregation
+- Dexie v9 offline drafts + `kind: "tracker"` outbox replay
+- RLS test `increment9_daily_rls.sql`; ADRs 0013–0014
+- Master doc: `docs/development/INCREMENT_9_DAILY_SYSTEM.md`
 
-Still deferred: Increment 9 (hydration/meditation/calendar), AI body analysis, clinician portal.
+Increment 8 (progress tracking) is complete locally. Still deferred: Increment 10 (AI import review), reminder delivery, wearables.
 
 Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.
-Increment notes: `docs/development/INCREMENT_8_PROGRESS_TRACKING.md`.
-Data model: `docs/architecture/DATA_MODEL.md`.
 
 ## Stack
 
