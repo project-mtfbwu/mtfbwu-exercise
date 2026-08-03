@@ -47,9 +47,10 @@ jobs:
       - name: Secret scanning (basic)
         run: |
           set -euo pipefail
-          if grep -RInE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.next --exclude=pnpm-lock.yaml \
+          # Exclude workflow definitions so the pattern literals themselves are not hits.
+          if grep -RInE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=.github --exclude=pnpm-lock.yaml \
             -e 'BEGIN (RSA|OPENSSH) PRIVATE KEY' \
-            -e 'sk_live_' \
+            -e 'sk_live_[0-9a-zA-Z]{8,}' \
             . ; then
             echo "::error::possible secret material found in working tree"
             exit 1
