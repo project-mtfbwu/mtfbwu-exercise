@@ -10,6 +10,7 @@ export const ROUTES = {
   history: "/history",
   plans: "/plans",
   rehabPlans: "/rehab/plans",
+  rehabSessions: "/rehab/sessions",
   progress: "/progress",
   profile: "/profile",
   import: "/import",
@@ -20,6 +21,10 @@ export const ROUTES = {
   resetPassword: "/reset-password",
   onboarding: "/onboarding",
   customize: "/customize",
+  privacy: "/privacy",
+  terms: "/terms",
+  support: "/support",
+  about: "/about",
 } as const;
 
 export function rehabPlanRoute(planId: string): string {
@@ -37,6 +42,7 @@ export const PROTECTED_ROUTES = [
   ROUTES.history,
   ROUTES.plans,
   ROUTES.rehabPlans,
+  ROUTES.rehabSessions,
   ROUTES.progress,
   ROUTES.profile,
   ROUTES.import,

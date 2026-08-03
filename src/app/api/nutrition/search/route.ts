@@ -136,6 +136,16 @@ export async function GET(request: Request) {
   if (error || !user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { checkRateLimit, rateLimitResponse } =
+    await import("@/shared/security/rate-limit");
+  const limited = await checkRateLimit({
+    key: `nutrition-search:${user.id}`,
+    limit: 30,
+    windowMs: 60_000,
+    onProviderFailure: "fail_open",
+  });
+  if (!limited.ok) return rateLimitResponse(limited);
+
   try {
     const search = new FoodSearch(
       localSearch(supabase as unknown as FoodsClient),

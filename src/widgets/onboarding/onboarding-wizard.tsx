@@ -9,13 +9,19 @@ import { completeOnboardingAction } from "@/shared/board/actions";
 import type { ModuleDefinition } from "@/shared/database/types";
 import type { AnimationMode, UnitsSystem } from "@/shared/database/types";
 import { detectBrowserTimeZone } from "@/shared/utils/local-date";
+import { AppLink } from "@/shared/ui/app-link";
+import { ROUTES } from "@/shared/config/constants";
+import { trackProductEvent } from "@/shared/observability/analytics";
 
 const STEPS = [
+  "Welcome",
   "Display name",
   "Timezone",
   "Units",
   "Modules",
+  "Optional targets",
   "Motion",
+  "Privacy",
   "Finish",
 ] as const;
 
@@ -64,7 +70,9 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
       });
       if (result && !result.ok) {
         setError(result.error);
+        return;
       }
+      trackProductEvent("onboarding_completed", { modules: enabled.size });
     });
   }
 
@@ -72,11 +80,20 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
     <BoardBackdrop motionPreference="reduced">
       <div className="mx-auto max-w-2xl space-y-4 py-6">
         <RetroWindow title="Onboarding" accent="lime">
-          <p className="mb-3 text-sm text-[var(--mt-ink-muted)]">
+          <p className="mb-3 text-sm text-[var(--mt-ink-muted)]" aria-live="polite">
             Step {step + 1} of {STEPS.length}: {STEPS[step]}
           </p>
           <PaperCard>
             {step === 0 ? (
+              <div className="space-y-2 text-sm">
+                <p className="font-bold">Welcome to MTFBWU</p>
+                <p>
+                  Personal body-and-training tracker — not a journal, feed, or medical
+                  device. You choose which modules to enable.
+                </p>
+              </div>
+            ) : null}
+            {step === 1 ? (
               <div className="space-y-2">
                 <label className="font-bold" htmlFor="ob-name">
                   Display name
@@ -89,7 +106,7 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
                 />
               </div>
             ) : null}
-            {step === 1 ? (
+            {step === 2 ? (
               <div className="space-y-2">
                 <label className="font-bold" htmlFor="ob-tz">
                   Timezone
@@ -101,11 +118,12 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
                   onChange={(e) => setTimezone(e.target.value)}
                 />
                 <p className="text-xs text-[var(--mt-ink-muted)]">
-                  Used for local daily dates (no UTC day slip).
+                  Used for local daily dates. Changing timezone later does not rewrite
+                  historical local dates.
                 </p>
               </div>
             ) : null}
-            {step === 2 ? (
+            {step === 3 ? (
               <fieldset className="space-y-2">
                 <legend className="font-bold">Units</legend>
                 {(["metric", "imperial"] as const).map((u) => (
@@ -121,11 +139,11 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
                 ))}
               </fieldset>
             ) : null}
-            {step === 3 ? (
+            {step === 4 ? (
               <div className="space-y-3">
                 <p className="text-sm">
-                  Core recommendations preselected: {recommended.join(", ")}. Smoking-free
-                  is not required.
+                  Recommendations preselected: {recommended.join(", ")}. Smoking-free
+                  stays optional/off by default.
                 </p>
                 <ul className="space-y-2">
                   {modules.map((m) => (
@@ -149,7 +167,16 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
                 </ul>
               </div>
             ) : null}
-            {step === 4 ? (
+            {step === 5 ? (
+              <div className="space-y-2 text-sm">
+                <p className="font-bold">Optional targets</p>
+                <p>
+                  Targets are optional. You can set hydration or tracker targets later in
+                  Customize. Progress photos and supplements are never required.
+                </p>
+              </div>
+            ) : null}
+            {step === 6 ? (
               <fieldset className="space-y-2">
                 <legend className="font-bold">Motion mode</legend>
                 {(["full", "reduced", "off"] as const).map((mode) => (
@@ -165,17 +192,23 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
                 ))}
               </fieldset>
             ) : null}
-            {step === 5 ? (
+            {step === 7 ? (
+              <div className="space-y-2 text-sm">
+                <p className="font-bold">Privacy summary</p>
+                <p>
+                  Your records stay private to your account. Read the draft{" "}
+                  <AppLink href={ROUTES.privacy}>privacy policy</AppLink> (legal review
+                  still required before public launch).
+                </p>
+              </div>
+            ) : null}
+            {step === 8 ? (
               <div className="space-y-2 text-sm">
                 <p>
                   <strong>{displayName || "Athlete"}</strong> · {timezone} · {unitsSystem}{" "}
                   · motion {animationMode}
                 </p>
                 <p>Enabled modules: {[...enabled].join(", ") || "(none)"}</p>
-                <p className="text-[var(--mt-ink-muted)]">
-                  No medical details collected. Domain logging arrives in later
-                  increments.
-                </p>
               </div>
             ) : null}
 
@@ -196,7 +229,7 @@ export function OnboardingWizard({ modules, initialDisplayName }: Props) {
               {step < STEPS.length - 1 ? (
                 <PixelButton
                   tone="primary"
-                  disabled={pending || (step === 0 && !displayName.trim())}
+                  disabled={pending || (step === 1 && !displayName.trim())}
                   onClick={() => setStep((s) => s + 1)}
                 >
                   Continue

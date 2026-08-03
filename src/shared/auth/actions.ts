@@ -10,6 +10,10 @@ import {
 } from "@/shared/validation/increment3";
 import { ROUTES } from "@/shared/config/constants";
 import type { AuthActionResult } from "@/shared/auth/action-result";
+import { isPrivateBetaSignupAllowed } from "@/shared/config/feature-flags";
+import { safeInternalPath } from "@/shared/security/safe-redirect";
+import { checkRateLimit } from "@/shared/security/rate-limit";
+import { authRateLimitKey } from "@/shared/security/rate-limit-key";
 
 function mapAuthError(message: string): string {
   const lower = message.toLowerCase();
@@ -33,12 +37,20 @@ export async function signInAction(
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
+  const limited = await checkRateLimit({
+    key: authRateLimitKey("signin", parsed.data.email),
+    limit: 20,
+    windowMs: 60_000,
+    onProviderFailure: "fail_closed",
+  });
+  if (!limited.ok) return { ok: false, error: "Too many attempts. Try again shortly." };
+
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { ok: false, error: mapAuthError(error.message) };
 
-  const next = String(formData.get("next") || ROUTES.today);
-  redirect(next.startsWith("/") ? next : ROUTES.today);
+  const next = safeInternalPath(String(formData.get("next") || ROUTES.today));
+  redirect(next);
 }
 
 export async function signUpAction(
@@ -54,6 +66,21 @@ export async function signUpAction(
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
+
+  if (!isPrivateBetaSignupAllowed(parsed.data.email)) {
+    return {
+      ok: false,
+      error: "Signup is closed for private beta. Contact support if you were invited.",
+    };
+  }
+
+  const limited = await checkRateLimit({
+    key: authRateLimitKey("signup", parsed.data.email),
+    limit: 10,
+    windowMs: 60_000,
+    onProviderFailure: "fail_closed",
+  });
+  if (!limited.ok) return { ok: false, error: "Too many attempts. Try again shortly." };
 
   const supabase = await createSupabaseServerClient();
   const origin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

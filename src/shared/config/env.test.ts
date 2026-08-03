@@ -5,6 +5,7 @@ const valid = {
   NEXT_PUBLIC_APP_URL: "http://localhost:3000",
   NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon-key",
+  NEXT_PUBLIC_APP_ENV: "local",
   SUPABASE_SERVICE_ROLE_KEY: "service-role",
   USDA_FDC_API_KEY: "usda-key",
   OPEN_FOOD_FACTS_USER_AGENT: "MTFBWU/0.1.0 (test@example.com)",
@@ -14,6 +15,8 @@ describe("environment validation", () => {
   it("accepts valid public env", () => {
     const env = getPublicEnv(valid);
     expect(env.NEXT_PUBLIC_SUPABASE_URL).toContain("supabase.co");
+    expect(env.NEXT_PUBLIC_APP_ENV).toBe("local");
+    expect(env.NEXT_PUBLIC_RELEASE_VERSION).toBe("0.1.0-beta.1");
   });
 
   it("rejects missing public keys", () => {
@@ -31,6 +34,7 @@ describe("environment validation", () => {
     if (parsed.success) {
       expect(parsed.data.USDA_FDC_API_KEY).toBe("usda-key");
       expect(parsed.data.SUPABASE_SERVICE_ROLE_KEY).toBe("service-role");
+      expect(parsed.data.RATE_LIMIT_BACKEND).toBe("memory");
     }
   });
 

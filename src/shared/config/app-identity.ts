@@ -15,17 +15,24 @@ export const APP_IDENTITY = {
   repository: "https://github.com/project-mtfbwu/mtfbwu-exercise",
   homepage: "https://github.com/project-mtfbwu/mtfbwu-exercise#readme",
   bugs: "https://github.com/project-mtfbwu/mtfbwu-exercise/issues",
-  supportUrl: "https://github.com/project-mtfbwu/mtfbwu-exercise/issues",
-  privacyUrl: "/settings#privacy",
-  version: "0.1.0",
+  supportUrl: "/support",
+  privacyUrl: "/privacy",
+  termsUrl: "/terms",
+  aboutUrl: "/about",
+  version: "0.1.0-beta.1",
 } as const;
 
 /** Prefer CI-injected SHA; fall back for local builds. */
 export function resolveBuildIdentifier(): string {
   return (
+    process.env.NEXT_PUBLIC_BUILD_SHA ||
     process.env.NEXT_PUBLIC_GIT_COMMIT_SHA ||
     process.env.VERCEL_GIT_COMMIT_SHA ||
     process.env.GITHUB_SHA ||
     "local-dev"
   );
+}
+
+export function resolveReleaseVersion(): string {
+  return process.env.NEXT_PUBLIC_RELEASE_VERSION || APP_IDENTITY.version;
 }

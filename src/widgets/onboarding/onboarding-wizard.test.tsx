@@ -28,6 +28,7 @@ describe("OnboardingWizard", () => {
     await user.click(screen.getByRole("button", { name: /Continue/i }));
     await user.click(screen.getByRole("button", { name: /Continue/i }));
     await user.click(screen.getByRole("button", { name: /Continue/i }));
+    await user.click(screen.getByRole("button", { name: /Continue/i }));
 
     expect(screen.getByLabelText(/Nutrition/i)).toBeChecked();
     expect(screen.getByLabelText(/Swimming/i)).not.toBeChecked();

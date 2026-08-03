@@ -43,6 +43,9 @@ playwright/.cache/
 test-results/
 blob-report/
 .nyc_output/
+e2e/.auth/
+tmp/
+tmp/backups/
 
 # Debug / logs
 npm-debug.log*

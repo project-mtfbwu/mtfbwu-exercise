@@ -44,6 +44,9 @@ export function createTestBoardSnapshot(
     animation_mode: "off",
     onboarding_completed: true,
     onboarding_step: 6,
+    onboarding_version: 1,
+    analytics_consent: false,
+    deletion_requested_at: null,
     created_at: now,
     updated_at: now,
   };

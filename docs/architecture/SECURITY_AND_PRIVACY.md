@@ -80,7 +80,21 @@ Open Food Facts:
 
 - Collect only fields needed for tracking.
 - No social graph.
-- Support export/delete account in a later increment (GDPR-ready design).
+- Increment 10: account JSON export + owner-initiated deletion (domain purge RPC +
+  service-role auth/storage cleanup). See `docs/development/ACCOUNT_EXPORT.md`
+  and `ACCOUNT_DELETION.md` / ADR 0015.
+
+## Production readiness (Increment 10)
+
+- Env fail-closed in production via `assertProductionEnv` + `src/instrumentation.ts`.
+- Security headers: CSP (incl. `camera=(self)`, `worker-src`), COOP/CORP — `SECURITY_HEADERS.md`.
+- Rate limits: memory/none/Upstash; auth/account fail-closed — `RATE_LIMITING.md`.
+- Structured logging with redaction; error-monitoring adapter is no-op until DSN configured.
+- Analytics consent defaults **off** (`profiles.analytics_consent`).
+- Health `/api/health` and readiness `/api/readiness` (no secrets; rate-limit status only).
+- Private-beta allowlist via `PRIVATE_BETA_MODE` + allowlist env — `PRIVATE_BETA.md`.
+- Account export signed-link private-file manifest; deletion storage orchestrator stages persisted.
+- Legal pages (`/privacy`, `/terms`, `/support`, `/about`) are product drafts pending counsel review.
 
 ## Barcode camera
 

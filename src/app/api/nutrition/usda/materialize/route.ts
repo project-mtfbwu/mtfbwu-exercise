@@ -24,6 +24,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { checkRateLimit, rateLimitResponse } =
+    await import("@/shared/security/rate-limit");
+  const limited = await checkRateLimit({
+    key: `nutrition-usda:${user.id}`,
+    limit: 20,
+    windowMs: 60_000,
+    onProviderFailure: "fail_closed",
+  });
+  if (!limited.ok) return rateLimitResponse(limited);
+
   let body: unknown;
   try {
     body = await request.json();

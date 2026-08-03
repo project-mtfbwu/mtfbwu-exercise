@@ -35,6 +35,11 @@ export async function updateSession(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   if (!url || !anonKey) {
+    // Fail closed in production / production APP_ENV — do not allow unprotected shell.
+    const appEnv = process.env.NEXT_PUBLIC_APP_ENV ?? "local";
+    if (process.env.NODE_ENV === "production" || appEnv === "production") {
+      return new NextResponse("Service misconfigured", { status: 503 });
+    }
     // Local/dev without env: allow shell routes so docs/CI static checks still work.
     return response;
   }

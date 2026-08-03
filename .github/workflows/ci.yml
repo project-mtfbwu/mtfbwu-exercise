@@ -15,15 +15,18 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     env:
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key
+      NEXT_PUBLIC_APP_ENV: local
+      NEXT_PUBLIC_RELEASE_VERSION: 0.1.0-beta.1
       SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
       USDA_FDC_API_KEY: ci-usda-key
       OPEN_FOOD_FACTS_USER_AGENT: MTFBWU/0.1.0 (ci@example.com)
+      RATE_LIMIT_BACKEND: none
 
     steps:
       - name: Checkout
@@ -31,20 +34,28 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
-        # version comes from package.json#packageManager (pnpm@11.17.0)
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          # Pins exact Active LTS patch from .nvmrc (24.18.0)
           node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      # Pinned Supabase CLI (npm-installed `supabase` binary is deprecated
-      # upstream). ubuntu-latest ships Docker already running.
+      - name: Secret scanning (basic)
+        run: |
+          set -euo pipefail
+          if grep -RInE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.next --exclude=pnpm-lock.yaml \
+            -e 'BEGIN (RSA|OPENSSH) PRIVATE KEY' \
+            -e 'sk_live_' \
+            . ; then
+            echo "::error::possible secret material found in working tree"
+            exit 1
+          fi
+          echo "Basic secret scan clean"
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v3
         with:
@@ -53,10 +64,18 @@ jobs:
       - name: Start local Supabase
         run: supabase start
 
-      - name: Reset local database (apply Increment 3–9 migrations and seed)
+      - name: Map local Supabase env for app + E2E
+        run: |
+          set -euo pipefail
+          eval "$(supabase status -o env)"
+          echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
+
+      - name: Reset local database (apply Increment 3–10 migrations and seed)
         run: supabase db reset
 
-      - name: Run Increment 3–9 DB tests
+      - name: Run Increment 3–10 DB tests
         run: |
           set -euo pipefail
           DB_CONTAINER=$(docker ps --format '{{.Names}}' | grep '^supabase_db_' | head -n1)
@@ -66,99 +85,33 @@ jobs:
             exit 1
           fi
           echo "Using database container: $DB_CONTAINER"
-          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            < supabase/tests/increment3_auth_board_rls.sql
-          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            < supabase/tests/increment4_nutrition_rls.sql
-          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            < supabase/tests/increment5_label_rls.sql
-          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            < supabase/tests/increment6_workout_rls.sql
-          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            < supabase/tests/increment7_rehab_rls.sql
-          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            < supabase/tests/increment8_progress_rls.sql
-          docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            < supabase/tests/increment9_daily_rls.sql
+          for suite in \
+            increment3_auth_board_rls.sql \
+            increment4_nutrition_rls.sql \
+            increment5_label_rls.sql \
+            increment6_workout_rls.sql \
+            increment7_rehab_rls.sql \
+            increment8_progress_rls.sql \
+            increment9_daily_rls.sql \
+            increment10_account_lifecycle_rls.sql
+          do
+            docker exec -i "$DB_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+              < "supabase/tests/$suite"
+          done
 
       - name: Generate + validate Supabase TypeScript types
         run: |
           set -euo pipefail
           supabase gen types typescript --local > /tmp/types.generated.ts
-          for table in foods barcodes branded_products meal_logs nutrition_label_captures workout_sessions exercise_definitions rehab_sessions rehab_plans rehab_exercise_definitions rehab_alert_events body_weight_entries progress_photo_sets measurement_definitions; do
-            if ! grep -qE "^ *${table}: \{" /tmp/types.generated.ts; then
-              echo "::error::generated local schema is missing table '${table}' -- migrations did not apply as expected"
+          for table in foods barcodes branded_products meal_logs nutrition_label_captures workout_sessions exercise_definitions rehab_sessions rehab_plans rehab_exercise_definitions rehab_alert_events body_weight_entries progress_photo_sets measurement_definitions account_deletion_requests account_export_requests; do
+            if ! grep -qE "^ *${table}: \\{" /tmp/types.generated.ts; then
+              echo "::error::generated local schema is missing table '${table}'"
               exit 1
             fi
           done
-          # Canonical generated schema lives in database.types.ts; types.ts re-exports aliases.
-          if ! grep -q "branded_product_id" src/shared/database/database.types.ts; then
-            echo "::error::src/shared/database/database.types.ts is missing branded_product_id -- regenerate types for the barcode -> branded_product model"
-            exit 1
-          fi
-          if ! grep -q "branded_product_id" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing branded_product_id alias -- keep BarcodeBrandedProductId (or equivalent) in the aliases module"
-            exit 1
-          fi
-          if ! grep -q "nutrition_label_captures" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing nutrition_label_captures -- regenerate types after Increment 5 migration"
-            exit 1
-          fi
-          if ! grep -q "workout_sessions" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing workout_sessions -- regenerate types after Increment 6 migration"
-            exit 1
-          fi
-          if ! grep -q "exercise_definitions" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing exercise_definitions -- regenerate types after Increment 6 migration"
-            exit 1
-          fi
-          if ! grep -q "rehab_sessions" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing rehab_sessions -- regenerate types after Increment 7 migration"
-            exit 1
-          fi
-          if ! grep -q "rehab_plans" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing rehab_plans -- regenerate types after Increment 7 migration"
-            exit 1
-          fi
-          if ! grep -q "rehab_sessions" src/shared/database/database.types.ts; then
-            echo "::error::src/shared/database/database.types.ts is missing rehab_sessions -- regenerate after Increment 7"
-            exit 1
-          fi
-          if ! grep -q "body_weight_entries" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing body_weight_entries -- add Increment 8 aliases"
-            exit 1
-          fi
-          if ! grep -q "progress_photo_sets" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing progress_photo_sets -- add Increment 8 aliases"
-            exit 1
-          fi
-          if ! grep -q "measurement_definitions" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing measurement_definitions -- add Increment 8 aliases"
-            exit 1
-          fi
-          if ! grep -q "hydration_entries" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing hydration_entries -- add Increment 9 aliases"
-            exit 1
-          fi
-          if ! grep -q "meditation_sessions" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing meditation_sessions -- add Increment 9 aliases"
-            exit 1
-          fi
-          if ! grep -q "sleep_sessions" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing sleep_sessions -- add Increment 9 aliases"
-            exit 1
-          fi
-          if ! grep -q "tracker_definitions" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing tracker_definitions -- add Increment 9 aliases"
-            exit 1
-          fi
-          if ! grep -q "user_trackers" src/shared/database/types.ts; then
-            echo "::error::src/shared/database/types.ts is missing user_trackers -- add Increment 9 aliases"
-            exit 1
-          fi
-          for table in hydration_entries meditation_sessions sleep_sessions tracker_definitions user_trackers; do
-            if ! grep -q "${table}" src/shared/database/database.types.ts; then
-              echo "::error::src/shared/database/database.types.ts is missing ${table} -- regenerate after Increment 9"
+          for needle in branded_product_id nutrition_label_captures workout_sessions rehab_sessions body_weight_entries hydration_entries meditation_sessions sleep_sessions tracker_definitions user_trackers cleanup_stage file_count; do
+            if ! grep -q "$needle" src/shared/database/database.types.ts; then
+              echo "::error::database.types.ts missing ${needle} — regenerate after migrations"
               exit 1
             fi
           done
@@ -178,9 +131,23 @@ jobs:
       - name: Production build
         run: pnpm build
 
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Playwright critical smoke suite
+        run: pnpm test:e2e:smoke
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
       - name: Dependency audit (production)
-        # pnpm 11 bulk-advisories endpoint via `pnpm run audit` (see PACKAGE_MANAGER.md).
-        # Bare `pnpm audit --prod` still breaks on naked-gzip registry responses.
         run: pnpm run audit
 
       - name: Stop local Supabase

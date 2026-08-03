@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
@@ -29,6 +29,112 @@ export type Database = {
   };
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          cleanup_detail: Json;
+          cleanup_stage: string | null;
+          completed_at: string | null;
+          confirmation_phrase: string;
+          created_at: string;
+          id: string;
+          last_error: string | null;
+          requested_at: string;
+          scheduled_purge_at: string | null;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          cleanup_detail?: Json;
+          cleanup_stage?: string | null;
+          completed_at?: string | null;
+          confirmation_phrase?: string;
+          created_at?: string;
+          id?: string;
+          last_error?: string | null;
+          requested_at?: string;
+          scheduled_purge_at?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          cleanup_detail?: Json;
+          cleanup_stage?: string | null;
+          completed_at?: string | null;
+          confirmation_phrase?: string;
+          created_at?: string;
+          id?: string;
+          last_error?: string | null;
+          requested_at?: string;
+          scheduled_purge_at?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "account_deletion_requests_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      account_export_requests: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          expires_at: string | null;
+          failed_file_count: number;
+          file_count: number;
+          id: string;
+          last_error: string | null;
+          manifest_summary: Json;
+          status: string;
+          storage_path: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          failed_file_count?: number;
+          file_count?: number;
+          id?: string;
+          last_error?: string | null;
+          manifest_summary?: Json;
+          status?: string;
+          storage_path?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          failed_file_count?: number;
+          file_count?: number;
+          id?: string;
+          last_error?: string | null;
+          manifest_summary?: Json;
+          status?: string;
+          storage_path?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "account_export_requests_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       barcodes: {
         Row: {
           barcode_type: string | null;
@@ -1766,40 +1872,49 @@ export type Database = {
       };
       profiles: {
         Row: {
+          analytics_consent: boolean;
           animation_mode: Database["public"]["Enums"]["animation_mode"];
           avatar_path: string | null;
           created_at: string;
+          deletion_requested_at: string | null;
           display_name: string;
           id: string;
           locale: string;
           onboarding_completed: boolean;
           onboarding_step: number;
+          onboarding_version: number;
           timezone: string;
           units_system: Database["public"]["Enums"]["units_system"];
           updated_at: string;
         };
         Insert: {
+          analytics_consent?: boolean;
           animation_mode?: Database["public"]["Enums"]["animation_mode"];
           avatar_path?: string | null;
           created_at?: string;
+          deletion_requested_at?: string | null;
           display_name?: string;
           id: string;
           locale?: string;
           onboarding_completed?: boolean;
           onboarding_step?: number;
+          onboarding_version?: number;
           timezone?: string;
           units_system?: Database["public"]["Enums"]["units_system"];
           updated_at?: string;
         };
         Update: {
+          analytics_consent?: boolean;
           animation_mode?: Database["public"]["Enums"]["animation_mode"];
           avatar_path?: string | null;
           created_at?: string;
+          deletion_requested_at?: string | null;
           display_name?: string;
           id?: string;
           locale?: string;
           onboarding_completed?: boolean;
           onboarding_step?: number;
+          onboarding_version?: number;
           timezone?: string;
           units_system?: Database["public"]["Enums"]["units_system"];
           updated_at?: string;
@@ -4817,9 +4932,36 @@ export type Database = {
         Args: { p_user_id: string };
         Returns: undefined;
       };
+      execute_account_domain_purge: {
+        Args: { p_user_id: string };
+        Returns: undefined;
+      };
       recalculate_tracker_daily_summary: {
         Args: { p_local_date: string; p_user_tracker_id: string };
         Returns: undefined;
+      };
+      request_account_deletion: {
+        Args: never;
+        Returns: {
+          cleanup_detail: Json;
+          cleanup_stage: string | null;
+          completed_at: string | null;
+          confirmation_phrase: string;
+          created_at: string;
+          id: string;
+          last_error: string | null;
+          requested_at: string;
+          scheduled_purge_at: string | null;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "account_deletion_requests";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
     };
     Enums: {

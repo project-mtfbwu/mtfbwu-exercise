@@ -233,26 +233,47 @@ performed sessions with symptom scales, alerts, board status, offline logging.
 - Wearables, AI meal/workout generation, social
 - Chart libraries (optional inline SVG only)
 
-## Increment 10 — Custom trackers + AI import review
+## Increment 10 — Production readiness
 
-- Configurable trackers polish
+**Status:** Complete (local; uncommitted until user asks).
+
+- [x] Environment separation + Zod validation (`NEXT_PUBLIC_APP_ENV`, build/version)
+- [x] Security headers (camera=(self), worker-src, CSP updates)
+- [x] Rate limiting adapter (memory / none / Upstash REST) + nutrition API limits
+- [x] Health `/api/health` + readiness `/api/readiness`
+- [x] Structured logging + redaction; error-monitoring no-op adapter
+- [x] Analytics consent foundation (off by default)
+- [x] Account export (signed-link private-file manifest) + deletion orchestrator
+- [x] Privacy / terms / support / about pages (legal review required)
+- [x] Onboarding expansion + `onboarding_version`
+- [x] Private-beta allowlist hooks + feature flags
+- [x] Launch / backup / rollback / a11y / perf docs
+- [x] Playwright Chromium smoke (+ extended suite optional)
+- [x] Local backup/restore drill scripts + EXPLAIN review
+- [ ] Physical device / Safari / screen-reader QA (documented pending)
+- [ ] Hosted staging/production deploy approval (docs only until secrets configured)
+
+### Explicitly out of scope for Increment 10
+
+- Paid billing, team accounts, public community
+- AI coaching / AI import review UI (deferred)
+- Wearables, Windows Authenticode packaging
+- Live reminder push/email delivery
+
+## Increment 11 — Product polish + AI import
+
 - AI proposal review UI + provenance
-
-## Increment 11 — Hardening
-
-- Conflict UX, export/delete, performance, security pass
-- Drop-set and richer protocols if not already done
-- Animation polish within mode constraints
+- Conflict UX polish, animation polish
+- Additional protocol richness if needed
 
 ---
 
 ## Open questions blocking crisp later increments
 
-1. Preferred Supabase hosted vs local CLI for auth/RLS (Increment 3)?
-2. First-ship protocol set: supersets only, or drop sets too?
+1. Preferred monitoring provider (Sentry vs self-hosted) for production DSN?
+2. Private-beta allowlist vs invite codes for first cohort?
 3. App license for MTFBWU itself (proprietary vs permissive OSS)?
-4. Any must-have rehab fields from a clinician workflow?
 
-Resolved earlier: design references are in `docs/design-references/`; package manager is pnpm 11; Node is 24 Active LTS.
+Resolved earlier: design references are in `docs/design-references/`; package manager is pnpm 11; Node is 24 Active LTS; Increment 10 is production readiness (AI import deferred).
 
 Update this list as decisions land.

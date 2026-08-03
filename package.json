@@ -1,6 +1,6 @@
 {
   "name": "mtfbwu-exercise",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.1",
   "private": true,
   "description": "MTFBWU — personal body-and-training tracker by Anjay Nilmek (Parvat and Shifu Learning Studio LLP). Not medical advice.",
   "author": {
@@ -38,7 +38,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "audit": "node ./scripts/run-prod-audit.mjs"
+    "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test --project=smoke",
+    "test:e2e:extended": "playwright test --project=smoke --project=extended",
+    "audit": "node ./scripts/run-prod-audit.mjs",
+    "backup:local": "node ./scripts/backup-local.mjs",
+    "restore:local": "node ./scripts/restore-local.mjs",
+    "verify:restore": "node ./scripts/verify-restore.mjs",
+    "seed:recovery-drill": "node ./scripts/seed-recovery-drill.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -63,17 +70,22 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.55.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/jest-axe": "3.5.9",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/coverage-v8": "^3.2.4",
+    "axe-core": "4.10.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "jest-axe": "9.0.0",
     "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",

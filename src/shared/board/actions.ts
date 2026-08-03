@@ -37,8 +37,9 @@ export async function completeOnboardingAction(input: unknown): Promise<Mutation
       units_system: parsed.data.unitsSystem,
       animation_mode: parsed.data.animationMode,
       onboarding_completed: true,
-      onboarding_step: 6,
-    })
+      onboarding_step: 8,
+      onboarding_version: 1,
+    } as never)
     .eq("id", user.id);
 
   if (profileError) return { ok: false, error: profileError.message };

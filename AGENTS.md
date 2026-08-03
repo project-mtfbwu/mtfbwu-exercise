@@ -30,18 +30,19 @@ Guidance for coding agents working in this repository.
 
 ## Current phase
 
-**Increment 9 — Daily trackers** is implemented locally (uncommitted until you ask).
+**Increment 10 — Production readiness** is implemented locally (uncommitted until you ask).
 
-Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 10
-(AI import review) without authorization.
+Follow `docs/architecture/BUILD_INCREMENTS.md`. Do **not** start Increment 11
+(product polish / AI import review) without authorization.
 
-Increment 9 master doc: `docs/development/INCREMENT_9_DAILY_SYSTEM.md`.
+Increment 10 master doc: `docs/development/INCREMENT_10_PRODUCTION_READINESS.md`.
 
-### Still deferred (Increment 10+)
+### Still deferred (Increment 11+)
 
 - AI meal-photo estimation / natural-language food logging / AI workout or rehab generation
 - Reminder push/email delivery (preferences persist; delivery later)
 - Wearables, pose detection, social/trainer features, clinician portal
+- Paid billing / Windows packaging
 
 ## Source of truth (read these first)
 

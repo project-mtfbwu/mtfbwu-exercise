@@ -20,6 +20,16 @@ export async function GET(_request: Request, { params }: RouteContext) {
   if (error || !user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { checkRateLimit, rateLimitResponse } =
+    await import("@/shared/security/rate-limit");
+  const limited = await checkRateLimit({
+    key: `nutrition-barcode:${user.id}`,
+    limit: 30,
+    windowMs: 60_000,
+    onProviderFailure: "fail_open",
+  });
+  if (!limited.ok) return rateLimitResponse(limited);
+
   try {
     const cache = new SupabaseProductCache();
     const cached = await cache.getByBarcode(code);

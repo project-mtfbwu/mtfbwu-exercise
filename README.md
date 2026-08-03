@@ -7,15 +7,15 @@ This software does **not** provide medical diagnosis or treatment advice.
 
 ## Current increment
 
-**Increment 9 — Daily trackers** (implemented locally; uncommitted until user requests commit)
+**Increment 10 — Production readiness** (implemented locally; uncommitted until user requests commit)
 
-- Hydration, meditation, sleep, supplements, configurable custom trackers
-- Calendar month indicators + `/history` day list; `loadDailyOverview` aggregation
-- Dexie v9 offline drafts + `kind: "tracker"` outbox replay
-- RLS test `increment9_daily_rls.sql`; ADRs 0013–0014
-- Master doc: `docs/development/INCREMENT_9_DAILY_SYSTEM.md`
+- Env validation, security headers, rate limits, health/readiness
+- Account export/deletion, privacy/terms/support/about, onboarding completion
+- Observability redaction + analytics consent (off by default)
+- Launch docs: `docs/development/LAUNCH_CHECKLIST.md`
+- Master doc: `docs/development/INCREMENT_10_PRODUCTION_READINESS.md`
 
-Increment 8 (progress tracking) is complete locally. Still deferred: Increment 10 (AI import review), reminder delivery, wearables.
+Still deferred: Increment 11 (AI import review), reminder delivery, wearables, billing.
 
 Planning sequence: `docs/architecture/BUILD_INCREMENTS.md`.
 
