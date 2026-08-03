@@ -16,3 +16,15 @@ Artifacts under `tmp/backups/` are gitignored. Never commit dumps.
 ## Hosted Supabase (operator)
 
 Local drill does **not** replace hosted PITR / project restore. Configure backups on staging and production before private beta.
+
+### Staging
+
+- Project: `mtfbwu-staging` (`oliwxuhmlqefarazilss`)
+- Record plan backup frequency, retention, and PITR availability in `STAGING_RECOVERY_DRILL.md`
+- Prefer restore into an **isolated** target; do not overwrite active staging unless explicitly safe
+- Hosted recovery success must not be claimed until the drill is actually executed
+
+### Production (later)
+
+- Separate project and backup policy
+- Same isolation rules; never restore production into staging or vice versa without a written procedure

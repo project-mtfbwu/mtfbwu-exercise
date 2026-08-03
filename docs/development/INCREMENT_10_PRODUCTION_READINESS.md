@@ -48,7 +48,7 @@ Approach **B**: signed-link manifest (`privateFiles` in export JSON). ZIP packag
 | Target       | Status                                                                                                                                                                            |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Local QA     | Ready when automated gates pass                                                                                                                                                   |
-| Staging      | Engineering-ready once hosted project + env values supplied                                                                                                                       |
+| Staging      | Hosted project `mtfbwu-staging` created; remaining migrations + app host + Upstash + env still required (`STAGING_SETUP.md`)                                                      |
 | Private beta | **Not ready** until staging deploy, manual browser/device smoke, founder/legal skim of legal pages, hosted backup policy, shared rate limiting configured, support contact active |
 | Public MVP   | **Blocked** until counsel review, physical-device matrix, hosted recovery drill, monitoring choice, production secrets/domain/auth redirects, launch checklist approval           |
 
