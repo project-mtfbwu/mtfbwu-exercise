@@ -91,4 +91,6 @@ Release: `0.1.0-beta.1`
 
 ## Outcome this prep
 
-Hosted smoke **not executed** — staging app hostname and full migrations / Upstash / env still operator-blocked.
+Hosted smoke **not executed** — staging app hostname / Upstash / env / allowlist still operator-blocked.
+
+Database side (2026-08-04): Inc 3–10 + security-definer + privilege-hardening migrations are applied on `mtfbwu-staging`; hosted SQL/RLS suites pass. That does **not** mean smoke passed.

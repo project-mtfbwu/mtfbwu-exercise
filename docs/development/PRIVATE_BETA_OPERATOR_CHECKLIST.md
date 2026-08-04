@@ -5,7 +5,8 @@ Goal: controlled tester access on staging. Not public MVP.
 ## Engineering prerequisites
 
 - [x] Increments 0–10 closed; CI green on checkpoint `d1c9104…`
-- [ ] Hosted staging Supabase migrations Inc 3–10 complete
+- [x] Hosted staging Supabase migrations Inc 3–10 complete (`oliwxuhmlqefarazilss`)
+- [x] Privilege hardening `20260804120000` applied; hosted Inc 3–10 + privilege SQL/RLS pass
 - [ ] Staging app deployed on non-prod hostname
 - [ ] Env checklist complete (`STAGING_ENV_CHECKLIST.md`)
 - [ ] `PRIVATE_BETA_MODE=true`
@@ -49,11 +50,11 @@ Do **not** build an admin dashboard for allowlist management in this phase.
 
 ## Go / no-go
 
-| Question               | Answer this prep                                           |
-| ---------------------- | ---------------------------------------------------------- |
-| Staging healthy?       | **No** — migrations incomplete; app host / Upstash pending |
-| Private beta ready?    | **No**                                                     |
-| Public signup enabled? | **No** (must stay off)                                     |
+| Question               | Answer this prep                                                               |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| Staging healthy?       | **No** — DB healthy, but no app host / Auth URLs / Upstash / allowlist / smoke |
+| Private beta ready?    | **No** — blocked                                                               |
+| Public signup enabled? | **No** (must stay off)                                                         |
 
 ## Related
 

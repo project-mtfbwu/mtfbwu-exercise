@@ -55,7 +55,12 @@ Defaults are on for barcode/OCR/camera/export/deletion. Override only intentiona
 | Fail-fast env validation on boot                   | [ ]   |
 | `/api/readiness` reports rate-limit without tokens | [ ]   |
 
-## Still required from operator (secrets)
+## Database note (2026-08-04)
+
+Hosted staging schema privileges hardened via `20260804120000_staging_privilege_hardening.sql`.
+Database SQL/RLS verification is green. Env vars below remain **unset on any app host** until Vercel staging exists.
+
+## Still required from operator (secrets / host)
 
 1. Staging service-role key (dashboard)
 2. Staging Upstash URL + token
@@ -63,3 +68,4 @@ Defaults are on for barcode/OCR/camera/export/deletion. Override only intentiona
 4. USDA key for staging
 5. Final staging hostname + TLS cert on host
 6. Optional monitoring DSN after approval
+7. Install all checklist vars on the Preview/staging host (none installed yet)

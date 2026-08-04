@@ -2,36 +2,37 @@
 
 ## Headers / transport (hosted)
 
-| Check                     | Result | Notes                           |
-| ------------------------- | ------ | ------------------------------- |
-| CSP                       |        | App middleware / headers module |
-| HSTS                      |        | Host + app headers              |
-| Frame restrictions        |        |                                 |
-| Referrer policy           |        |                                 |
-| Camera Permissions-Policy |        | self only                       |
-| HTTPS only                |        |                                 |
+| Check                     | Result  | Notes                           |
+| ------------------------- | ------- | ------------------------------- |
+| CSP                       | Pending | App middleware / headers module |
+| HSTS                      | Pending | Host + app headers              |
+| Frame restrictions        | Pending |                                 |
+| Referrer policy           | Pending |                                 |
+| Camera Permissions-Policy | Pending | self only                       |
+| HTTPS only                | Pending | Needs live staging URL          |
 
 ## Data isolation
 
-| Check                                 | Result | Notes                   |
-| ------------------------------------- | ------ | ----------------------- |
-| No public storage buckets             |        | After Inc5/8 migrations |
-| Cross-user RLS                        |        | Two-user smoke          |
-| Signed URL expiry                     |        |                         |
-| Service-role isolation                |        | Server-only             |
-| Account export isolation              |        |                         |
-| Deletion isolation                    |        | Disposable user         |
-| Safe auth redirects                   |        |                         |
-| Private response caching              |        |                         |
-| Rate-limit behavior                   |        | Upstash                 |
-| No secrets in source maps / responses |        |                         |
-| Staging disallow public indexing      |        | Prefer `noindex`        |
+| Check                                 | Result                                               | Notes                                            |
+| ------------------------------------- | ---------------------------------------------------- | ------------------------------------------------ |
+| No public storage buckets             | Pass (schema)                                        | `progress-photos`, `nutrition-labels` private    |
+| Cross-user RLS                        | Pass (hosted SQL suites Inc3–10 after privilege fix) | App two-user smoke still pending                 |
+| Catalog / append-only privileges      | Pass                                                 | `20260804120000` privilege hardening             |
+| Signed URL expiry                     | Pending                                              | Needs app + users                                |
+| Service-role isolation                | Pass (RPC grants)                                    | `execute_account_domain_purge` service_role only |
+| Account export isolation              | Pending                                              | Hosted smoke                                     |
+| Deletion isolation                    | Pending                                              | Disposable user smoke                            |
+| Safe auth redirects                   | Pending                                              | Needs Site URL                                   |
+| Private response caching              | Pending                                              | Hosted app                                       |
+| Rate-limit behavior                   | Pending                                              | Upstash                                          |
+| No secrets in source maps / responses | Pending                                              | Hosted deploy                                    |
+| Staging disallow public indexing      | Pending                                              | Prefer `noindex`                                 |
 
 ## Dependency / secret scan
 
 | Check                          | Result                  |
 | ------------------------------ | ----------------------- |
-| `pnpm run audit` on checkpoint | Pass (local 2026-08-03) |
+| `pnpm run audit` on checkpoint | Pass (local 2026-08-04) |
 | CI secret scan on `main`       | Green at checkpoint     |
 | Hosted deploy secret scan      | Pending                 |
 
@@ -49,18 +50,31 @@ If a provider is chosen later:
 
 Until then: **monitoring = operator blocker** (no-op adapter remains).
 
-## Supabase advisors (staging project, Inc3 only)
+## Supabase advisors (staging project)
 
-Recorded 2026-08-03 via hosted security advisors (before full migration push):
+### Resolved
 
-| Finding                                           | Severity | Notes                                                                                        |
-| ------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------- |
-| `set_updated_at` mutable search_path              | WARN     | Prefer `SET search_path` on function in a future forward migration (do not edit applied SQL) |
-| `ensure_user_board_defaults` executable by `anon` | WARN     | Revoke `EXECUTE` from `PUBLIC`/`anon` in a forward hardening migration when authorized       |
-| `handle_new_user` executable via RPC roles        | WARN     | Trigger function; revoke broad `EXECUTE` if exposed via PostgREST                            |
+| Finding                                                      | Resolved by                                         |
+| ------------------------------------------------------------ | --------------------------------------------------- |
+| `set_updated_at` mutable search_path                         | `20260803120000_staging_security_definer_hardening` |
+| `ensure_user_board_defaults` executable by `anon`            | `20260803120000`                                    |
+| `handle_new_user` broad EXECUTE                              | `20260803120000`                                    |
+| `sync_personal_record_status` mutable search_path            | `20260804120000_staging_privilege_hardening`        |
+| anon/authenticated EXECUTE on `execute_account_domain_purge` | `20260804120000`                                    |
+| anon EXECUTE on `request_account_deletion`                   | `20260804120000`                                    |
 
-These are **not** silently “fixed” in this staging prep (no migration rewrites; no Inc11). Track as P2 follow-ups after `db push` completes.
+### Remaining — expected and justified
 
-## Status this prep
+| Finding                                              | Object                       | Justification                                                                   |
+| ---------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------- |
+| `authenticated_security_definer_function_executable` | `archive_rehab_plan`         | Intentional app RPC for owner rehab plan archive                                |
+| `authenticated_security_definer_function_executable` | `ensure_user_board_defaults` | Intentional onboarding / board initialization RPC                               |
+| `authenticated_security_definer_function_executable` | `request_account_deletion`   | Intentional authenticated deletion-request RPC; purge remains service_role-only |
 
-Hosted app security verification **not executed** (no staging app URL). Code-level headers and local RLS covered by local gates + Inc 3–10 SQL suites. Advisor warnings above recorded for operator triage.
+No additional forward migration required for these intentional grants.
+
+## Status
+
+- **Staging database:** healthy (22 migrations; hosted Inc3–10 + privilege suites pass; advisors classified).
+- **Staging overall:** **not healthy** until app hostname, Auth Site URL/redirects, Upstash, env/allowlist, and hosted smoke (including export/deletion) complete.
+- Hosted app security headers / smoke **not executed** (no staging app URL).
